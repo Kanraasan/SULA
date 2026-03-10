@@ -1,2 +1,0 @@
-# SULA
-Team Capstone Project
