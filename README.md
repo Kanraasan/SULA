@@ -1,34 +1,50 @@
 # Project Capstone Fullstack Vite + Express
 
-Projek ini memakai **Vite** untuk frontend dan **Express.js** untuk backend.
+projek ini pake **Vite** buat frontend dan **Express.js** buat backend. 
 
 ## Teknologi Utama
 - **Frontend**: Vite, React 19, Tailwind CSS v4, TypeScript.
 - **Backend**: Express.js, TypeScript, ts-node-dev.
 
 ## Struktur
-- `frontend/`: Aplikasi React yang dibuat dengan Vite dan Tailwind CSS v4.
-- `backend/`: Server Express.js menggunakan TypeScript.
+- `frontend/`: aplikasi react yang dibuat pake vite dan tailwind css v4.
+- `backend/`: server express.js pake typescript.
 
-## Memulai Proyek
+## Cara Mulai
 
-### 1. Jalankan Backend
+### 1. Atur Variabel Lingkungan (.env)
+sebelum jalanin, pastiin kamu udah buat file `.env` di folder masing-masing ya. kamu bisa contek dari file `.env.example` yang udah ada.
+
+**di folder `frontend/`:**
+buat file `.env.development` (buat lokal) atau `.env.production` (kalo mau deploy).
+```bash
+VITE_API_URL=/api
+```
+
+**di folder `backend/`:**
+buat file `.env`.
+```bash
+PORT=5000
+FRONTEND_URL=http://localhost:5173
+```
+
+### 2. Jalankan Backend
 ```bash
 cd backend
 npm install
 npm run dev
 ```
-Backend berjalan di `http://localhost:5000`.
+backend bakal jalan di `http://localhost:5000`.
 
-### 2. Jalankan Frontend
+### 3. Jalankan Frontend
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Frontend berjalan di `http://localhost:5173`. 
+frontend bakal jalan di `http://localhost:5173`. 
 
-> **Catatan**: Vite dikonfigurasi dengan proxy untuk meneruskan permintaan dari `/api` ke `http://localhost:5000`.
+> **catatan**: vite udah dikonfigurasi pake proxy, jadi semua request ke `/api` bakal otomatis dilempar ke `http://localhost:5000` biar gak kena masalah CORS pas lagi development.
 
 ## API Endpoints
-- `GET /api/hello`: Mengembalikan pesan salam dari backend.
+- `GET /api/hello`: balikin pesan salam dari backend.
