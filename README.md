@@ -1,10 +1,14 @@
-# Project Capstone Fullstack Next.js + Express
+# Project Capstone Fullstack Vite + Express
 
-Projek ini untuk frontend menggunakan Next.js dan backend menggunakan Express.js.
+Projek ini memakai **Vite** untuk frontend dan **Express.js** untuk backend.
+
+## Teknologi Utama
+- **Frontend**: Vite, React 19, Tailwind CSS v4, TypeScript.
+- **Backend**: Express.js, TypeScript, ts-node-dev.
 
 ## Struktur
-- `frontend/`: Aplikasi Next.js (App Router, Tailwind CSS, TypeScript)
-- `backend/`: Server Express.js (TypeScript, ts-node-dev)
+- `frontend/`: Aplikasi React yang dibuat dengan Vite dan Tailwind CSS v4.
+- `backend/`: Server Express.js menggunakan TypeScript.
 
 ## Memulai Proyek
 
@@ -14,7 +18,7 @@ cd backend
 npm install
 npm run dev
 ```
-Backend jalan di `http://localhost:5000`.
+Backend berjalan di `http://localhost:5000`.
 
 ### 2. Jalankan Frontend
 ```bash
@@ -22,7 +26,9 @@ cd frontend
 npm install
 npm run dev
 ```
-frontend jalan di `http://localhost:3000`.
+Frontend berjalan di `http://localhost:5173`. 
+
+> **Catatan**: Vite dikonfigurasi dengan proxy untuk meneruskan permintaan dari `/api` ke `http://localhost:5000`.
 
 ## API Endpoints
-- `GET http://localhost:5000/api/hello`: Mengembalikan pesan salam.
+- `GET /api/hello`: Mengembalikan pesan salam dari backend.
