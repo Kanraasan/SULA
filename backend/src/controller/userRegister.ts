@@ -15,8 +15,8 @@ export const createUser = (req: any, res: any) => {
     password,
     passwordConfirm,
     alamatLengkap,
-    kecamatan = 'untitled',
-    kelurahan = 'untitled',
+    kecamatan,
+    kelurahan,
   } = req.body;
 
   if (!username || !password || !passwordConfirm) {

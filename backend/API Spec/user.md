@@ -75,11 +75,46 @@ Response Body (Failed):
 
 ```json
 {
-  "errors": "please enter the right password/username"
+  "error": "please enter the right password/username"
 }
 ```
 
-## Get User
+## CRUD POST
+
+Aku gak tau ini bakalan jalan atau engga..
+
+Request Body:
+
+```json
+{
+  "judul": "Jalan Rusak Di Slamet Riyadi",
+  "kategori": "Jalan Rusak",
+  "deskripsi": "Tolong segera dibetulkan",
+  "lampiranFoto": "nih"
+}
+```
+
+Response Body (Success):
+
+```json
+{
+  "message": "Laporan berhasil dibuat",
+  "data": {
+    "judul": "Jalan Rusak Di Slamet Riyadi",
+    "kategori": "Jalan Rusak",
+    "deskripsi": "Tolong segera dibetulkan",
+    "lampiranFoto": "nih"
+  }
+}
+```
+
+Response Body (Failed):
+
+```json
+{
+  "message": "Mohon lengkapi form"
+}
+```
 
 ## Update User
 
