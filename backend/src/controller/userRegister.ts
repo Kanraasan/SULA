@@ -9,6 +9,16 @@ export const createUser = (req: any, res: any) => {
     });
   }
 
+  interface RegisterUser {
+    NIK: number;
+    username: string;
+    password: string;
+    passwordConfirm: string;
+    alamatLengkap: string;
+    kecamatan: any;
+    kelurahan: any;
+  }
+
   const {
     NIK = 'untitled',
     username,
@@ -17,7 +27,7 @@ export const createUser = (req: any, res: any) => {
     alamatLengkap,
     kecamatan,
     kelurahan,
-  } = req.body;
+  } = req.body as RegisterUser;
 
   if (!username || !password || !passwordConfirm) {
     return res.status(400).json({

@@ -81,16 +81,17 @@ Response Body (Failed):
 
 ## CRUD POST
 
-Aku gak tau ini bakalan jalan atau engga..
+Aku make lib multer buat bikin API POST ini, jadi kalo mau jalanin jangan lupa npm install multer dulu yaa...
+buat ngetest, pastiin udah ada folder 'uploads' di directory development kaliann
 
 Request Body:
 
 ```json
 {
-  "judul": "Jalan Rusak Di Slamet Riyadi",
-  "kategori": "Jalan Rusak",
-  "deskripsi": "Tolong segera dibetulkan",
-  "lampiranFoto": "nih"
+  "judul": "\"Jalan Rusak Di Slamet Riyadi\"",
+  "kategori": "\"Jalan Rusak\"",
+  "deskripsi": "\"Tolong segera dibetulkan\"",
+  "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
 }
 ```
 
@@ -103,7 +104,7 @@ Response Body (Success):
     "judul": "Jalan Rusak Di Slamet Riyadi",
     "kategori": "Jalan Rusak",
     "deskripsi": "Tolong segera dibetulkan",
-    "lampiranFoto": "nih"
+    "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
   }
 }
 ```

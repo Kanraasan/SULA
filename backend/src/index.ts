@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './routes';
+import multer from 'multer';
 
 // muat variabel dari file .env
 dotenv.config();
@@ -10,7 +11,6 @@ const app = express();
 const port = process.env.PORT || 5000;
 // ambil url frontend buat izin cors, default-nya localhost vite
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-
 // atur izin akses (cors) biar frontend bisa konek
 app.use(
   cors({
