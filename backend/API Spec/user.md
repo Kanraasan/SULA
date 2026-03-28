@@ -82,9 +82,9 @@ Response Body (Failed):
 ## CRUD POST
 
 Aku make lib multer buat bikin API POST ini, jadi kalo mau jalanin jangan lupa npm install multer dulu yaa...
-buat ngetest, pastiin udah ada folder 'uploads' di directory development kaliann
+buat ngetest, pastiin udah ada folder 'uploads' di directory development.
 
-Request Body:
+Request Body (POST):
 
 ```json
 {
@@ -101,9 +101,10 @@ Response Body (Success):
 {
   "message": "Laporan berhasil dibuat",
   "data": {
-    "judul": "Jalan Rusak Di Slamet Riyadi",
-    "kategori": "Jalan Rusak",
-    "deskripsi": "Tolong segera dibetulkan",
+    "id": "hufbdidvz4xq0vI6",
+    "judul": "\"Jalan Rusak Di Slamet Riyadi\"",
+    "kategori": "\"Jalan Rusak\"",
+    "deskripsi": "\"Tolong segera dibetulkan\"",
     "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
   }
 }
@@ -115,6 +116,55 @@ Response Body (Failed):
 {
   "message": "Mohon lengkapi form"
 }
+```
+
+Response Body (GET)
+
+```json
+{
+  "message": "Postingan ditemukan",
+  "data": {
+    "posts": {
+      "id": "hufbdidvz4xq0vI6",
+      "judul": "\"Jalan Rusak Di Slamet Riyadi\"",
+      "kategori": "\"Jalan Rusak\"",
+      "deskripsi": "\"Tolong segera dibetulkan\"",
+      "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
+    }
+  }
+}
+
+//url = http://localhost:5000/api/post/hufbdidvz4xq0vI6
+```
+
+Request Body (PUT)
+
+```json
+{
+  "judul": "\"Jalan Rusak Di Slamet Riyadi\"",
+  "kategori": "\"Jalan Rusak\"",
+  "deskripsi": "\"Sudah dibenarkan\"",
+  "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
+}
+//url = http://localhost:5000/api/post/hufbdidvz4xq0vI6
+```
+
+Response Body (PUT)
+
+```json
+{ "message": "Laporan berhasil diperbaharui" }
+```
+
+Request Body (DELETE)
+
+```json
+{
+  "judul": "\"Jalan Rusak Di Slamet Riyadi\"",
+  "kategori": "\"Jalan Rusak\"",
+  "deskripsi": "\"Sudah dibenarkan\"",
+  "lampiranFoto": "b516ddd1f33a82ec42440a9808ba5757"
+}
+//url = http://localhost:5000/api/post/hufbdidvz4xq0vI6
 ```
 
 ## Update User
