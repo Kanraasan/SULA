@@ -8,6 +8,7 @@ import { Plus } from "lucide-react"
 import { RightFilterMenu } from "@/components/right-filter-menu"
 import { ReportTable, dataLaporan } from "@/components/report-table"
 import { type DateRange } from "react-day-picker"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function LaporanPage() {
   // 1. Definisikan semua State
@@ -64,6 +65,9 @@ export default function LaporanPage() {
           <SidebarTrigger className="-ml-1" />
           <Separator orientation="vertical" className="mr-2 h-4" />
           <h2 className="font-bold">Laporan</h2>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
 
         <div className="p-6">

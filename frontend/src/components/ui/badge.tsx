@@ -19,6 +19,14 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
+        menunggu:
+          "bg-red-100 text-red-800 border-red-200 dark:bg-red-500/10 dark:text-red-500 dark:border-red-500/20",
+        diproses:
+          "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-500/10 dark:text-yellow-500 dark:border-yellow-500/20",
+        selesai:
+          "bg-green-100 text-green-800 border-green-200 dark:bg-green-500/10 dark:text-green-500 dark:border-green-500/20",
+        ditolak:
+          "bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-500/10 dark:text-slate-500 dark:border-slate-500/20",
       },
     },
     defaultVariants: {

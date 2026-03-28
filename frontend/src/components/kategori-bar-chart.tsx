@@ -15,7 +15,7 @@ const chartData = [
 const chartConfig = {
   jumlah: {
     label: "Jumlah Laporan",
-    color: "hsl(var(--primary))", // Warna biru SULA
+    color: "oklch(0.488 0.243 264.376)", // Biru SULA
   },
 } satisfies ChartConfig
 
@@ -40,17 +40,17 @@ export function KategoriBarChart() {
       <CardContent className="flex-1 pb-4">
         <ChartContainer config={chartConfig} className="h-[250px] w-full">
           <BarChart accessibilityLayer data={chartData} margin={{ top: 20 }}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.3} />
+            <CartesianGrid vertical={false} strokeDasharray="4 4" className="stroke-slate-300 dark:stroke-slate-700" />
             <XAxis
               dataKey="kategori"
               tickLine={false}
               tickMargin={10}
               axisLine={false}
-              className="text-xs font-medium"
+              tick={{ fill: "var(--foreground)", fillOpacity: 0.65, fontSize: 11, fontWeight: 500 }}
             />
-            <ChartTooltip cursor={{ fill: 'rgba(0,0,0,0.05)' }} content={<ChartTooltipContent hideLabel />} />
+            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
             <Bar dataKey="jumlah" fill="var(--color-jumlah)" radius={[6, 6, 0, 0]} barSize={40}>
-              <LabelList dataKey="jumlah" position="top" className="fill-primary font-bold text-sm" offset={10} />
+              <LabelList dataKey="jumlah" position="top" className="fill-foreground font-bold text-sm" offset={10} />
             </Bar>
           </BarChart>
         </ChartContainer>

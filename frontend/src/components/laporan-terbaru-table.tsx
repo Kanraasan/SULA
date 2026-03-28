@@ -36,12 +36,14 @@ export function LaporanTerbaruTable() {
                 <TableCell className="px-6 py-5 text-muted-foreground">{row.ket}</TableCell>
                 <TableCell className="px-6 py-5">
                   <Badge 
-                    variant="secondary" 
-                    className={`font-semibold text-[10px] tracking-wider ${
+                    variant={
                       row.status === "SELESAI" 
-                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20" 
-                        : "bg-amber-100 text-amber-700 dark:bg-amber-500/20"
-                    }`}
+                        ? "selesai" 
+                        : row.status === "DIPROSES" 
+                          ? "diproses" 
+                          : "menunggu"
+                    }
+                    className="font-semibold text-[10px] tracking-wider uppercase"
                   >
                     {row.status}
                   </Badge>

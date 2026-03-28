@@ -6,12 +6,9 @@ import {
   type MapViewport,
 } from "@/components/ui/map"
 import { Separator } from "@/components/ui/separator"
-import {
-  SidebarInset,
-  SidebarProvider,
-  SidebarTrigger,
-} from "@/components/ui/sidebar"
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { useState, useEffect, useRef } from "react"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 const styles = {
   // default: undefined,
@@ -49,6 +46,9 @@ export default function PetaWilayahPage() {
             className="mr-2 data-[orientation=vertical]:h-4"
           />
           <h2 className="font-bold">Peta Wilayah</h2>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
         <div className="flex flex-col p-4">
           <div className="relative h-100 w-full">

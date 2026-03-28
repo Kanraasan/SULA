@@ -48,22 +48,22 @@ const chartData = [
   // ... Lanjutkan sisa tanggal di sini ...
 ]
 
-// Konfigurasi warna untuk 3 status keluhan
+// Konfigurasi warna untuk 3 status keluhan menggunakan nuansa biru SULA
 const chartConfig = {
   keluhan: {
     label: "Total Keluhan",
   },
   baru: {
     label: "Laporan Baru",
-    color: "hsl(var(--chart-1))", // Biasanya merah/orange di Shadcn
+    color: "oklch(0.7 0.15 264.376)", // Biru Muda
   },
   diproses: {
     label: "Sedang Diproses",
-    color: "hsl(var(--chart-2))", // Biasanya kuning/biru
+    color: "oklch(0.55 0.2 264.376)", // Biru Menengah
   },
   selesai: {
     label: "Selesai",
-    color: "hsl(var(--chart-3))", // Biasanya hijau
+    color: "oklch(0.488 0.243 264.376)", // Biru SULA (Primary)
   },
 } satisfies ChartConfig
 
@@ -148,7 +148,7 @@ export function ChartAreaInteractive() {
                 <stop offset="95%" stopColor="var(--color-selesai)" stopOpacity={0.1} />
               </linearGradient>
             </defs>
-            <CartesianGrid vertical={false} />
+            <CartesianGrid vertical={false} strokeDasharray="4 4" className="stroke-slate-300 dark:stroke-slate-700" />
             <XAxis
               dataKey="date"
               tickLine={false}

@@ -7,6 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default function DashboardPage() {
   return (
@@ -20,6 +21,9 @@ export default function DashboardPage() {
             className="mr-2 data-[orientation=vertical]:h-4"
           />
           <h2 className="font-bold">Dashboard</h2>
+          <div className="ml-auto">
+            <ThemeToggle />
+          </div>
         </header>
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">

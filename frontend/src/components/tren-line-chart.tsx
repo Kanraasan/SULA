@@ -1,4 +1,4 @@
-import { Line, LineChart, CartesianGrid, XAxis, YAxis } from "recharts"
+import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
   type ChartConfig,
@@ -19,7 +19,7 @@ const lineData = [
 const chartConfig = {
   total: {
     label: "Laporan",
-    color: "hsl(var(--primary))",
+    color: "oklch(0.488 0.243 264.376)", // Biru SULA
   },
 } satisfies ChartConfig
 
@@ -38,32 +38,45 @@ export function TrenLineChart() {
       </CardHeader>
       <CardContent className="flex-1 pb-4">
         <ChartContainer config={chartConfig} className="h-[250px] w-full">
-          <LineChart accessibilityLayer data={lineData} margin={{ left: 12, right: 12 }}>
-            <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.3} />
+          <AreaChart accessibilityLayer data={lineData} margin={{ left: 12, right: 12, top: 20 }}>
+            <defs>
+              <linearGradient id="fadeTotal" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="var(--color-total)" stopOpacity={0.3} />
+                <stop offset="95%" stopColor="var(--color-total)" stopOpacity={0} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid 
+              vertical={false} 
+              strokeDasharray="4 4" 
+              strokeWidth={1.5}
+              className="stroke-slate-300 dark:stroke-slate-700" 
+            />
             <XAxis
               dataKey="bulan"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              className="text-xs font-medium text-muted-foreground"
+              tick={{ fill: "var(--foreground)", fillOpacity: 0.65, fontSize: 11, fontWeight: 500 }}
             />
             <YAxis hide domain={[0, "dataMax + 50"]} />
             <ChartTooltip content={<ChartTooltipContent indicator="dot" />} cursor={false} />
-            <Line
+            <Area
               dataKey="total"
-              type="stepAfter"
-              stroke="hsl(var(--primary))"
+              type="monotone"
+              stroke="var(--color-total)"
               strokeWidth={4}
-              isAnimationActive={false}
+              fill="url(#fadeTotal)"
               dot={{
-                fill: "hsl(var(--background))",
-                stroke: "hsl(var(--primary))",
+                fill: "#ffffff",
+                fillOpacity: 1,
+                stroke: "var(--color-total)",
                 strokeWidth: 3,
+                strokeOpacity: 1,
                 r: 5,
               }}
-              activeDot={{ r: 7 }}
+              activeDot={{ r: 7, fillOpacity: 1 }}
             />
-          </LineChart>
+          </AreaChart>
         </ChartContainer>
       </CardContent>
     </Card>

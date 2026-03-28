@@ -22,12 +22,12 @@ export function StatisticCardsFigma() {
       </Card>
 
       {/* Kartu 2: Selesai */}
-      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm">
+      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm text-foreground bg-card">
         <div className="flex items-start justify-between">
-          <div className="rounded-xl bg-emerald-100 p-2.5 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400">
+          <div className="rounded-xl bg-green-100 p-2.5 text-green-600 dark:bg-green-900/30 dark:text-green-400">
             <CheckCircle2 className="size-5" />
           </div>
-          <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400">
+          <Badge variant="selesai" className="text-[10px]">
             +8.4%
           </Badge>
         </div>
@@ -38,12 +38,12 @@ export function StatisticCardsFigma() {
       </Card>
 
       {/* Kartu 3: Diproses */}
-      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm">
+      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm text-foreground bg-card">
         <div className="flex items-start justify-between">
-          <div className="rounded-xl bg-amber-100 p-2.5 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
+          <div className="rounded-xl bg-yellow-100 p-2.5 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400">
             <ClipboardList className="size-5" />
           </div>
-          <Badge variant="secondary" className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-500/20 dark:text-red-400">
+          <Badge variant="diproses" className="text-[10px]">
             -5.1%
           </Badge>
         </div>
@@ -54,12 +54,12 @@ export function StatisticCardsFigma() {
       </Card>
 
       {/* Kartu 4: Menunggu */}
-      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm">
+      <Card className="p-5 flex flex-col justify-between rounded-2xl border-none shadow-sm text-foreground bg-card">
         <div className="flex items-start justify-between">
           <div className="rounded-xl bg-red-100 p-2.5 text-red-600 dark:bg-red-900/30 dark:text-red-400">
             <AlertCircle className="size-5" />
           </div>
-          <Badge variant="secondary" className="bg-red-100 text-red-700 hover:bg-red-100 dark:bg-red-500/20 dark:text-red-400">
+          <Badge variant="menunggu" className="text-[10px]">
             -2.3%
           </Badge>
         </div>
