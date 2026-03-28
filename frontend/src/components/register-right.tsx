@@ -106,14 +106,14 @@ export function RegisterRight({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const [selectedKecamatan, setSelectedKecamatan] = useState<string | null>(
+  const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan | null>(
     null
   )
-  const [selectedKelurahan, setSelectedKelurahan] = useState<string | null>("")
+  const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(null)
 
   const filteredKelurahan = useMemo(() => {
     if (!selectedKecamatan) return []
-    return kelurahan.filter((item) => item.kecamatan === selectedKecamatan)
+    return kelurahan.filter((item) => item.kecamatan === selectedKecamatan.name)
   }, [selectedKecamatan])
 
   return (
@@ -126,7 +126,7 @@ export function RegisterRight({
             itemToStringValue={(kecamatan: Kecamatan) => kecamatan.name}
             onValueChange={(val) => {
               setSelectedKecamatan(val)
-              setSelectedKelurahan("")
+              setSelectedKelurahan(null)
             }}
           >
             <ComboboxInput placeholder="Pilih kecamatan anda" />
@@ -134,7 +134,7 @@ export function RegisterRight({
               <ComboboxEmpty>Pilih Kecamatan Anda</ComboboxEmpty>
               <ComboboxList>
                 {(kecamatan) => (
-                  <ComboboxItem key={kecamatan.id} value={kecamatan.name}>
+                  <ComboboxItem key={kecamatan.id} value={kecamatan}>
                     {kecamatan.name}
                   </ComboboxItem>
                 )}
@@ -157,14 +157,14 @@ export function RegisterRight({
                   ? "Pilih kelurahan anda"
                   : "Pilih kecamatan dulu"
               }
-              value={selectedKelurahan}
+              value={selectedKelurahan?.name ?? ""}
               disabled={!selectedKecamatan}
             />
             <ComboboxContent>
               <ComboboxEmpty>Pilih Kelurahan Anda</ComboboxEmpty>
               <ComboboxList>
                 {(kelurahan) => (
-                  <ComboboxItem key={kelurahan.id} value={kelurahan.name}>
+                  <ComboboxItem key={kelurahan.id} value={kelurahan}>
                     {kelurahan.name}
                   </ComboboxItem>
                 )}

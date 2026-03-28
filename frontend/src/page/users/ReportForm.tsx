@@ -19,7 +19,6 @@ import {
   Home, 
   UploadCloud, 
   Send, 
-  X, 
   ChevronDown, 
   Check,
   Zap,
