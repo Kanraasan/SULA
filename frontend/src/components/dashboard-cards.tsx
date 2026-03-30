@@ -47,7 +47,7 @@ export function DashboardCards() {
           </CardTitle>
           <CardAction>
             {/* Tren turun di sini berarti bagus (tanggungan berkurang) */}
-            <Badge variant="outline" className="text-blue-600">
+            <Badge variant="outline" className="text-blue-600 dark:text-blue-500">
               <TrendingDown className="mr-1 size-3" />
               -10%
             </Badge>

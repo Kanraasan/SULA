@@ -10,8 +10,8 @@ export function UserNavbar() {
   const navItems = [
     { label: "Dashboard", path: "/user-dashboard" },
     { label: "Buat Laporan", path: "/report-form" },
-    { label: "Status Laporan", path: "#" },
-    { label: "Leaderboard", path: "#" },
+    { label: "Status Laporan", path: "/status-laporan" },
+    { label: "Leaderboard", path: "/leaderboard" },
   ]
 
   return (
@@ -36,8 +36,8 @@ export function UserNavbar() {
                 className={cn(
                   "text-sm transition-colors",
                   isActive 
-                    ? "font-bold text-primary" 
-                    : "font-medium text-muted-foreground hover:text-primary"
+                    ? "font-bold text-primary dark:text-blue-600" 
+                    : "font-medium text-muted-foreground hover:text-primary dark:hover:text-blue-600"
                 )}
               >
                 {item.label}

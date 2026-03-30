@@ -54,7 +54,7 @@ export function LoginForm({
           </div>
           <a
             href="#"
-            className="ml-auto text-sm text-primary underline-offset-4 hover:underline"
+            className="ml-auto text-sm text-primary dark:text-blue-600 underline-offset-4 hover:underline"
           >
             Lupa sandi?
           </a>
@@ -65,7 +65,7 @@ export function LoginForm({
         <Field>
           <FieldDescription className="text-center">
             Belum punya akun?{" "}
-            <a href="/register" className="text-primary underline-offset-4 hover:underline">
+            <a href="/register" className="text-primary dark:text-blue-600 underline-offset-4 hover:underline">
               Daftar Sekarang
             </a>
           </FieldDescription>

@@ -191,7 +191,7 @@ export function RegisterRight({
             Sudah punya akun?{" "}
             <a
               href="/"
-              className="text-primary underline-offset-4 hover:underline"
+              className="text-primary dark:text-blue-600 underline-offset-4 hover:underline"
             >
               Masuk Sekarang
             </a>
