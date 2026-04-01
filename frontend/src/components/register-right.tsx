@@ -109,7 +109,10 @@ export function RegisterRight({
   const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan | null>(
     null
   )
-  const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(null)
+  
+  const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(
+    null
+  )
 
   const filteredKelurahan = useMemo(() => {
     if (!selectedKecamatan) return []
@@ -129,7 +132,10 @@ export function RegisterRight({
               setSelectedKelurahan(null)
             }}
           >
-            <ComboboxInput placeholder="Pilih kecamatan anda" />
+            <ComboboxInput
+              placeholder="Pilih kecamatan anda"
+              value={selectedKecamatan?.name ?? ""}
+            />
             <ComboboxContent>
               <ComboboxEmpty>Pilih Kecamatan Anda</ComboboxEmpty>
               <ComboboxList>
