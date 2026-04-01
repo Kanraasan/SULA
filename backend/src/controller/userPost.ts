@@ -2,7 +2,7 @@ import post from '../post';
 import { nanoid } from 'nanoid';
 
 export const postContent = (req: any, res: any) => {
-  const { judul, kategori, deskripsi } = req.body;
+  const { judul, kategori, deskripsi, userNIK, username } = req.body;
   const id = nanoid(16);
 
   if (!judul || !kategori || !deskripsi) {
@@ -14,6 +14,9 @@ export const postContent = (req: any, res: any) => {
     kategori: any;
     deskripsi: string;
     lampiranFoto: any;
+    userNIK?: any;
+    username?: string;
+    createdAt: string;
   }
   const newPost = {
     id,
@@ -21,6 +24,9 @@ export const postContent = (req: any, res: any) => {
     kategori,
     deskripsi,
     lampiranFoto: req.file?.filename ?? null,
+    userNIK,
+    username,
+    createdAt: new Date().toISOString(),
   } as laporan;
   post.push(newPost);
 

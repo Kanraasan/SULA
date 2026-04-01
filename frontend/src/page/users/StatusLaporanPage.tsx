@@ -24,7 +24,8 @@ const DUMMY_REPORTS = [
     createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
     author: "Budi S.",
     votes: 24,
-    imageUrl: "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop",
   },
   {
     id: 2,
@@ -35,7 +36,8 @@ const DUMMY_REPORTS = [
     createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
     author: "Siti A.",
     votes: 15,
-    imageUrl: "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=1374&auto=format&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=1374&auto=format&fit=crop",
   },
   {
     id: 3,
@@ -46,11 +48,18 @@ const DUMMY_REPORTS = [
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
     author: "Agus K.",
     votes: 42,
-    imageUrl: "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?q=80&w=1470&auto=format&fit=crop",
+    imageUrl:
+      "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?q=80&w=1470&auto=format&fit=crop",
   },
 ]
 
-const CATEGORIES = ["Infrastruktur", "Kebersihan", "Fasilitas", "Lingkungan", "Penerangan"]
+const CATEGORIES = [
+  "Infrastruktur",
+  "Kebersihan",
+  "Fasilitas",
+  "Lingkungan",
+  "Penerangan",
+]
 
 export default function StatusLaporanPage() {
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
@@ -78,24 +87,25 @@ export default function StatusLaporanPage() {
   }, [filterCategory, sortOrder])
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex flex-col">
+    <div className="flex min-h-screen flex-col bg-background text-foreground">
       <UserNavbar />
 
-      <main className="flex-1 container mx-auto px-4 py-8 md:px-8">
+      <main className="container mx-auto flex-1 px-4 py-8 md:px-8">
         {/* Hero Section */}
-        <section className="relative h-[380px] w-full rounded-3xl overflow-hidden mb-10 group">
-          <div className="absolute inset-0 bg-slate-900/70 transition-colors group-hover:bg-slate-900/60 z-10" />
-          <img 
-            src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop" 
-            className="absolute inset-0 w-full h-full object-cover"
+        <section className="group relative mb-10 h-[380px] w-full overflow-hidden rounded-3xl">
+          <div className="absolute inset-0 z-10 bg-slate-900/70 transition-colors group-hover:bg-slate-900/60" />
+          <img
+            src="https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop"
+            className="absolute inset-0 h-full w-full object-cover"
             alt="Hero background"
           />
-          <div className="relative z-20 h-full flex flex-col items-center justify-center text-center px-4 max-w-3xl mx-auto space-y-6">
-            <h1 className="text-4xl md:text-6xl font-black text-white tracking-tight uppercase leading-tight drop-shadow-lg">
+          <div className="relative z-20 mx-auto flex h-full max-w-3xl flex-col items-center justify-center space-y-6 px-4 text-center">
+            <h1 className="text-4xl leading-tight font-black tracking-tight text-white uppercase drop-shadow-lg md:text-6xl">
               CEK STATUS LAPORAN ANDA
             </h1>
-            <p className="text-lg md:text-xl font-medium text-slate-100 max-w-2xl opacity-90">
-              Anda dapat memantau status laporan yang diunggah oleh anda atau pengguna layanan lainnya secara real-time.
+            <p className="max-w-2xl text-lg font-medium text-slate-100 opacity-90 md:text-xl">
+              Anda dapat memantau status laporan yang diunggah oleh anda atau
+              pengguna layanan lainnya secara real-time.
             </p>
           </div>
         </section>
@@ -103,40 +113,56 @@ export default function StatusLaporanPage() {
         {/* Content Section */}
         <div className="space-y-8">
           {/* Header & Filters */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-4 border-b border-border">
+          <div className="flex flex-col justify-between gap-4 border-b border-border pb-4 md:flex-row md:items-end">
             <div>
-              <h2 className="text-2xl font-bold text-foreground">Laporan Terbaru di Sekitarmu</h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {filterCategory ? `Menampilkan kategori: ${filterCategory}` : "Menampilkan laporan terkini dari seluruh wilayah"}
+              <h2 className="text-2xl font-bold text-foreground">
+                Laporan Terbaru di Sekitarmu
+              </h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {filterCategory
+                  ? `Menampilkan kategori: ${filterCategory}`
+                  : "Menampilkan laporan terkini dari seluruh wilayah"}
               </p>
             </div>
             <div className="flex items-center gap-2">
               {/* Filter Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className={cn(
-                    "h-10 px-4 rounded-xl border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all flex gap-2",
-                    filterCategory && "border-primary text-primary dark:text-blue-600"
-                  )}>
-                    <Filter className="w-4 h-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className={cn(
+                      "flex h-10 gap-2 rounded-xl border-border bg-card px-4 transition-all hover:bg-accent hover:text-accent-foreground",
+                      filterCategory &&
+                        "border-primary text-primary dark:text-blue-600"
+                    )}
+                  >
+                    <Filter className="h-4 w-4" />
                     <span>{filterCategory || "Filter"}</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-xl">
                   <DropdownMenuLabel>Pilih Kategori</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setFilterCategory(null)} className="flex justify-between items-center">
+                  <DropdownMenuItem
+                    onClick={() => setFilterCategory(null)}
+                    className="flex items-center justify-between"
+                  >
                     Semua Kategori
-                    {!filterCategory && <Check className="w-4 h-4 text-primary" />}
+                    {!filterCategory && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
                   </DropdownMenuItem>
                   {CATEGORIES.map((cat) => (
-                    <DropdownMenuItem 
-                      key={cat} 
+                    <DropdownMenuItem
+                      key={cat}
                       onClick={() => setFilterCategory(cat)}
-                      className="flex justify-between items-center"
+                      className="flex items-center justify-between"
                     >
                       {cat}
-                      {filterCategory === cat && <Check className="w-4 h-4 text-primary" />}
+                      {filterCategory === cat && (
+                        <Check className="h-4 w-4 text-primary" />
+                      )}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>
@@ -145,21 +171,35 @@ export default function StatusLaporanPage() {
               {/* Sort Dropdown */}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="sm" className="h-10 px-4 rounded-xl border-border bg-card hover:bg-accent hover:text-accent-foreground transition-all flex gap-2">
-                    <ListFilter className="w-4 h-4" />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex h-10 gap-2 rounded-xl border-border bg-card px-4 transition-all hover:bg-accent hover:text-accent-foreground"
+                  >
+                    <ListFilter className="h-4 w-4" />
                     <span>Urutkan</span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-56 rounded-xl">
                   <DropdownMenuLabel>Urutan Waktu</DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={() => setSortOrder("newest")} className="flex justify-between items-center">
+                  <DropdownMenuItem
+                    onClick={() => setSortOrder("newest")}
+                    className="flex items-center justify-between"
+                  >
                     Paling Baru
-                    {sortOrder === "newest" && <Check className="w-4 h-4 text-primary" />}
+                    {sortOrder === "newest" && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => setSortOrder("oldest")} className="flex justify-between items-center">
+                  <DropdownMenuItem
+                    onClick={() => setSortOrder("oldest")}
+                    className="flex items-center justify-between"
+                  >
                     Paling Lama
-                    {sortOrder === "oldest" && <Check className="w-4 h-4 text-primary" />}
+                    {sortOrder === "oldest" && (
+                      <Check className="h-4 w-4 text-primary" />
+                    )}
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -168,28 +208,32 @@ export default function StatusLaporanPage() {
 
           {/* Grid Reports */}
           {processedReports.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {processedReports.map((report) => (
                 <ReportCard key={report.id} {...report} />
               ))}
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
-              <div className="bg-muted p-6 rounded-full">
-                <Filter className="w-12 h-12 text-muted-foreground opacity-20" />
+            <div className="flex flex-col items-center justify-center space-y-4 py-20 text-center">
+              <div className="rounded-full bg-muted p-6">
+                <Filter className="h-12 w-12 text-muted-foreground opacity-20" />
               </div>
               <h3 className="text-xl font-bold">Tidak ada laporan ditemukan</h3>
-              <p className="text-muted-foreground">Coba ubah filter Anda untuk melihat hasil lain.</p>
-              <Button variant="link" onClick={() => setFilterCategory(null)}>Reset Filter</Button>
+              <p className="text-muted-foreground">
+                Coba ubah filter Anda untuk melihat hasil lain.
+              </p>
+              <Button variant="link" onClick={() => setFilterCategory(null)}>
+                Reset Filter
+              </Button>
             </div>
           )}
 
           {/* Load More */}
           {processedReports.length > 0 && (
             <div className="flex justify-center pt-6">
-              <Button 
-                variant="outline" 
-                className="px-8 h-12 rounded-2xl border-border text-foreground font-semibold hover:bg-accent transition-all shadow-sm"
+              <Button
+                variant="outline"
+                className="h-12 rounded-2xl border-border px-8 font-semibold text-foreground shadow-sm transition-all hover:bg-accent"
               >
                 Muat Lebih Banyak
               </Button>

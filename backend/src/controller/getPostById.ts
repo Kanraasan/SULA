@@ -7,7 +7,7 @@ export const getPostById = (req: any, res: any) => {
   if (posts) {
     return res.json({
       message: 'Postingan ditemukan',
-      data: { posts },
+      data: posts,
     });
   }
 
