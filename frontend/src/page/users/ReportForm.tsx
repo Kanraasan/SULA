@@ -50,7 +50,7 @@ export default function ReportFormPage() {
       <main className="container mx-auto px-4 py-12 md:px-8">
         {/* Breadcrumb - More Minimalist */}
         <nav className="mb-10 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-          <a href="/user-dashboard" className="flex items-center gap-1 hover:text-primary transition-colors">
+          <a href="/user-dashboard" className="flex items-center gap-1 hover:text-primary dark:text-blue-600 transition-colors">
             <Home className="h-3.5 w-3.5" />
             <span>Beranda</span>
           </a>
@@ -61,7 +61,7 @@ export default function ReportFormPage() {
         <div className="mx-auto max-w-2xl">
           <Card className="border-none shadow-2xl shadow-primary/5 bg-card/50 backdrop-blur-sm">
             <CardHeader className="space-y-2 pb-8 text-center">
-              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:text-blue-600">
                 <Send className="h-6 w-6" />
               </div>
               <CardTitle className="text-3xl font-black tracking-tight">Buat Laporan Baru</CardTitle>
@@ -73,7 +73,7 @@ export default function ReportFormPage() {
             <CardContent className="space-y-8 px-8 pb-10">
               {/* Judul Laporan */}
               <div className="group space-y-2">
-                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">
+                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
                   Judul Laporan
                 </Label>
                 <Input 
@@ -85,7 +85,7 @@ export default function ReportFormPage() {
 
               {/* Kategori - Drawer Style */}
               <div className="group space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">
+                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
                   Pilih Kategori
                 </Label>
                 <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -125,7 +125,7 @@ export default function ReportFormPage() {
                         >
                           <div className={cn(
                             "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
-                            selectedCategory === cat.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                            selectedCategory === cat.id ? "bg-primary text-primary dark:text-blue-600-foreground" : "bg-muted text-muted-foreground"
                           )}>
                             <cat.icon className="h-5 w-5" />
                           </div>
@@ -147,7 +147,7 @@ export default function ReportFormPage() {
 
               {/* Deskripsi */}
               <div className="group space-y-2">
-                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary transition-colors">
+                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
                   Deskripsi Detail
                 </Label>
                 <Textarea 
@@ -165,7 +165,7 @@ export default function ReportFormPage() {
                 <div className="relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-muted-foreground/10 bg-muted/10 transition-all hover:border-primary/40 hover:bg-primary/[0.02]">
                   <input type="file" className="absolute inset-0 z-10 cursor-pointer opacity-0" />
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm group-hover:scale-110 transition-transform">
-                    <UploadCloud className="h-6 w-6 text-primary" />
+                    <UploadCloud className="h-6 w-6 text-primary dark:text-blue-600" />
                   </div>
                   <div className="mt-4 text-center">
                     <p className="text-sm font-bold">Klik atau seret foto ke sini</p>

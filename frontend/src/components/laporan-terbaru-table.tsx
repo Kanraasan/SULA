@@ -13,7 +13,7 @@ export function LaporanTerbaruTable() {
     <Card className="rounded-2xl border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-5">
         <CardTitle className="text-lg font-bold">Laporan Terbaru</CardTitle>
-        <Button variant="link" className="text-primary font-semibold px-0">
+        <Button variant="link" className="text-primary dark:text-blue-600 font-semibold px-0">
           Lihat Semua
         </Button>
       </CardHeader>

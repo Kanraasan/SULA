@@ -33,7 +33,7 @@ export default function UserDashboardPage() {
       title: "Cek Status Laporan",
       description: "Lacak perkembangan dan respon atas laporan yang telah Anda buat sebelumnya.",
       icon: ClipboardList,
-      link: "#"
+      link: "/status-laporan"
     },
     {
       title: "Leaderboard",
@@ -49,7 +49,7 @@ export default function UserDashboardPage() {
       title: "Jalan Berlubang di Jl. Mawar",
       description: "Terdapat lubang cukup dalam di pertigaan Jl. Mawar yang membahayakan pengendara motor, terutama...",
       status: "Diproses",
-      statusVariant: "diproses" as const, // Sekarang Kuning
+      statusVariant: "diproses" as const, 
       date: "2 hari yang lalu",
       location: "RT 01",
       reporter: "Pak Agus",
@@ -60,7 +60,7 @@ export default function UserDashboardPage() {
       title: "Sampah Menumpuk di Taman",
       description: "Tempat sampah di taman utama sudah penuh dan berserakan, mohon petugas kebersihan segera...",
       status: "Selesai",
-      statusVariant: "selesai" as const, // Sekarang Hijau
+      statusVariant: "selesai" as const, 
       date: "5 hari yang lalu",
       location: "Fasum Taman",
       reporter: "Ibu Siti",
@@ -71,7 +71,7 @@ export default function UserDashboardPage() {
       title: "Lampu PJU Mati",
       description: "Lampu penerangan jalan umum di gang buntu blok C mati sejak semalam, membuat jalan sangat gelap.",
       status: "Menunggu",
-      statusVariant: "menunggu" as const, // Sekarang Merah
+      statusVariant: "menunggu" as const, 
       date: "Hari ini",
       location: "RT 03",
       reporter: "Budi Warga",
@@ -115,18 +115,18 @@ export default function UserDashboardPage() {
               <Card 
                 key={idx} 
                 onClick={() => navigate(action.link)}
-                className="group cursor-pointer transition-all duration-300 border-border hover:bg-primary hover:border-primary hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
+                className="group cursor-pointer transition-all duration-300 border-border hover:bg-primary dark:hover:bg-blue-600 hover:border-primary dark:hover:border-blue-600 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
               >
                 <CardHeader className="pb-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors duration-300 group-hover:bg-primary-foreground/20 group-hover:text-primary-foreground">
-                    <action.icon className="h-6 w-6" />
+                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 dark:bg-blue-500/10 text-primary dark:text-blue-500 transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                    <action.icon className="h-6 w-6 stroke-[2.5px] transition-colors duration-300 group-hover:stroke-white group-hover:text-white" />
                   </div>
                 </CardHeader>
                 <CardContent className="space-y-2">
-                  <CardTitle className="transition-colors duration-300 group-hover:text-primary-foreground">
+                  <CardTitle className="transition-colors duration-300 group-hover:text-white">
                     {action.title}
                   </CardTitle>
-                  <CardDescription className="transition-colors duration-300 group-hover:text-primary-foreground/90">
+                  <CardDescription className="transition-colors duration-300 group-hover:text-white/90">
                     {action.description}
                   </CardDescription>
                 </CardContent>
@@ -139,14 +139,14 @@ export default function UserDashboardPage() {
         <section className="mb-16">
           <div className="mb-6 flex items-center justify-between">
             <h2 className="text-2xl font-bold tracking-tight">Ringkasan Laporan Lingkungan</h2>
-            <Button variant="link" className="group p-0 text-primary">
+            <Button variant="link" onClick={() => navigate("/status-laporan")} className="group p-0 text-primary dark:text-blue-600 hover:no-underline">
               Lihat Semua
               <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {reports.map((report) => (
-              <Card key={report.id} className="overflow-hidden">
+              <Card key={report.id} className="overflow-hidden border-border bg-card">
                 <div className="aspect-video w-full bg-muted">
                   {report.image ? (
                     <img src={report.image} alt={report.title} className="h-full w-full object-cover" />
@@ -190,10 +190,10 @@ export default function UserDashboardPage() {
           <h2 className="mb-6 text-2xl font-bold tracking-tight">FAQ</h2>
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {faqs.map((faq, idx) => (
-              <Card key={idx}>
+              <Card key={idx} className="border-border bg-card">
                 <CardHeader>
                   <CardTitle className="text-base flex gap-2">
-                    <HelpCircle className="h-5 w-5 text-primary shrink-0" />
+                    <HelpCircle className="h-5 w-5 text-primary dark:text-blue-600 shrink-0" />
                     {faq.question}
                   </CardTitle>
                 </CardHeader>

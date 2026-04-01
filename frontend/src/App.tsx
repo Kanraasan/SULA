@@ -7,6 +7,8 @@ import PetaWilayahPage from "./page/admin/PetaWilayahPage"
 import StatistikPage from "./page/admin/StatistikPage"
 import UserDashboardPage from "./page/users/DashboardPage"
 import ReportFormPage from "./page/users/ReportForm"
+import StatusLaporanPage from "./page/users/StatusLaporanPage"
+import ReportDetailPage from "./page/users/ReportDetailPage"
 
 export function App() {
   return (
@@ -15,6 +17,8 @@ export function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/user-dashboard" element={<UserDashboardPage />} />
       <Route path="/report-form" element={<ReportFormPage />} />
+      <Route path="/status-laporan" element={<StatusLaporanPage />} />
+      <Route path="/report-detail/:id" element={<ReportDetailPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/laporan" element={<LaporanPage />} />
       <Route path="/peta-wilayah" element={<PetaWilayahPage />} />
