@@ -2,7 +2,13 @@ import { useState } from "react"
 import { UserNavbar } from "@/components/users/user-navbar"
 import { UserFooter } from "@/components/users/user-footer"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
@@ -14,43 +20,117 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
-import { 
-  ChevronRight, 
-  Home, 
-  UploadCloud, 
-  Send, 
-  ChevronDown, 
+import {
+  ChevronRight,
+  Home,
+  UploadCloud,
+  Send,
+  ChevronDown,
   Check,
   Zap,
   Lightbulb,
   Trash2,
   Building2,
-  Leaf
+  Leaf,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const categories = [
-  { id: "infrastruktur", label: "Infrastruktur", desc: "Jalan rusak, jembatan, trotoar", icon: Building2 },
-  { id: "penerangan", label: "Penerangan", desc: "Lampu jalan mati, kabel menjuntai", icon: Lightbulb },
-  { id: "kebersihan", label: "Kebersihan", desc: "Sampah menumpuk, saluran air mampet", icon: Trash2 },
-  { id: "fasilitas", label: "Fasilitas Publik", desc: "Halte rusak, taman tidak terawat", icon: Zap },
-  { id: "lingkungan", label: "Lingkungan", desc: "Polusi, penebangan liar, limbah", icon: Leaf },
+  {
+    id: "infrastruktur",
+    label: "Infrastruktur",
+    desc: "Jalan rusak, jembatan, trotoar",
+    icon: Building2,
+  },
+  {
+    id: "penerangan",
+    label: "Penerangan",
+    desc: "Lampu jalan mati, kabel menjuntai",
+    icon: Lightbulb,
+  },
+  {
+    id: "kebersihan",
+    label: "Kebersihan",
+    desc: "Sampah menumpuk, saluran air mampet",
+    icon: Trash2,
+  },
+  {
+    id: "fasilitas",
+    label: "Fasilitas Publik",
+    desc: "Halte rusak, taman tidak terawat",
+    icon: Zap,
+  },
+  {
+    id: "lingkungan",
+    label: "Lingkungan",
+    desc: "Polusi, penebangan liar, limbah",
+    icon: Leaf,
+  },
 ]
 
 export default function ReportFormPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
+  const [judul, setJudul] = useState("")
+  const [deskripsi, setDeskripsi] = useState("")
+  const [file, setFile] = useState<File | null>(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const categoryLabel = categories.find(c => c.id === selectedCategory)?.label
+  const categoryLabel = categories.find((c) => c.id === selectedCategory)?.label
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (!judul || !selectedCategory || !deskripsi) {
+      alert("Mohon lengkapi semua field yang wajib diisi")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    const formData = new FormData()
+    formData.append("judul", judul)
+    formData.append("kategori", selectedCategory)
+    formData.append("deskripsi", deskripsi)
+    if (file) {
+      formData.append("lampiranFoto", file)
+    }
+
+    try {
+      const response = await fetch("/api/post", {
+        method: "POST",
+        body: formData,
+      })
+
+      const result = await response.json()
+
+      if (response.ok) {
+        alert("Laporan berhasil dikirim!")
+        setJudul("")
+        setDeskripsi("")
+        setSelectedCategory(null)
+        setFile(null)
+      } else {
+        alert(result.message || "Gagal mengirim laporan")
+      }
+    } catch (error) {
+      alert("Terjadi kesalahan saat mengirim laporan")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
-    <div className="min-h-screen bg-muted/30 dark:bg-background transition-colors duration-300">
+    <div className="min-h-screen bg-muted/30 transition-colors duration-300 dark:bg-background">
       <UserNavbar />
 
       <main className="container mx-auto px-4 py-12 md:px-8">
-        {/* Breadcrumb - More Minimalist */}
-        <nav className="mb-10 flex items-center gap-2 text-xs font-medium uppercase tracking-wider text-muted-foreground/60">
-          <a href="/user-dashboard" className="flex items-center gap-1 hover:text-primary dark:text-blue-600 transition-colors">
+        {/* Breadcrumb */}
+        <nav className="mb-10 flex items-center gap-2 text-xs font-medium tracking-wider text-muted-foreground/60 uppercase">
+          <a
+            href="/user-dashboard"
+            className="flex items-center gap-1 transition-colors hover:text-primary dark:text-blue-600"
+          >
             <Home className="h-3.5 w-3.5" />
             <span>Beranda</span>
           </a>
@@ -59,135 +139,186 @@ export default function ReportFormPage() {
         </nav>
 
         <div className="mx-auto max-w-2xl">
-          <Card className="border-none shadow-2xl shadow-primary/5 bg-card/50 backdrop-blur-sm">
+          <Card className="border-none bg-card/50 shadow-2xl shadow-primary/5 backdrop-blur-sm">
             <CardHeader className="space-y-2 pb-8 text-center">
               <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 text-primary dark:text-blue-600">
                 <Send className="h-6 w-6" />
               </div>
-              <CardTitle className="text-3xl font-black tracking-tight">Buat Laporan Baru</CardTitle>
-              <CardDescription className="text-base max-w-sm mx-auto">
-                Laporkan kendala fasilitas publik untuk kenyamanan warga Surakarta.
+              <CardTitle className="text-3xl font-black tracking-tight">
+                Buat Laporan Baru
+              </CardTitle>
+              <CardDescription className="mx-auto max-w-sm text-base">
+                Laporkan kendala fasilitas publik untuk kenyamanan warga
+                Surakarta.
               </CardDescription>
             </CardHeader>
-            
+
             <CardContent className="space-y-8 px-8 pb-10">
-              {/* Judul Laporan */}
-              <div className="group space-y-2">
-                <Label htmlFor="title" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
-                  Judul Laporan
-                </Label>
-                <Input 
-                  id="title" 
-                  placeholder="Apa yang ingin Anda laporkan?" 
-                  className="rounded-2xl h-14 border-muted-foreground/10 bg-muted/20 px-5 text-base focus-visible:ring-primary/20 focus-visible:border-primary transition-all shadow-none"
-                />
-              </div>
+              <form onSubmit={handleSubmit} className="space-y-8">
+                {/* Judul Laporan */}
+                <div className="group space-y-2">
+                  <Label
+                    htmlFor="title"
+                    className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600"
+                  >
+                    Judul Laporan
+                  </Label>
+                  <Input
+                    id="title"
+                    value={judul}
+                    onChange={(e) => setJudul(e.target.value)}
+                    placeholder="Apa yang ingin Anda laporkan?"
+                    className="h-14 rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
+                    required
+                  />
+                </div>
 
-              {/* Kategori - Drawer Style */}
-              <div className="group space-y-2">
-                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
-                  Pilih Kategori
-                </Label>
-                <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
-                  <SheetTrigger asChild>
-                    <Button 
-                      variant="outline" 
-                      className={cn(
-                        "w-full h-14 justify-between rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base font-normal hover:bg-muted/30 transition-all shadow-none",
-                        !selectedCategory && "text-muted-foreground"
-                      )}
+                {/* Kategori */}
+                <div className="group space-y-2">
+                  <Label className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600">
+                    Pilih Kategori
+                  </Label>
+                  <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
+                    <SheetTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className={cn(
+                          "h-14 w-full justify-between rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base font-normal shadow-none transition-all hover:bg-muted/30",
+                          !selectedCategory && "text-muted-foreground"
+                        )}
+                      >
+                        {categoryLabel || "Pilih kategori masalah..."}
+                        <ChevronDown className="h-4 w-4 opacity-50" />
+                      </Button>
+                    </SheetTrigger>
+                    <SheetContent
+                      side="bottom"
+                      className="mx-auto rounded-t-[32px] border-none px-6 pb-10 shadow-2xl sm:max-w-xl"
                     >
-                      {categoryLabel || "Pilih kategori masalah..."}
-                      <ChevronDown className="h-4 w-4 opacity-50" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="bottom" className="rounded-t-[32px] px-6 pb-10 sm:max-w-xl mx-auto border-none shadow-2xl">
-                    <SheetHeader className="pb-6">
-                      <SheetTitle className="text-2xl font-bold text-center">Pilih Kategori</SheetTitle>
-                      <SheetDescription className="text-center">
-                        Sesuaikan laporan Anda dengan kategori yang tersedia agar lebih cepat ditangani.
-                      </SheetDescription>
-                    </SheetHeader>
-                    <div className="grid gap-3 py-4">
-                      {categories.map((cat) => (
-                        <button
-                          key={cat.id}
-                          onClick={() => {
-                            setSelectedCategory(cat.id)
-                            setIsSheetOpen(false)
-                          }}
-                          className={cn(
-                            "flex items-center gap-4 w-full p-4 rounded-2xl text-left transition-all border-2 border-transparent",
-                            selectedCategory === cat.id 
-                              ? "bg-primary/5 border-primary shadow-sm" 
-                              : "hover:bg-muted/50 border-muted/20"
-                          )}
-                        >
-                          <div className={cn(
-                            "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
-                            selectedCategory === cat.id ? "bg-primary text-primary dark:text-blue-600-foreground" : "bg-muted text-muted-foreground"
-                          )}>
-                            <cat.icon className="h-5 w-5" />
-                          </div>
-                          <div className="flex-1">
-                            <p className="font-bold text-sm leading-tight">{cat.label}</p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{cat.desc}</p>
-                          </div>
-                          {selectedCategory === cat.id && (
-                            <div className="h-6 w-6 rounded-full bg-primary flex items-center justify-center text-white">
-                              <Check className="h-3.5 w-3.5 stroke-[3px]" />
+                      <SheetHeader className="pb-6">
+                        <SheetTitle className="text-center text-2xl font-bold">
+                          Pilih Kategori
+                        </SheetTitle>
+                        <SheetDescription className="text-center">
+                          Sesuaikan laporan Anda dengan kategori yang tersedia
+                          agar lebih cepat ditangani.
+                        </SheetDescription>
+                      </SheetHeader>
+                      <div className="grid gap-3 py-4">
+                        {categories.map((cat) => (
+                          <button
+                            key={cat.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedCategory(cat.id)
+                              setIsSheetOpen(false)
+                            }}
+                            className={cn(
+                              "flex w-full items-center gap-4 rounded-2xl border-2 border-transparent p-4 text-left transition-all",
+                              selectedCategory === cat.id
+                                ? "border-primary bg-primary/5 shadow-sm"
+                                : "border-muted/20 hover:bg-muted/50"
+                            )}
+                          >
+                            <div
+                              className={cn(
+                                "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
+                                selectedCategory === cat.id
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted text-muted-foreground"
+                              )}
+                            >
+                              <cat.icon className="h-5 w-5" />
                             </div>
-                          )}
-                        </button>
-                      ))}
+                            <div className="flex-1">
+                              <p className="text-sm leading-tight font-bold">
+                                {cat.label}
+                              </p>
+                              <p className="mt-0.5 text-xs text-muted-foreground">
+                                {cat.desc}
+                              </p>
+                            </div>
+                            {selectedCategory === cat.id && (
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-white">
+                                <Check className="h-3.5 w-3.5 stroke-[3px]" />
+                              </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
+                    </SheetContent>
+                  </Sheet>
+                </div>
+
+                {/* Deskripsi */}
+                <div className="group space-y-2">
+                  <Label
+                    htmlFor="description"
+                    className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600"
+                  >
+                    Deskripsi Detail
+                  </Label>
+                  <Textarea
+                    id="description"
+                    value={deskripsi}
+                    onChange={(e) => setDeskripsi(e.target.value)}
+                    placeholder="Jelaskan detail lokasi, kondisi, dan kronologi kejadian..."
+                    className="min-h-[180px] resize-none rounded-2xl border-muted-foreground/10 bg-muted/20 p-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
+                    required
+                  />
+                </div>
+
+                {/* Upload Foto */}
+                <div className="group space-y-3">
+                  <Label className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
+                    Lampiran Foto{" "}
+                    {file && (
+                      <span className="text-primary">({file.name})</span>
+                    )}
+                  </Label>
+                  <div className="relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-muted-foreground/10 bg-muted/10 transition-all hover:border-primary/40 hover:bg-primary/[0.02]">
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      onChange={(e) => setFile(e.target.files?.[0] || null)}
+                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                    />
+                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm transition-transform group-hover:scale-110">
+                      <UploadCloud className="h-6 w-6 text-primary dark:text-blue-600" />
                     </div>
-                  </SheetContent>
-                </Sheet>
-              </div>
-
-              {/* Deskripsi */}
-              <div className="group space-y-2">
-                <Label htmlFor="description" className="text-xs font-bold uppercase tracking-widest text-muted-foreground group-focus-within:text-primary dark:text-blue-600 transition-colors">
-                  Deskripsi Detail
-                </Label>
-                <Textarea 
-                  id="description" 
-                  placeholder="Jelaskan detail lokasi, kondisi, dan kronologi kejadian..." 
-                  className="min-h-[180px] rounded-2xl border-muted-foreground/10 bg-muted/20 p-5 text-base focus-visible:ring-primary/20 focus-visible:border-primary transition-all resize-none shadow-none"
-                />
-              </div>
-
-              {/* Upload Foto - More Polished */}
-              <div className="group space-y-3">
-                <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-                  Lampiran Foto
-                </Label>
-                <div className="relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-muted-foreground/10 bg-muted/10 transition-all hover:border-primary/40 hover:bg-primary/[0.02]">
-                  <input type="file" className="absolute inset-0 z-10 cursor-pointer opacity-0" />
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm group-hover:scale-110 transition-transform">
-                    <UploadCloud className="h-6 w-6 text-primary dark:text-blue-600" />
-                  </div>
-                  <div className="mt-4 text-center">
-                    <p className="text-sm font-bold">Klik atau seret foto ke sini</p>
-                    <p className="mt-1 text-xs text-muted-foreground">PNG, JPG atau WEBP (Maks. 10MB)</p>
+                    <div className="mt-4 text-center">
+                      <p className="text-sm font-bold">
+                        Klik atau seret foto ke sini
+                      </p>
+                      <p className="mt-1 text-xs text-muted-foreground">
+                        PNG, JPG atau WEBP (Maks. 10MB)
+                      </p>
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center gap-4 pt-4">
-                <Button 
-                  variant="ghost" 
-                  className="flex-1 h-14 rounded-2xl text-base font-bold hover:bg-destructive/5 hover:text-destructive transition-colors"
-                  onClick={() => window.history.back()}
-                >
-                  Batal
-                </Button>
-                <Button className="flex-[2] h-14 rounded-2xl text-base font-bold shadow-xl shadow-primary/20 hover:shadow-primary/30 transition-all">
-                  <Send className="mr-2 h-5 w-5" />
-                  Kirim Laporan
-                </Button>
-              </div>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-4 pt-4">
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    className="h-14 flex-1 rounded-2xl text-base font-bold transition-colors hover:bg-destructive/5 hover:text-destructive"
+                    onClick={() => window.history.back()}
+                    disabled={isSubmitting}
+                  >
+                    Batal
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="h-14 flex-[2] rounded-2xl text-base font-bold shadow-xl shadow-primary/20 transition-all hover:shadow-primary/30"
+                    disabled={isSubmitting}
+                  >
+                    <Send className="mr-2 h-5 w-5" />
+                    {isSubmitting ? "Mengirim..." : "Kirim Laporan"}
+                  </Button>
+                </div>
+              </form>
             </CardContent>
           </Card>
         </div>

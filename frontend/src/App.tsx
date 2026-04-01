@@ -9,6 +9,8 @@ import UserDashboardPage from "./page/users/DashboardPage"
 import ReportFormPage from "./page/users/ReportForm"
 import StatusLaporanPage from "./page/users/StatusLaporanPage"
 import ReportDetailPage from "./page/users/ReportDetailPage"
+import MyReportsPage from "./page/users/MyReportsPage"
+import EditReportPage from "./page/users/EditReportPage"
 
 export function App() {
   return (
@@ -17,6 +19,8 @@ export function App() {
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/user-dashboard" element={<UserDashboardPage />} />
       <Route path="/report-form" element={<ReportFormPage />} />
+      <Route path="/my-reports" element={<MyReportsPage />} />
+      <Route path="/edit-report/:id" element={<EditReportPage />} />
       <Route path="/status-laporan" element={<StatusLaporanPage />} />
       <Route path="/report-detail/:id" element={<ReportDetailPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
