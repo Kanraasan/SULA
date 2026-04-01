@@ -12,6 +12,7 @@ const router = express.Router();
 router.post('/regist', createUser);
 router.post('/login', loginUser);
 router.post('/post', uploadFile, postContent);
+router.get('/post', getPost);
 router.get('/post/:id', getPostById);
 router.put('/post/:id', editPost);
 router.delete('/post/:id', deleteNoteById);

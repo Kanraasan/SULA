@@ -1,4 +1,5 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import { useParams, useNavigate } from "react-router-dom"
 import { UserNavbar } from "@/components/users/user-navbar"
 import { UserFooter } from "@/components/users/user-footer"
 import { Button } from "@/components/ui/button"
@@ -68,15 +69,39 @@ const categories = [
   },
 ]
 
-export default function ReportFormPage() {
+export default function EditReportPage() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [judul, setJudul] = useState("")
   const [deskripsi, setDeskripsi] = useState("")
   const [file, setFile] = useState<File | null>(null)
+  const [existingPhoto, setExistingPhoto] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
 
   const categoryLabel = categories.find((c) => c.id === selectedCategory)?.label
+
+  useEffect(() => {
+    // Fetch data laporan berdasarkan ID
+    fetch(`/api/post/${id}`)
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.data) {
+          setJudul(result.data.judul)
+          setDeskripsi(result.data.deskripsi)
+          setSelectedCategory(result.data.kategori)
+          setExistingPhoto(result.data.lampiranFoto)
+        }
+        setIsLoading(false)
+      })
+      .catch(() => {
+        alert("Gagal memuat data laporan")
+        setIsLoading(false)
+      })
+  }, [id])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -88,47 +113,40 @@ export default function ReportFormPage() {
 
     setIsSubmitting(true)
 
-    // Ambil data user dari localStorage
-    const userData = localStorage.getItem("user")
-    const user = userData ? JSON.parse(userData) : null
-
-    console.log("User data:", user)
-
-    const formData = new FormData()
-    formData.append("judul", judul)
-    formData.append("kategori", selectedCategory)
-    formData.append("deskripsi", deskripsi)
-    if (user) {
-      formData.append("userNIK", user.NIK)
-      formData.append("username", user.username)
-      console.log("Sending userNIK:", user.NIK, "username:", user.username)
-    }
-    if (file) {
-      formData.append("lampiranFoto", file)
-    }
-
     try {
-      const response = await fetch("/api/post", {
-        method: "POST",
-        body: formData,
+      const response = await fetch(`/api/post/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          judul,
+          kategori: selectedCategory,
+          deskripsi,
+        }),
       })
 
       const result = await response.json()
 
       if (response.ok) {
-        alert("Laporan berhasil dikirim!")
-        setJudul("")
-        setDeskripsi("")
-        setSelectedCategory(null)
-        setFile(null)
+        alert("Laporan berhasil diperbarui!")
+        navigate("/my-reports")
       } else {
-        alert(result.message || "Gagal mengirim laporan")
+        alert(result.message || "Gagal memperbarui laporan")
       }
     } catch (error) {
-      alert("Terjadi kesalahan saat mengirim laporan")
+      alert("Terjadi kesalahan saat memperbarui laporan")
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center">
+        <p>Memuat data laporan...</p>
+      </div>
+    )
   }
 
   return (
@@ -146,7 +164,14 @@ export default function ReportFormPage() {
             <span>Beranda</span>
           </a>
           <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground/80">Buat Laporan</span>
+          <a
+            href="/my-reports"
+            className="transition-colors hover:text-primary dark:text-blue-600"
+          >
+            Laporan Saya
+          </a>
+          <ChevronRight className="h-3 w-3" />
+          <span className="text-foreground/80">Edit Laporan</span>
         </nav>
 
         <div className="mx-auto max-w-2xl">
@@ -156,11 +181,11 @@ export default function ReportFormPage() {
                 <Send className="h-6 w-6" />
               </div>
               <CardTitle className="text-3xl font-black tracking-tight">
-                Buat Laporan Baru
+                Edit Laporan
               </CardTitle>
               <CardDescription className="mx-auto max-w-sm text-base">
-                Laporkan kendala fasilitas publik untuk kenyamanan warga
-                Surakarta.
+                Ubah informasi laporan Anda. Data yang ditampilkan adalah
+                laporan Anda sebelumnya.
               </CardDescription>
             </CardHeader>
 
@@ -172,7 +197,7 @@ export default function ReportFormPage() {
                     htmlFor="title"
                     className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600"
                   >
-                    Judul Laporan
+                    Judul Laporan (Edit sesuai kebutuhan)
                   </Label>
                   <Input
                     id="title"
@@ -182,12 +207,16 @@ export default function ReportFormPage() {
                     className="h-14 rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Judul saat ini:{" "}
+                    <span className="font-semibold">{judul}</span>
+                  </p>
                 </div>
 
                 {/* Kategori */}
                 <div className="group space-y-2">
                   <Label className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600">
-                    Pilih Kategori
+                    Kategori (Ubah jika perlu)
                   </Label>
                   <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
                     <SheetTrigger asChild>
@@ -268,7 +297,7 @@ export default function ReportFormPage() {
                     htmlFor="description"
                     className="text-xs font-bold tracking-widest text-muted-foreground uppercase transition-colors group-focus-within:text-primary dark:text-blue-600"
                   >
-                    Deskripsi Detail
+                    Deskripsi Detail (Edit sesuai kebutuhan)
                   </Label>
                   <Textarea
                     id="description"
@@ -278,36 +307,29 @@ export default function ReportFormPage() {
                     className="min-h-[180px] resize-none rounded-2xl border-muted-foreground/10 bg-muted/20 p-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required
                   />
+                  <p className="text-xs text-muted-foreground">
+                    Anda dapat menghapus atau menambahkan informasi pada
+                    deskripsi di atas
+                  </p>
                 </div>
 
-                {/* Upload Foto */}
-                <div className="group space-y-3">
-                  <Label className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
-                    Lampiran Foto{" "}
-                    {file && (
-                      <span className="text-primary">({file.name})</span>
-                    )}
-                  </Label>
-                  <div className="relative flex min-h-[160px] cursor-pointer flex-col items-center justify-center rounded-[24px] border-2 border-dashed border-muted-foreground/10 bg-muted/10 transition-all hover:border-primary/40 hover:bg-primary/[0.02]">
-                    <input
-                      type="file"
-                      accept="image/png,image/jpeg,image/jpg,image/webp"
-                      onChange={(e) => setFile(e.target.files?.[0] || null)}
-                      className="absolute inset-0 z-10 cursor-pointer opacity-0"
+                {/* Foto Existing */}
+                {existingPhoto && (
+                  <div className="space-y-2">
+                    <Label className="text-xs font-bold tracking-widest text-muted-foreground uppercase">
+                      Foto Laporan Sebelumnya
+                    </Label>
+                    <img
+                      src={`http://localhost:5000/uploads/${existingPhoto}`}
+                      alt="Foto laporan"
+                      className="h-48 w-full rounded-2xl object-cover"
                     />
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-background shadow-sm transition-transform group-hover:scale-110">
-                      <UploadCloud className="h-6 w-6 text-primary dark:text-blue-600" />
-                    </div>
-                    <div className="mt-4 text-center">
-                      <p className="text-sm font-bold">
-                        Klik atau seret foto ke sini
-                      </p>
-                      <p className="mt-1 text-xs text-muted-foreground">
-                        PNG, JPG atau WEBP (Maks. 10MB)
-                      </p>
-                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Ini adalah foto yang Anda upload sebelumnya. Saat ini foto
+                      tidak dapat diubah.
+                    </p>
                   </div>
-                </div>
+                )}
 
                 {/* Action Buttons */}
                 <div className="flex items-center gap-4 pt-4">
@@ -315,7 +337,7 @@ export default function ReportFormPage() {
                     type="button"
                     variant="ghost"
                     className="h-14 flex-1 rounded-2xl text-base font-bold transition-colors hover:bg-destructive/5 hover:text-destructive"
-                    onClick={() => window.history.back()}
+                    onClick={() => navigate("/my-reports")}
                     disabled={isSubmitting}
                   >
                     Batal
@@ -326,7 +348,7 @@ export default function ReportFormPage() {
                     disabled={isSubmitting}
                   >
                     <Send className="mr-2 h-5 w-5" />
-                    {isSubmitting ? "Mengirim..." : "Kirim Laporan"}
+                    {isSubmitting ? "Memperbarui..." : "Perbarui Laporan"}
                   </Button>
                 </div>
               </form>
