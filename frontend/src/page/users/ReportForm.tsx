@@ -88,21 +88,27 @@ export default function ReportFormPage() {
 
     setIsSubmitting(true)
 
+<<<<<<< HEAD
     // Ambil data user dari localStorage
     const userData = localStorage.getItem("user")
     const user = userData ? JSON.parse(userData) : null
 
     console.log("User data:", user)
 
+=======
+>>>>>>> 68eb482936c9d9337c8ba2d9d0d6fb597b1f7c75
     const formData = new FormData()
     formData.append("judul", judul)
     formData.append("kategori", selectedCategory)
     formData.append("deskripsi", deskripsi)
+<<<<<<< HEAD
     if (user) {
       formData.append("userNIK", user.NIK)
       formData.append("username", user.username)
       console.log("Sending userNIK:", user.NIK, "username:", user.username)
     }
+=======
+>>>>>>> 68eb482936c9d9337c8ba2d9d0d6fb597b1f7c75
     if (file) {
       formData.append("lampiranFoto", file)
     }
