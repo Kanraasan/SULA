@@ -3,23 +3,25 @@ import { KategoriBarChart } from "@/components/kategori-bar-chart"
 import { LaporanTerbaruTable } from "@/components/laporan-terbaru-table"
 import { StatisticCardsFigma } from "@/components/statistic-cards-figma"
 import { TrenLineChart } from "@/components/tren-line-chart"
-import { Separator } from "@/components/ui/separator"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Clock from "@/components/clock-02"
 
 export default function StatistikPage() {
   return (
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-slate-50/50 dark:bg-background">
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator orientation="vertical" className="mr-2 h-4" />
-          <h2 className="font-bold">Statistik</h2>
-          <div className="ml-auto">
-            <ThemeToggle />
-          </div>
-        </header>
+        <header className="flex h-16 shrink-0 items-center justify-between border-b bg-sidebar px-4">
+            <div className="flex items-center gap-2">
+              <SidebarTrigger className="-ml-1" />
+              <h2 className="font-bold">Laporan</h2>
+            </div>
+            <div className="flex items-center gap-4">
+              <Clock />
+              <ThemeToggle />
+            </div>
+          </header>
 
         <div className="flex flex-1 flex-col gap-8 p-6">
           <div>
