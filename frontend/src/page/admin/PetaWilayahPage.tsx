@@ -5,10 +5,14 @@ import {
   type MapRef,
   type MapViewport,
 } from "@/components/ui/map"
-import { Separator } from "@/components/ui/separator"
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "@/components/ui/sidebar"
 import { useState, useEffect, useRef } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
+import Clock from "@/components/clock-02"
 
 const styles = {
   // default: undefined,
@@ -39,14 +43,13 @@ export default function PetaWilayahPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-16 shrink-0 items-center gap-2 border-b bg-sidebar px-4">
-          <SidebarTrigger className="-ml-1" />
-          <Separator
-            orientation="vertical"
-            className="mr-2 data-[orientation=vertical]:h-4"
-          />
-          <h2 className="font-bold">Peta Wilayah</h2>
-          <div className="ml-auto">
+        <header className="flex h-16 shrink-0 items-center justify-between border-b bg-sidebar px-4">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger className="-ml-1" />
+            <h2 className="font-bold">Laporan</h2>
+          </div>
+          <div className="flex items-center gap-4">
+            <Clock />
             <ThemeToggle />
           </div>
         </header>
@@ -63,33 +66,33 @@ export default function PetaWilayahPage() {
               }
               className="rounded-xl"
             >
-            <MapControls
-              position="bottom-right"
-              showZoom
-              showCompass
-              showLocate
-              showFullscreen
-            />
+              <MapControls
+                position="bottom-right"
+                showZoom
+                showCompass
+                showLocate
+                showFullscreen
+              />
             </Map>
             <div className="absolute top-2 left-2 z-10 flex flex-wrap gap-x-3 gap-y-1 rounded border bg-background/80 px-2 py-1.5 font-mono text-xs backdrop-blur">
               <span>
-                <span className="text-muted-foreground">lng:</span>{" "}
+                <span className="text-muted-foreground">bujur:</span>{" "}
                 {viewport.center[0].toFixed(3)}
               </span>
               <span>
-                <span className="text-muted-foreground">lat:</span>{" "}
+                <span className="text-muted-foreground">lintang:</span>{" "}
                 {viewport.center[1].toFixed(3)}
               </span>
               <span>
-                <span className="text-muted-foreground">zoom:</span>{" "}
+                <span className="text-muted-foreground">perbesaran:</span>{" "}
                 {viewport.zoom.toFixed(1)}
               </span>
               <span>
-                <span className="text-muted-foreground">bearing:</span>{" "}
+                <span className="text-muted-foreground">arah:</span>{" "}
                 {viewport.bearing.toFixed(1)}°
               </span>
               <span>
-                <span className="text-muted-foreground">pitch:</span>{" "}
+                <span className="text-muted-foreground">kemiringan:</span>{" "}
                 {viewport.pitch.toFixed(1)}°
               </span>
             </div>
@@ -99,8 +102,10 @@ export default function PetaWilayahPage() {
                 onChange={(e) => setStyle(e.target.value as StyleKey)}
                 className="rounded-md border bg-background px-2 py-1 text-sm text-foreground shadow"
               >
-                <option value="openstreetmap">OpenStreetMap</option>
-                <option value="openstreetmap3d">OpenStreetMap 3D</option>
+                <option value="openstreetmap">
+                  Peta Standar (OpenStreetMap)
+                </option>
+                <option value="openstreetmap3d">Peta 3D (OpenStreetMap)</option>
               </select>
             </div>
           </div>
