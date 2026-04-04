@@ -12,6 +12,15 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
 import {
   Sheet,
   SheetContent,
@@ -21,7 +30,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet"
 import {
-  ChevronRight,
   Home,
   UploadCloud,
   Send,
@@ -32,6 +40,8 @@ import {
   Trash2,
   Building2,
   Leaf,
+  EyeOff,
+  Lock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
@@ -68,6 +78,70 @@ const categories = [
   },
 ]
 
+type ReportType = "anonymous" | "confidential"
+
+interface PrivacyOptionProps {
+  id: ReportType
+  title: string
+  description: string
+  icon: React.ElementType
+  selected: boolean
+  onClick: () => void
+}
+
+function PrivacyOption({
+  title,
+  description,
+  icon: Icon,
+  selected,
+  onClick,
+}: PrivacyOptionProps) {
+  return (
+    <div
+      onClick={onClick}
+      className={cn(
+        "group flex w-full cursor-pointer items-center gap-4 rounded-xl border transition-all",
+        selected
+          ? "border-primary bg-primary/[0.03] shadow-sm"
+          : "border-border bg-background hover:bg-muted/50"
+      )}
+    >
+      <div className="shrink-0 pl-4 pt-0.5">
+        <Checkbox
+          checked={selected}
+          onCheckedChange={onClick}
+          className="size-5 rounded-md border-muted-foreground/30 transition-all data-checked:border-primary data-checked:bg-primary"
+        />
+      </div>
+
+      <div
+        className={cn(
+          "flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-colors",
+          selected
+            ? "bg-primary/10 text-primary"
+            : "bg-muted text-muted-foreground"
+        )}
+      >
+        <Icon className="h-5 w-5" />
+      </div>
+
+      <div className="flex-1 space-y-1 py-4 pr-4">
+        <p
+          className={cn(
+            "text-sm font-bold leading-none transition-colors",
+            selected ? "text-primary" : "text-foreground"
+          )}
+        >
+          {title}
+        </p>
+        <p className="max-w-[400px] text-xs leading-relaxed text-muted-foreground">
+          {description}
+        </p>
+      </div>
+    </div>
+  )
+}
+
 export default function ReportFormPage() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
@@ -75,6 +149,9 @@ export default function ReportFormPage() {
   const [deskripsi, setDeskripsi] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [reportType, setReportType] = useState<ReportType | null>(
+    "confidential"
+  )
 
   const categoryLabel = categories.find((c) => c.id === selectedCategory)?.label
 
@@ -105,6 +182,7 @@ export default function ReportFormPage() {
       formData.append("deskripsi", deskripsi)
       formData.append("userNIK", user.NIK.toString())
       formData.append("username", user.username)
+      formData.append("reportType", reportType || "confidential")
 
       if (file) {
         formData.append("lampiranFoto", file)
@@ -155,23 +233,34 @@ export default function ReportFormPage() {
     }
   }
 
+  const handleToggleReportType = (type: ReportType) => {
+    setReportType((prev) => (prev === type ? null : type))
+  }
+
   return (
     <div className="min-h-screen bg-muted/30 transition-colors duration-300 dark:bg-background">
       <UserNavbar />
 
       <main className="container mx-auto px-4 py-12 md:px-8">
-        {/* Breadcrumb */}
-        <nav className="mb-10 flex items-center gap-2 text-xs font-medium tracking-wider text-muted-foreground/60 uppercase">
-          <a
-            href="/user-dashboard"
-            className="flex items-center gap-1 transition-colors hover:text-primary dark:text-blue-600"
-          >
-            <Home className="h-3.5 w-3.5" />
-            <span>Beranda</span>
-          </a>
-          <ChevronRight className="h-3 w-3" />
-          <span className="text-foreground/80">Buat Laporan</span>
-        </nav>
+        <Breadcrumb className="mb-10">
+          <BreadcrumbList className="text-xs font-medium uppercase tracking-wider">
+            <BreadcrumbItem>
+              <BreadcrumbLink
+                href="/user-dashboard"
+                className="flex items-center gap-1"
+              >
+                <Home className="h-3.5 w-3.5" />
+                Beranda
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbPage className="text-foreground/80">
+                Buat Laporan
+              </BreadcrumbPage>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
 
         <div className="mx-auto max-w-2xl">
           <Card className="border-none bg-card/50 shadow-2xl shadow-primary/5 backdrop-blur-sm">
@@ -267,7 +356,7 @@ export default function ReportFormPage() {
                               <cat.icon className="h-5 w-5" />
                             </div>
                             <div className="flex-1">
-                              <p className="text-sm leading-tight font-bold">
+                              <p className="text-sm font-bold leading-tight">
                                 {cat.label}
                               </p>
                               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -330,6 +419,31 @@ export default function ReportFormPage() {
                         PNG, JPG atau WEBP (Maks. 10MB)
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Anonymity Selection */}
+                <div className="space-y-4">
+                  <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Privasi Laporan
+                  </Label>
+                  <div className="grid gap-3">
+                    <PrivacyOption
+                      id="anonymous"
+                      title="Kirim secara anonim"
+                      description="Pesan Anda akan terlihat oleh semua orang, namun nama Anda tidak akan ditampilkan. Poin Anda tidak akan terakumulasi jika laporan valid."
+                      icon={EyeOff}
+                      selected={reportType === "anonymous"}
+                      onClick={() => handleToggleReportType("anonymous")}
+                    />
+                    <PrivacyOption
+                      id="confidential"
+                      title="Kirim secara rahasia"
+                      description="Pesan Anda tidak akan ditampilkan ke semua orang, namun Admin dapat melihat laporan beserta nama Anda. Poin akan terakumulasi jika laporan valid."
+                      icon={Lock}
+                      selected={reportType === "confidential"}
+                      onClick={() => handleToggleReportType("confidential")}
+                    />
                   </div>
                 </div>
 

@@ -11,6 +11,7 @@ import StatusLaporanPage from "./page/users/StatusLaporanPage"
 import ReportDetailPage from "./page/users/ReportDetailPage"
 import MyReportsPage from "./page/users/MyReportsPage"
 import EditReportPage from "./page/users/EditReportPage"
+import LeaderboardPage from "./page/users/Leaderboard"
 
 export function App() {
   return (
@@ -23,6 +24,7 @@ export function App() {
       <Route path="/edit-report/:id" element={<EditReportPage />} />
       <Route path="/status-laporan" element={<StatusLaporanPage />} />
       <Route path="/report-detail/:id" element={<ReportDetailPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
       <Route path="/dashboard" element={<DashboardPage />} />
       <Route path="/laporan" element={<LaporanPage />} />
       <Route path="/peta-wilayah" element={<PetaWilayahPage />} />
