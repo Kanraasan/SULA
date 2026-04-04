@@ -57,12 +57,10 @@ export function LoginForm({
       const result = await response.json()
 
       if (response.ok) {
+        // Simpan data user ke localStorage (selalu simpan untuk session)
+        localStorage.setItem("user", JSON.stringify(result.data))
         alert(`Login berhasil! Selamat datang ${result.data.username}`)
-        if (rememberMe) {
-          localStorage.setItem("user", JSON.stringify(result.data))
-        }
         window.location.href = "/user-dashboard"
-        // Redirect ke dashboard atau halaman lain
       } else {
         setErrors({ general: result.message || "Login gagal" })
       }

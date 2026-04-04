@@ -80,50 +80,76 @@ export default function ReportFormPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-
-    if (!judul || !selectedCategory || !deskripsi) {
-      alert("Mohon lengkapi semua field yang wajib diisi")
+    if (!selectedCategory) {
+      alert("Pilih kategori terlebih dahulu")
       return
     }
 
     setIsSubmitting(true)
-    // Ambil data user dari localStorage
-    const userData = localStorage.getItem("user")
-    const user = userData ? JSON.parse(userData) : null
-    const formData = new FormData()
-    formData.append("judul", judul)
-    formData.append("kategori", selectedCategory)
-    formData.append("deskripsi", deskripsi)
-
-    if (user) {
-      formData.append("userNIK", user.NIK)
-      formData.append("username", user.username)
-      console.log("Sending userNIK:", user.NIK, "username:", user.username)
-    }
-
-    if (file) {
-      formData.append("lampiranFoto", file)
-    }
 
     try {
+      // Ambil data user dari localStorage
+      const userData = localStorage.getItem("user")
+      if (!userData) {
+        alert("Anda harus login terlebih dahulu")
+        window.location.href = "/"
+        return
+      }
+
+      const user = JSON.parse(userData)
+
+      // Buat FormData untuk upload file
+      const formData = new FormData()
+      formData.append("judul", judul)
+      formData.append("kategori", selectedCategory)
+      formData.append("deskripsi", deskripsi)
+      formData.append("userNIK", user.NIK.toString())
+      formData.append("username", user.username)
+
+      if (file) {
+        formData.append("lampiranFoto", file)
+      }
+
+      // Kirim ke backend
       const response = await fetch("/api/post", {
         method: "POST",
         body: formData,
       })
 
-      const result = await response.json()
+      // Cek apakah response OK
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
 
-      if (response.ok) {
-        alert("Laporan berhasil dikirim!")
+      // Ambil response sebagai text dulu untuk debug
+      const text = await response.text()
+
+      // Parse JSON
+      let result
+      try {
+        result = JSON.parse(text)
+      } catch (e) {
+        console.error("JSON parse error:", e)
+        console.error("Response text:", text)
+        throw new Error("Invalid JSON response from server")
+      }
+
+      if (result.message) {
+        alert(result.message)
+        // Reset form
         setJudul("")
         setDeskripsi("")
         setSelectedCategory(null)
         setFile(null)
+        // Redirect ke my-reports
+        window.location.href = "/my-reports"
       } else {
-        alert(result.message || "Gagal mengirim laporan")
+        alert("Laporan berhasil dikirim!")
+        window.location.href = "/my-reports"
       }
     } catch (error) {
-      alert("Terjadi kesalahan saat mengirim laporan")
+      console.error("Error:", error)
+      alert("Terjadi kesalahan saat mengirim laporan. Silakan coba lagi.")
     } finally {
       setIsSubmitting(false)
     }

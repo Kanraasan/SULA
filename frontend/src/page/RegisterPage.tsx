@@ -160,8 +160,8 @@ export default function RegisterPage() {
           password,
           passwordConfirm,
           alamatLengkap,
-          kecamatan: selectedKecamatan.name,
-          kelurahan: selectedKelurahan.name,
+          kecamatan: selectedKecamatan?.name || "",
+          kelurahan: selectedKelurahan?.name || "",
         }),
       })
 
