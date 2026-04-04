@@ -4,7 +4,7 @@ import { UserFooter } from "@/components/users/user-footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Calendar, Tag, Trash2, Edit } from "lucide-react"
+import { FileText, Calendar, Trash2, Edit } from "lucide-react"
 
 type Post = {
   id: string
@@ -49,8 +49,11 @@ export default function MyReportsPage() {
 
   // Filter postingan berdasarkan user yang login
   const myPosts = posts.filter((post) => {
-    console.log("Comparing:", post.userNIK, "===", userNIK, "Result:", post.userNIK == userNIK)
-    return post.userNIK == userNIK
+    // Konversi keduanya ke string untuk perbandingan yang konsisten
+    const postNIK = post.userNIK?.toString()
+    const currentUserNIK = userNIK?.toString()
+    console.log("Comparing:", postNIK, "===", currentUserNIK, "Result:", postNIK === currentUserNIK)
+    return postNIK === currentUserNIK
   })
 
   console.log("My posts:", myPosts)

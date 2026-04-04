@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './routes';
 import multer from 'multer';
+import path from 'path';
 
 // muat variabel dari file .env
 dotenv.config();
@@ -20,6 +21,9 @@ app.use(
   }),
 );
 app.use(express.json());
+
+// Serve static files dari folder uploads
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api', router);
 

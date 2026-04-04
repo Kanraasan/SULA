@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { ThumbsUp, MapPin, Clock } from "lucide-react"
+import { Card, CardContent, CardFooter } from "@/components/ui/card"
+import { ThumbsUp, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 interface ReportCardProps {

@@ -1,10 +1,10 @@
 "use client"
 
 import {
-  IconDotsVertical,
-  IconLogout,
-  IconSettings,
-} from "@tabler/icons-react"
+  Settings,
+  LogOut,
+  MoreVertical,
+} from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -53,7 +53,7 @@ export function NavUser({
                   {user.email}
                 </span>
               </div>
-              <IconDotsVertical className="ml-auto size-4" />
+              <MoreVertical className="ml-auto size-4" />
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
@@ -79,12 +79,12 @@ export function NavUser({
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem>
-                <IconSettings />
+                <Settings />
                 Setting
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuItem>
-              <IconLogout />
+              <LogOut />
               Log out
             </DropdownMenuItem>
           </DropdownMenuContent>

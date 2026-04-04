@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { UserNavbar } from "@/components/users/user-navbar"
 import { UserFooter } from "@/components/users/user-footer"
 import { ReportCard } from "@/components/users/report-card"
@@ -14,44 +14,17 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
 
-const DUMMY_REPORTS = [
-  {
-    id: 1,
-    title: "Jalan berlubang parah depan di Pasar Gemblegan",
-    category: "Infrastruktur",
-    status: "Menunggu" as const,
-    time: "2 jam yang lalu",
-    createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-    author: "Budi S.",
-    votes: 24,
-    imageUrl:
-      "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Tumpukan sampah belum diambil di Belakang Terminal Tirtonadi",
-    category: "Kebersihan",
-    status: "Diproses" as const,
-    time: "Kemarin",
-    createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Yesterday
-    author: "Siti A.",
-    votes: 15,
-    imageUrl:
-      "https://images.unsplash.com/photo-1530587191325-3db32d826c18?q=80&w=1374&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    title: "5 Lampu PJU mati total di Jl. Veteran",
-    category: "Fasilitas",
-    status: "Selesai" as const,
-    time: "3 hari yang lalu",
-    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
-    author: "Agus K.",
-    votes: 42,
-    imageUrl:
-      "https://images.unsplash.com/photo-1471193945509-9ad0617afabf?q=80&w=1470&auto=format&fit=crop",
-  },
-]
+type Report = {
+  id: string
+  title: string
+  category: string
+  status: "Menunggu" | "Diproses" | "Selesai"
+  time: string
+  createdAt: Date
+  author: string
+  votes: number
+  imageUrl: string
+}
 
 const CATEGORIES = [
   "Infrastruktur",
@@ -61,13 +34,77 @@ const CATEGORIES = [
   "Penerangan",
 ]
 
+// Fungsi helper untuk format waktu relatif
+const getRelativeTime = (dateString: string) => {
+  const date = new Date(dateString)
+  const now = new Date()
+  const diffMs = now.getTime() - date.getTime()
+  const diffMins = Math.floor(diffMs / 60000)
+  const diffHours = Math.floor(diffMs / 3600000)
+  const diffDays = Math.floor(diffMs / 86400000)
+
+  if (diffMins < 60) return `${diffMins} menit yang lalu`
+  if (diffHours < 24) return `${diffHours} jam yang lalu`
+  if (diffDays === 1) return "Kemarin"
+  if (diffDays < 7) return `${diffDays} hari yang lalu`
+  return date.toLocaleDateString("id-ID", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  })
+}
+
+// Fungsi helper untuk mapping kategori
+const mapCategory = (kategori: string) => {
+  const categoryMap: Record<string, string> = {
+    infrastruktur: "Infrastruktur",
+    kebersihan: "Kebersihan",
+    fasilitas: "Fasilitas",
+    lingkungan: "Lingkungan",
+    penerangan: "Penerangan",
+  }
+  return categoryMap[kategori.toLowerCase()] || kategori
+}
+
 export default function StatusLaporanPage() {
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest")
+  const [reports, setReports] = useState<Report[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+
+  // Fetch data dari backend
+  useEffect(() => {
+    fetch("/api/post")
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.data) {
+          // Transform data dari backend ke format yang dibutuhkan
+          const transformedReports: Report[] = result.data.map((post: any) => ({
+            id: post.id,
+            title: post.judul,
+            category: mapCategory(post.kategori),
+            status: "Menunggu" as const, // Default status, bisa disesuaikan
+            time: getRelativeTime(post.createdAt),
+            createdAt: new Date(post.createdAt),
+            author: post.username || "Anonim",
+            votes: Math.floor(Math.random() * 50), // Random votes untuk demo
+            imageUrl: post.lampiranFoto
+              ? `http://localhost:5000/uploads/${post.lampiranFoto}`
+              : "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop",
+          }))
+          setReports(transformedReports)
+        }
+        setIsLoading(false)
+      })
+      .catch((error) => {
+        console.error("Error fetching reports:", error)
+        setIsLoading(false)
+      })
+  }, [])
 
   // Logic for filtering and sorting
   const processedReports = useMemo(() => {
-    let result = [...DUMMY_REPORTS]
+    let result = [...reports]
 
     // Filter
     if (filterCategory) {
@@ -84,7 +121,7 @@ export default function StatusLaporanPage() {
     })
 
     return result
-  }, [filterCategory, sortOrder])
+  }, [reports, filterCategory, sortOrder])
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -207,7 +244,12 @@ export default function StatusLaporanPage() {
           </div>
 
           {/* Grid Reports */}
-          {processedReports.length > 0 ? (
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center space-y-4 py-20 text-center">
+              <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+              <p className="text-muted-foreground">Memuat laporan...</p>
+            </div>
+          ) : processedReports.length > 0 ? (
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
               {processedReports.map((report) => (
                 <ReportCard key={report.id} {...report} />

@@ -24,7 +24,6 @@ import {
 import {
   ChevronRight,
   Home,
-  UploadCloud,
   Send,
   ChevronDown,
   Check,
@@ -77,7 +76,6 @@ export default function EditReportPage() {
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [judul, setJudul] = useState("")
   const [deskripsi, setDeskripsi] = useState("")
-  const [file, setFile] = useState<File | null>(null)
   const [existingPhoto, setExistingPhoto] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
