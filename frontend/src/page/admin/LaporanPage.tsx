@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react"
+import { type FormEvent, useEffect, useMemo, useState } from "react"
 import { AppSidebar } from "@/components/app-sidebar"
 import { SearchForm } from "@/components/search-form"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
 import { RightFilterMenu } from "@/components/right-filter-menu"
-import { ReportTable, dataLaporan } from "@/components/report-table"
+import { ReportTable, type Laporan } from "@/components/report-table"
 import { type DateRange } from "react-day-picker"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {
@@ -34,6 +34,85 @@ import {
 } from "@/components/ui/select"
 import Clock from "@/components/clock-02"
 
+type BackendPost = {
+  id: string
+  judul: string
+  kategori: string
+  deskripsi: string
+  lampiranFoto: string | null
+  userNIK?: string
+  username?: string
+  createdAt: string
+}
+
+const API_BASE_URL =
+  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || ""
+
+const toApiUrl = (path: string) => {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`
+
+  if (!API_BASE_URL) {
+    return normalizedPath
+  }
+
+  const normalizedBase = API_BASE_URL.replace(/\/+$/, "")
+  const baseEndsWithApi = /\/api$/i.test(normalizedBase)
+  const pathStartsWithApi = normalizedPath.startsWith("/api/")
+
+  if (baseEndsWithApi && pathStartsWithApi) {
+    return `${normalizedBase}${normalizedPath.replace(/^\/api/, "")}`
+  }
+
+  return `${normalizedBase}${normalizedPath}`
+}
+
+const parseJsonResponse = async (response: Response) => {
+  const contentType = response.headers.get("content-type") || ""
+  const rawText = await response.text()
+
+  if (!contentType.includes("application/json")) {
+    const preview = rawText.trim().slice(0, 120)
+    throw new Error(
+      `Response API bukan JSON (status ${response.status}). Kemungkinan endpoint salah atau API URL belum benar. Preview: ${preview}`
+    )
+  }
+
+  try {
+    return JSON.parse(rawText)
+  } catch {
+    throw new Error(
+      `Gagal parse JSON dari API (status ${response.status}). Pastikan backend mengembalikan JSON valid.`
+    )
+  }
+}
+
+const toInitials = (name: string) => {
+  const tokens = name.trim().split(/\s+/).filter(Boolean)
+  if (tokens.length === 0) return "AN"
+  if (tokens.length === 1) return tokens[0].slice(0, 2).toUpperCase()
+  return `${tokens[0][0]}${tokens[1][0]}`.toUpperCase()
+}
+
+const mapPostToLaporan = (item: BackendPost): Laporan => {
+  const reporterName = item.username || "Anonim"
+
+  return {
+    id: item.id,
+    date: item.createdAt,
+    reporter: {
+      initials: toInitials(reporterName),
+      name: reporterName,
+    },
+    complaint: {
+      title: item.judul,
+      category: item.kategori?.toLowerCase() || "lainnya",
+      description: item.deskripsi,
+    },
+    status: "menunggu",
+    upvotes: 0,
+  }
+}
+
 const kategoriMasalah = [
   { value: "infrastruktur", label: "Infrastruktur & Jalan" },
   { value: "kebersihan", label: "Kebersihan & Lingkungan" },
@@ -52,6 +131,41 @@ export default function LaporanPage() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [newReportCategory, setNewReportCategory] = useState("")
+  const [laporanData, setLaporanData] = useState<Laporan[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const fetchLaporan = async () => {
+    setIsLoading(true)
+    setErrorMessage(null)
+
+    try {
+      const response = await fetch(toApiUrl("/api/post"))
+      const result = await parseJsonResponse(response)
+
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal mengambil data laporan")
+      }
+
+      const mapped = Array.isArray(result.data)
+        ? result.data.map((item: BackendPost) => mapPostToLaporan(item))
+        : []
+
+      setLaporanData(mapped)
+    } catch (error) {
+      setErrorMessage(
+        error instanceof Error ? error.message : "Terjadi kesalahan jaringan"
+      )
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    void fetchLaporan()
+  }, [])
 
   const handleResetFilters = () => {
     setSelectedCategory("")
@@ -61,7 +175,7 @@ export default function LaporanPage() {
 
   // 2. Logika Filtering
   const filteredData = useMemo(() => {
-    return dataLaporan.filter((item) => {
+    return laporanData.filter((item) => {
       // A. Pencarian Text (Judul Laporan atau Nama Pelapor)
       const matchesSearch =
         item.complaint.title
@@ -95,7 +209,81 @@ export default function LaporanPage() {
       // Harus lulus semua kondisi
       return matchesSearch && matchesCategory && matchesStatus && matchesDate
     })
-  }, [searchQuery, selectedCategory, selectedStatus, dateRange])
+  }, [laporanData, searchQuery, selectedCategory, selectedStatus, dateRange])
+
+  const handleCreateReport = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+
+    const formData = new FormData(e.currentTarget)
+    const judul = String(formData.get("judulLaporan") || "").trim()
+    const kategori = newReportCategory
+    const deskripsi = String(formData.get("deskripsiDetail") || "").trim()
+    const lampiranFoto = formData.get("lampiranFoto")
+
+    if (!judul || !kategori || !deskripsi) {
+      alert("Mohon lengkapi judul, kategori, dan deskripsi laporan")
+      return
+    }
+
+    const payload = new FormData()
+    payload.append("judul", judul)
+    payload.append("kategori", kategori)
+    payload.append("deskripsi", deskripsi)
+
+    const userData = localStorage.getItem("user")
+    if (userData) {
+      const user = JSON.parse(userData) as { NIK?: string | number; username?: string }
+      if (user.NIK) payload.append("userNIK", String(user.NIK))
+      if (user.username) payload.append("username", user.username)
+    }
+
+    if (lampiranFoto instanceof File && lampiranFoto.size > 0) {
+      payload.append("lampiranFoto", lampiranFoto)
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch(toApiUrl("/api/post"), {
+        method: "POST",
+        body: payload,
+      })
+      const result = await parseJsonResponse(response)
+
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal membuat laporan")
+      }
+
+      alert(result.message || "Laporan berhasil dibuat")
+      setIsDialogOpen(false)
+      setNewReportCategory("")
+      e.currentTarget.reset()
+      await fetchLaporan()
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Gagal membuat laporan")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
+  const handleDeleteReport = async (id: string) => {
+    setDeletingId(id)
+    try {
+      const response = await fetch(toApiUrl(`/api/post/${id}`), {
+        method: "DELETE",
+      })
+
+      const result = await parseJsonResponse(response)
+      if (!response.ok) {
+        throw new Error(result.message || "Gagal menghapus laporan")
+      }
+
+      setLaporanData((prev) => prev.filter((item) => item.id !== id))
+    } catch (error) {
+      alert(error instanceof Error ? error.message : "Gagal menghapus laporan")
+    } finally {
+      setDeletingId(null)
+    }
+  }
 
   function handleNewReport() {
     setNewReportCategory("")
@@ -151,14 +339,29 @@ export default function LaporanPage() {
               />
             </div>
 
-            {/* 3. Masukkan Data yang sudah difilter ke Tabel */}
-            <ReportTable data={filteredData} />
+            {errorMessage && (
+              <div className="mb-4 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+                {errorMessage}
+              </div>
+            )}
+
+            {isLoading ? (
+              <div className="rounded-xl border bg-card p-8 text-center text-muted-foreground">
+                Memuat data laporan...
+              </div>
+            ) : (
+              <ReportTable
+                data={filteredData}
+                onDelete={handleDeleteReport}
+                deletingId={deletingId}
+              />
+            )}
           </div>
         </SidebarInset>
       </SidebarProvider>
 
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <form>
+        <form onSubmit={handleCreateReport}>
           <DialogContent className="sm:max-w-sm">
             <DialogHeader>
               <DialogTitle>Buat Laporan Baru</DialogTitle>
@@ -216,7 +419,7 @@ export default function LaporanPage() {
                 <Label htmlFor="report-photo">Foto Pendukung (Opsional)</Label>
                 <Input
                   id="report-photo"
-                  name="foto"
+                  name="lampiranFoto"
                   type="file"
                   accept="image/*"
                 />
@@ -229,7 +432,9 @@ export default function LaporanPage() {
               <DialogClose asChild>
                 <Button variant="outline">Batal</Button>
               </DialogClose>
-              <Button type="submit">Buat</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Menyimpan..." : "Buat"}
+              </Button>
             </DialogFooter>
           </DialogContent>
         </form>

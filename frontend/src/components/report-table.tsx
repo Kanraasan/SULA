@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table"
 import { useState } from "react"
 
-type Laporan = {
+export type Laporan = {
   id: string
   date: string
   reporter: {
@@ -356,7 +356,7 @@ export const dataLaporan: Laporan[] = [
 ]
 
 const getColumns = (
-  onDeleteClick: () => void
+  onDeleteClick: (id: string) => void
 ): ColumnDef<Laporan>[] => [
   {
     accessorKey: "date",
@@ -438,7 +438,7 @@ const getColumns = (
   {
     id: "actions",
     header: "AKSI",
-    cell: () => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="size-8 p-0 text-muted-foreground">
@@ -452,7 +452,7 @@ const getColumns = (
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-destructive"
-            onClick={onDeleteClick}
+            onClick={() => onDeleteClick(row.original.id)}
           >
             Hapus Laporan
           </DropdownMenuItem>
@@ -462,9 +462,31 @@ const getColumns = (
   },
 ]
 
-export function ReportTable({ data }: { data: Laporan[] }) {
+type ReportTableProps = {
+  data: Laporan[]
+  onDelete?: (id: string) => Promise<void> | void
+  deletingId?: string | null
+}
+
+export function ReportTable({ data, onDelete, deletingId = null }: ReportTableProps) {
   const [isDialogAlertOpen, setIsDialogAlertOpen] = useState(false)
-  const columns = getColumns(() => setIsDialogAlertOpen(true))
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  const columns = getColumns((id) => {
+    setSelectedId(id)
+    setIsDialogAlertOpen(true)
+  })
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedId || !onDelete) {
+      setIsDialogAlertOpen(false)
+      return
+    }
+
+    await onDelete(selectedId)
+    setIsDialogAlertOpen(false)
+    setSelectedId(null)
+  }
 
   const table = useReactTable({
     data: data,
@@ -621,7 +643,14 @@ export function ReportTable({ data }: { data: Laporan[] }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction>Hapus</AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={Boolean(deletingId && deletingId === selectedId)}
+            >
+              {deletingId && deletingId === selectedId
+                ? "Menghapus..."
+                : "Hapus"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

@@ -6,8 +6,70 @@ import { TrenLineChart } from "@/components/tren-line-chart"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Clock from "@/components/clock-02"
+import { useEffect, useState } from "react"
+
+type BackendPost = {
+  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
+}
+
+const API_BASE_URL =
+  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || ""
+
+const toApiUrl = (path: string) => {
+  const normalizedPath = path.startsWith("/") ? path : `/${path}`
+
+  if (!API_BASE_URL) {
+    return normalizedPath
+  }
+
+  const normalizedBase = API_BASE_URL.replace(/\/+$/, "")
+  const baseEndsWithApi = /\/api$/i.test(normalizedBase)
+  const pathStartsWithApi = normalizedPath.startsWith("/api/")
+
+  if (baseEndsWithApi && pathStartsWithApi) {
+    return `${normalizedBase}${normalizedPath.replace(/^\/api/, "")}`
+  }
+
+  return `${normalizedBase}${normalizedPath}`
+}
 
 export default function StatistikPage() {
+  const [summary, setSummary] = useState({
+    total: 0,
+    selesai: 0,
+    diproses: 0,
+    menunggu: 0,
+  })
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const response = await fetch(toApiUrl("/api/post"))
+        const result = await response.json()
+
+        if (!response.ok || !Array.isArray(result.data)) {
+          return
+        }
+
+        const posts: BackendPost[] = result.data
+        const selesai = posts.filter((item) => item.status === "selesai").length
+        const diproses = posts.filter((item) => item.status === "diproses").length
+        const menunggu = posts.filter((item) => !item.status || item.status === "menunggu").length
+
+        setSummary({
+          total: posts.length,
+          selesai,
+          diproses,
+          menunggu,
+        })
+      } catch (error) {
+        console.error("Gagal memuat statistik laporan:", error)
+      }
+    }
+
+    void loadStats()
+  }, [])
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -32,7 +94,7 @@ export default function StatistikPage() {
               Ringkasan data laporan masyarakat secara real-time
             </p>
           </div>
-          <StatisticCardsFigma />
+          <StatisticCardsFigma summary={summary} />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <KategoriBarChart />
             <TrenLineChart />
