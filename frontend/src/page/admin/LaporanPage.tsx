@@ -171,7 +171,7 @@ export default function LaporanPage() {
                 <Label htmlFor="report-title">Judul Laporan</Label>
                 <Input
                   id="report-title"
-                  name="judulLaporan"
+                  name="title"
                   placeholder="Contoh: Jalan berlubang di Jl. Merdeka"
                   required
                 />
@@ -196,7 +196,7 @@ export default function LaporanPage() {
                 </Select>
                 <input
                   type="hidden"
-                  name="kategoriMasalah"
+                  name="category"
                   value={newReportCategory}
                 />
               </Field>
@@ -205,7 +205,7 @@ export default function LaporanPage() {
                 <Label htmlFor="report-detail">Deskripsi Detail</Label>
                 <Textarea
                   id="report-detail"
-                  name="deskripsiDetail"
+                  name="description"
                   placeholder="Jelaskan lokasi, waktu kejadian, dan kondisi masalah secara rinci"
                   className="min-h-28"
                   required

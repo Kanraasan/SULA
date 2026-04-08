@@ -1,5 +1,5 @@
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"

@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react"
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
-import { ReportCard } from "@/components/users/report-card"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
+import { ReportCard } from "@/components/user/report-card"
 import { Button } from "@/components/ui/button"
 import { Filter, ListFilter, Check } from "lucide-react"
 import {
@@ -55,7 +55,7 @@ const getRelativeTime = (dateString: string) => {
 }
 
 // Fungsi helper untuk mapping kategori
-const mapCategory = (kategori: string) => {
+const mapCategory = (category: string) => {
   const categoryMap: Record<string, string> = {
     infrastruktur: "Infrastruktur",
     kebersihan: "Kebersihan",
@@ -63,7 +63,7 @@ const mapCategory = (kategori: string) => {
     lingkungan: "Lingkungan",
     penerangan: "Penerangan",
   }
-  return categoryMap[kategori.toLowerCase()] || kategori
+  return categoryMap[category.toLowerCase()] || category
 }
 
 export default function StatusLaporanPage() {
@@ -74,15 +74,15 @@ export default function StatusLaporanPage() {
 
   // Fetch data dari backend
   useEffect(() => {
-    fetch("/api/post")
+    fetch("/api/report")
       .then((res) => res.json())
       .then((result) => {
         if (result.data) {
           // Transform data dari backend ke format yang dibutuhkan
           const transformedReports: Report[] = result.data.map((post: any) => ({
             id: post.id,
-            title: post.judul,
-            category: mapCategory(post.kategori),
+            title: post.title,
+            category: mapCategory(post.category),
             status: "Menunggu" as const, // Default status, bisa disesuaikan
             time: getRelativeTime(post.createdAt),
             createdAt: new Date(post.createdAt),

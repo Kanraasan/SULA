@@ -22,17 +22,17 @@ app.use(
 );
 app.use(express.json());
 
-// Serve static files dari folder uploads
+// buat akses file statis dari folder uploads
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 app.use('/api', router);
 
-// endpoint simpel buat ngetes koneksi
+// endpoint simpel buat ngetes koneksi aja
 app.get('/api/hello', (req: Request, res: Response) => {
-  res.json({ message: 'Hello from Express!' });
+  res.json({ message: 'halo dari express!' });
 });
 
 // nyalain server-nya
 app.listen(port, () => {
-  console.log(`Server is running on http://localhost:${port}`);
+  console.log(`server jalan di http://localhost:${port}`);
 });

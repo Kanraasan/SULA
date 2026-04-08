@@ -1,8 +1,8 @@
-import post from '../post';
+import reportData from '../reportData';
 
-export const getPost = (req: any, res: any) => {
-  return res.status(200).json({
-    message: 'berhasil',
-    data: post,
+export const getReports = (req: any, res: any) => {
+  res.status(200).json({
+    message: 'Berhasil mengambil data laporan',
+    data: reportData,
   });
 };

@@ -17,6 +17,9 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/components/ui/combobox"
+import { useNavigate } from "react-router-dom"
+import { useApi } from "@/hooks/useApi"
+import { authService } from "@/services/auth.service"
 
 type Kecamatan = {
   id: number
@@ -104,7 +107,10 @@ const kelurahan: Kelurahan[] = [
 ]
 
 export default function RegisterPage() {
-  const [NIK, setNIK] = useState("")
+  const navigate = useNavigate()
+  const { execute, loading: isSubmitting, error: apiError } = useApi()
+
+  const [nik, setNik] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirm, setPasswordConfirm] = useState("")
@@ -116,7 +122,6 @@ export default function RegisterPage() {
     null
   )
   const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const filteredKelurahan = useMemo(() => {
     if (!selectedKecamatan) return []
@@ -128,7 +133,7 @@ export default function RegisterPage() {
 
     const newErrors: Record<string, string> = {}
 
-    if (!NIK.trim()) newErrors.NIK = "NIK wajib diisi"
+    if (!nik.trim()) newErrors.nik = "NIK wajib diisi"
     if (!username.trim()) newErrors.username = "Username wajib diisi"
     if (!password.trim()) newErrors.password = "Password wajib diisi"
     if (!passwordConfirm.trim())
@@ -145,38 +150,23 @@ export default function RegisterPage() {
       return
     }
 
-    setIsSubmitting(true)
     setErrors({})
 
     try {
-      const response = await fetch("/api/regist", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          NIK: parseInt(NIK),
-          username,
-          password,
-          passwordConfirm,
-          alamatLengkap,
-          kecamatan: selectedKecamatan?.name || "",
-          kelurahan: selectedKelurahan?.name || "",
-        }),
-      })
+      await execute(authService.register({
+        nik,
+        username,
+        password,
+        passwordConfirm,
+        alamatLengkap,
+        kecamatan: selectedKecamatan?.name || "",
+        kelurahan: selectedKelurahan?.name || "",
+      }))
 
-      const result = await response.json()
-
-      if (response.ok) {
-        alert("Registrasi berhasil! Silakan login dengan akun Anda.")
-        window.location.href = "/"
-      } else {
-        setErrors({ general: result.message || "Registrasi gagal" })
-      }
+      alert("Registrasi berhasil! Silakan login dengan akun Anda.")
+      navigate("/")
     } catch (error) {
-      setErrors({ general: "Terjadi kesalahan saat registrasi" })
-    } finally {
-      setIsSubmitting(false)
+      // Error handled by useApi
     }
   }
 
@@ -197,9 +187,9 @@ export default function RegisterPage() {
                   </p>
                 </div>
 
-                {errors.general && (
+                {(apiError || errors.general) && (
                   <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                    {errors.general}
+                    {apiError || errors.general}
                   </div>
                 )}
 
@@ -209,13 +199,13 @@ export default function RegisterPage() {
                     id="nik"
                     type="text"
                     placeholder="Masukkan NIK Anda"
-                    value={NIK}
-                    onChange={(e) => setNIK(e.target.value)}
+                    value={nik}
+                    onChange={(e) => setNik(e.target.value)}
                     required
                     className="bg-background"
                   />
-                  {errors.NIK && (
-                    <p className="text-sm text-destructive">{errors.NIK}</p>
+                  {errors.nik && (
+                    <p className="text-sm text-destructive">{errors.nik}</p>
                   )}
                 </Field>
 
@@ -306,12 +296,13 @@ export default function RegisterPage() {
                     <ComboboxContent>
                       <ComboboxEmpty>Pilih Kecamatan Anda</ComboboxEmpty>
                       <ComboboxList>
-                        {(kecamatan) => (
-                          <ComboboxItem key={kecamatan.id} value={kecamatan}>
-                            {kecamatan.name}
+                        {kecamatan.map((kec) => (
+                          <ComboboxItem key={kec.id} value={kec}>
+                            {kec.name}
                           </ComboboxItem>
-                        )}
+                        ))}
                       </ComboboxList>
+
                     </ComboboxContent>
                   </Combobox>
                   {errors.kecamatan && (
@@ -342,11 +333,11 @@ export default function RegisterPage() {
                     <ComboboxContent>
                       <ComboboxEmpty>Pilih Kelurahan Anda</ComboboxEmpty>
                       <ComboboxList>
-                        {(kelurahan) => (
-                          <ComboboxItem key={kelurahan.id} value={kelurahan}>
-                            {kelurahan.name}
+                        {filteredKelurahan.map((kel) => (
+                          <ComboboxItem key={kel.id} value={kel}>
+                            {kel.name}
                           </ComboboxItem>
-                        )}
+                        ))}
                       </ComboboxList>
                     </ComboboxContent>
                   </Combobox>

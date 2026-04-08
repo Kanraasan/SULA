@@ -1,40 +1,40 @@
 import { compareSync } from 'bcryptjs';
-import regist from '../regist';
+import userData from '../userData';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_sula_123';
 
 export const loginUser = (req: any, res: any) => {
-  if (!req.body) {
-    return res
-      .status(400)
-      .json({
-        message:
-          'Request body tidak ditemukan. Pastikan Content-Type: application/json',
-      });
-  }
-
   const { identifier, password } = req.body;
 
-  if (!identifier || !password) {
-    return res
-      .status(400)
-      .json({ message: 'Username/NIK dan password wajib diisi' });
-  }
-
-  const user = regist.find(
-    (u) => u.username === identifier || u.NIK === identifier,
+  const user = userData.find(
+    (u) => u.username === identifier || String(u.nik) === String(identifier),
   );
 
   if (!user) {
-    return res.status(404).json({ message: 'User tidak ditemukan' });
+    return res.status(404).json({ message: 'user gak ketemu' });
   }
 
   const isMatch = compareSync(password, user.password);
 
   if (!isMatch) {
-    return res.status(401).json({ message: 'Password salah' });
+    return res.status(401).json({ message: 'password-nya salah bos' });
   }
 
+  // bikin token jwt-nya
+  const token = jwt.sign(
+    { nik: user.nik, username: user.username, role: user.role },
+    JWT_SECRET,
+    { expiresIn: '1d' } // token-nya awet cuma sehari
+  );
+
   return res.status(200).json({
-    message: 'Login berhasil',
-    data: { NIK: user.NIK, username: user.username },
+    message: 'login mantap!',
+    data: { 
+      nik: user.nik, 
+      username: user.username, 
+      role: user.role,
+      token: token // kirim token ke frontend
+    },
   });
 };

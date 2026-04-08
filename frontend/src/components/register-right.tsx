@@ -125,10 +125,8 @@ export function RegisterRight({
         <Field>
           <FieldLabel htmlFor="kecamatan">Kecamatan</FieldLabel>
           <Combobox
-            items={kecamatan}
-            itemToStringValue={(kecamatan: Kecamatan) => kecamatan.name}
             onValueChange={(val) => {
-              setSelectedKecamatan(val)
+              setSelectedKecamatan(val as Kecamatan)
               setSelectedKelurahan(null)
             }}
           >
@@ -139,11 +137,11 @@ export function RegisterRight({
             <ComboboxContent>
               <ComboboxEmpty>Pilih Kecamatan Anda</ComboboxEmpty>
               <ComboboxList>
-                {(kecamatan) => (
-                  <ComboboxItem key={kecamatan.id} value={kecamatan}>
-                    {kecamatan.name}
+                {kecamatan.map((kec) => (
+                  <ComboboxItem key={kec.id} value={kec}>
+                    {kec.name}
                   </ComboboxItem>
-                )}
+                ))}
               </ComboboxList>
             </ComboboxContent>
           </Combobox>
@@ -151,10 +149,8 @@ export function RegisterRight({
         <Field>
           <FieldLabel htmlFor="kelurahan">Kelurahan</FieldLabel>
           <Combobox
-            items={filteredKelurahan}
-            itemToStringValue={(kelurahan: Kelurahan) => kelurahan.name}
             onValueChange={(val) => {
-              setSelectedKelurahan(val)
+              setSelectedKelurahan(val as Kelurahan)
             }}
           >
             <ComboboxInput
@@ -169,11 +165,11 @@ export function RegisterRight({
             <ComboboxContent>
               <ComboboxEmpty>Pilih Kelurahan Anda</ComboboxEmpty>
               <ComboboxList>
-                {(kelurahan) => (
-                  <ComboboxItem key={kelurahan.id} value={kelurahan}>
-                    {kelurahan.name}
+                {filteredKelurahan.map((kel) => (
+                  <ComboboxItem key={kel.id} value={kel}>
+                    {kel.name}
                   </ComboboxItem>
-                )}
+                ))}
               </ComboboxList>
             </ComboboxContent>
           </Combobox>

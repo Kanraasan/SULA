@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react"
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { FileText, Calendar, Trash2, Edit } from "lucide-react"
+
+import { FileText as FileTextIcon, Calendar as CalendarIcon, Trash2 as Trash2Icon, Edit as EditIcon } from "lucide-react"
 
 type Post = {
   id: string
-  judul: string
-  kategori: string
-  deskripsi: string
+  title: string
+  category: string
+  description: string
   lampiranFoto: string | null
-  userNIK?: string
+  userNik?: string
   username?: string
   createdAt: string
 }
@@ -20,60 +21,56 @@ type Post = {
 export default function MyReportsPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [userNIK, setUserNIK] = useState<string | null>(null)
+  const [userNik, setUserNik] = useState<string | null>(null)
 
   useEffect(() => {
-    // Ambil data user dari localStorage
+    // ambil data user dari localstorage
     const userData = localStorage.getItem("user")
     if (userData) {
       const user = JSON.parse(userData)
-      setUserNIK(user.NIK)
-      console.log("User NIK:", user.NIK)
+      setUserNik(user.nik)
+      console.log("user nik:", user.nik)
     } else {
-      console.log("No user data in localStorage")
+      console.log("gak ada data user di localstorage")
     }
 
-    // Fetch semua postingan
-    fetch("/api/post")
+    // fetch semua laporan
+    fetch("/api/report")
       .then((res) => res.json())
       .then((result) => {
-        console.log("All posts:", result.data)
+        console.log("semua laporan:", result.data)
         setPosts(result.data || [])
         setIsLoading(false)
       })
       .catch((error) => {
-        console.error("Error fetching posts:", error)
+        console.error("error pas ambil laporan:", error)
         setIsLoading(false)
       })
   }, [])
 
-  // Filter postingan berdasarkan user yang login
+  // filter laporan biar cuma punya user yang lagi login
   const myPosts = posts.filter((post) => {
-    // Konversi keduanya ke string untuk perbandingan yang konsisten
-    const postNIK = post.userNIK?.toString()
-    const currentUserNIK = userNIK?.toString()
-    console.log("Comparing:", postNIK, "===", currentUserNIK, "Result:", postNIK === currentUserNIK)
-    return postNIK === currentUserNIK
+    const postNik = post.userNik?.toString()
+    const currentUserNik = userNik?.toString()
+    return postNik === currentUserNik
   })
 
-  console.log("My posts:", myPosts)
-
   const handleDelete = async (id: string) => {
-    if (!confirm("Apakah Anda yakin ingin menghapus laporan ini?")) return
+    if (!confirm("yakin nih mau dihapus laporannya?")) return
 
     try {
-      const response = await fetch(`/api/post/${id}`, {
+      const response = await fetch(`/api/report/${id}`, {
         method: "DELETE",
       })
 
       if (response.ok) {
-        alert("Laporan berhasil dihapus")
+        alert("laporan udah dihapus ya")
         setPosts(posts.filter((post) => post.id !== id))
       } else {
-        alert("Gagal menghapus laporan")
+        alert("gagal nih hapus laporannya")
       }
     } catch (error) {
-      alert("Terjadi kesalahan saat menghapus laporan")
+      alert("waduh ada error pas mau hapus")
     }
   }
 
@@ -85,24 +82,24 @@ export default function MyReportsPage() {
         <div className="mb-8">
           <h1 className="text-3xl font-bold mb-2">Laporan Saya</h1>
           <p className="text-muted-foreground">
-            Kelola semua laporan yang telah Anda buat
+            Kelola semua laporan yang udah kamu bikin
           </p>
         </div>
 
         {isLoading ? (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">Memuat laporan...</p>
+            <p className="text-muted-foreground">lagi loading laporannya...</p>
           </div>
         ) : myPosts.length === 0 ? (
           <Card className="text-center py-12">
             <CardContent className="pt-6">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
+              <FileTextIcon className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-xl font-semibold mb-2">Belum ada laporan</h3>
               <p className="text-muted-foreground mb-4">
-                Anda belum membuat laporan apapun
+                Kamu belum bikin laporan apa-apa nih
               </p>
               <Button onClick={() => window.location.href = "/report-form"}>
-                Buat Laporan Baru
+                Bikin Laporan Baru
               </Button>
             </CardContent>
           </Card>
@@ -113,7 +110,7 @@ export default function MyReportsPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <Badge variant="secondary" className="mb-2">
-                      {post.kategori}
+                      {post.category}
                     </Badge>
                     <div className="flex gap-2">
                       <Button
@@ -122,7 +119,7 @@ export default function MyReportsPage() {
                         className="h-8 w-8 p-0"
                         onClick={() => window.location.href = `/edit-report/${post.id}`}
                       >
-                        <Edit className="h-4 w-4" />
+                        <EditIcon className="h-4 w-4" />
                       </Button>
                       <Button
                         variant="ghost"
@@ -130,13 +127,13 @@ export default function MyReportsPage() {
                         className="h-8 w-8 p-0 text-destructive hover:text-destructive"
                         onClick={() => handleDelete(post.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2Icon className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
-                  <CardTitle className="text-lg">{post.judul}</CardTitle>
+                  <CardTitle className="text-lg">{post.title}</CardTitle>
                   <CardDescription className="flex items-center gap-2 text-xs">
-                    <Calendar className="h-3 w-3" />
+                    <CalendarIcon className="h-3 w-3" />
                     {new Date(post.createdAt).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "long",
@@ -146,12 +143,12 @@ export default function MyReportsPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                    {post.deskripsi}
+                    {post.description}
                   </p>
                   {post.lampiranFoto && (
                     <img
                       src={`http://localhost:5000/uploads/${post.lampiranFoto}`}
-                      alt={post.judul}
+                      alt={post.title}
                       className="w-full h-40 object-cover rounded-md"
                     />
                   )}

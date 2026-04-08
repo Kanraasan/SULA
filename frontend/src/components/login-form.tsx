@@ -9,6 +9,11 @@ import {
 } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from "react-router-dom"
+import { useApi } from "@/hooks/useApi"
+import { authService } from "@/services/auth.service"
+import { Eye, EyeOff } from "lucide-react"
 
 export function LoginForm({
   className,
@@ -16,9 +21,13 @@ export function LoginForm({
 }: React.ComponentProps<"form">) {
   const [identifier, setIdentifier] = useState("") //identifier = NIK/Username
   const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
-  const [errors, setErrors] = useState<Record<string, string>>({})
-  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [formErrors, setFormErrors] = useState<Record<string, string>>({})
+  
+  const { login } = useAuth()
+  const navigate = useNavigate()
+  const { execute, loading, error: apiError } = useApi()
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
@@ -28,7 +37,7 @@ export function LoginForm({
     if (!password.trim()) {
       newErrors.password = "Kata sandi wajib diisi"
     }
-    setErrors(newErrors)
+    setFormErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
 
@@ -39,35 +48,18 @@ export function LoginForm({
       return
     }
 
-    setIsSubmitting(true)
-    setErrors({})
-
     try {
-      const response = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          identifier,
-          password,
-        }),
-      })
-
-      const result = await response.json()
-
-      if (response.ok) {
-        // Simpan data user ke localStorage (selalu simpan untuk session)
-        localStorage.setItem("user", JSON.stringify(result.data))
-        alert(`Login berhasil! Selamat datang ${result.data.username}`)
-        window.location.href = "/user-dashboard"
+      const userData = await execute(authService.login(identifier, password))
+      login(userData)
+      alert(`Login berhasil! Selamat datang ${userData.username}`)
+      
+      if (userData.role === "admin") {
+        navigate("/dashboard")
       } else {
-        setErrors({ general: result.message || "Login gagal" })
+        navigate("/user-dashboard")
       }
     } catch (error) {
-      setErrors({ general: "Terjadi kesalahan saat login" })
-    } finally {
-      setIsSubmitting(false)
+      // Error handled by useApi
     }
   }
 
@@ -88,25 +80,25 @@ export function LoginForm({
           </p>
         </div>
 
-        {errors.general && (
+        {(apiError || formErrors.general) && (
           <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-            {errors.general}
+            {apiError || formErrors.general}
           </div>
         )}
 
         <Field>
-          <FieldLabel htmlFor="nik">NIK</FieldLabel>
+          <FieldLabel htmlFor="nik">NIK / Username</FieldLabel>
           <Input
             id="nik"
             type="text"
-            placeholder="Masukkan NIK"
+            placeholder="Masukkan NIK atau Username Anda"
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
             required
             className="bg-background"
           />
-          {errors.identifier && (
-            <p className="text-sm text-destructive">{errors.identifier}</p>
+          {formErrors.identifier && (
+            <p className="text-sm text-destructive">{formErrors.identifier}</p>
           )}
         </Field>
 
@@ -114,17 +106,30 @@ export function LoginForm({
           <div className="flex items-center">
             <FieldLabel htmlFor="password">Kata Sandi</FieldLabel>
           </div>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Masukkan kata sandi"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="bg-background"
-          />
-          {errors.password && (
-            <p className="text-sm text-destructive">{errors.password}</p>
+          <div className="relative">
+            <Input
+              id="password"
+              type={showPassword ? "text" : "password"}
+              placeholder="Masukkan kata sandi"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="bg-background pr-10"
+            />
+            <button
+              type="button"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? (
+                <EyeOff className="h-4 w-4" />
+              ) : (
+                <Eye className="h-4 w-4" />
+              )}
+            </button>
+          </div>
+          {formErrors.password && (
+            <p className="text-sm text-destructive">{formErrors.password}</p>
           )}
         </Field>
 
@@ -145,8 +150,8 @@ export function LoginForm({
         </div>
 
         <Field>
-          <Button size="lg" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Memproses..." : "Masuk"}
+          <Button size="lg" type="submit" disabled={loading}>
+            {loading ? "Memproses..." : "Masuk"}
           </Button>
         </Field>
 

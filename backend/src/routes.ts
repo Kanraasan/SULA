@@ -1,19 +1,25 @@
 import express from 'express';
 import { createUser } from './controller/userRegister';
 import { loginUser } from './controller/userLogin';
-import { postContent } from './controller/userPost';
+import { createReport } from './controller/userPost';
 import { uploadFile } from './controller/uploadFile';
-import { getPost } from './controller/getPost';
-import { getPostById } from './controller/getPostById';
-import { editPost } from './controller/editPost';
-import { deleteNoteById } from './controller/delete';
+import { getReports } from './controller/getPost';
+import { getReportById } from './controller/getPostById';
+import { editReport } from './controller/editPost';
+import { deleteReportById } from './controller/deleteReport';
+import { authorize } from './middleware/auth';
 
 const router = express.Router();
 router.post('/regist', createUser);
 router.post('/login', loginUser);
-router.post('/post', uploadFile, postContent);
-router.get('/post', getPost);
-router.get('/post/:id', getPostById);
-router.put('/post/:id', editPost);
-router.delete('/post/:id', deleteNoteById);
+
+// User & Admin can do these
+router.post('/report', authorize(['user', 'admin']), uploadFile, createReport);
+router.get('/report', getReports);
+router.get('/report/:id', getReportById);
+
+// Restricted actions (Admin only)
+router.put('/report/:id', authorize(['admin']), editReport);
+router.delete('/report/:id', authorize(['admin']), deleteReportById);
+
 export default router;

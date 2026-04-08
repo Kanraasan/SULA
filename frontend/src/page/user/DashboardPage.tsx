@@ -10,17 +10,27 @@ import {
   LayoutDashboard, 
   MapPin, 
   Trophy, 
-  UserCircle 
+  UserCircle,
+  Loader2
 } from "lucide-react"
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/hooks/useAuth"
+import { useEffect } from "react"
+import { useApi } from "@/hooks/useApi"
+import { reportService } from "@/services/report.service"
 
 export default function UserDashboardPage() {
   const navigate = useNavigate()
-  const user = {
-    name: "Dicoding",
-  }
+  const { user } = useAuth()
+  const { execute, data: reports, loading } = useApi()
+  
+  const displayName = user?.username || "Warga"
+
+  useEffect(() => {
+    execute(reportService.getAll())
+  }, [execute])
 
   const quickActions = [
     {
@@ -39,43 +49,7 @@ export default function UserDashboardPage() {
       title: "Leaderboard",
       description: "Lihat siapakah kontributor yang paling banyak membantu!",
       icon: Trophy,
-      link: "#"
-    }
-  ]
-
-  const reports = [
-    {
-      id: 1,
-      title: "Jalan Berlubang di Jl. Mawar",
-      description: "Terdapat lubang cukup dalam di pertigaan Jl. Mawar yang membahayakan pengendara motor, terutama...",
-      status: "Diproses",
-      statusVariant: "diproses" as const, 
-      date: "2 hari yang lalu",
-      location: "RT 01",
-      reporter: "Pak Agus",
-      image: "https://placehold.co/400x200"
-    },
-    {
-      id: 2,
-      title: "Sampah Menumpuk di Taman",
-      description: "Tempat sampah di taman utama sudah penuh dan berserakan, mohon petugas kebersihan segera...",
-      status: "Selesai",
-      statusVariant: "selesai" as const, 
-      date: "5 hari yang lalu",
-      location: "Fasum Taman",
-      reporter: "Ibu Siti",
-      image: "https://placehold.co/400x200"
-    },
-    {
-      id: 3,
-      title: "Lampu PJU Mati",
-      description: "Lampu penerangan jalan umum di gang buntu blok C mati sejak semalam, membuat jalan sangat gelap.",
-      status: "Menunggu",
-      statusVariant: "menunggu" as const, 
-      date: "Hari ini",
-      location: "RT 03",
-      reporter: "Budi Warga",
-      image: ""
+      link: "/leaderboard"
     }
   ]
 
@@ -94,6 +68,14 @@ export default function UserDashboardPage() {
     }
   ]
 
+  const getStatusVariant = (status: string) => {
+    switch (status?.toLowerCase()) {
+      case 'selesai': return 'selesai';
+      case 'diproses': return 'diproses';
+      default: return 'menunggu';
+    }
+  }
+
   return (
     <div className="min-h-screen bg-muted/30 dark:bg-background transition-colors duration-300">
       <UserNavbar />
@@ -101,7 +83,7 @@ export default function UserDashboardPage() {
       <main className="container mx-auto px-4 py-12 md:px-8">
         {/* Hero Section */}
         <section className="mb-12">
-          <h1 className="text-4xl font-black tracking-tight text-foreground">Halo, {user.name}!</h1>
+          <h1 className="text-4xl font-black tracking-tight text-foreground">Halo, {displayName}!</h1>
           <p className="mt-2 text-lg text-muted-foreground">
             Selamat datang di dashboard layanan aduan Kota Surakarta. Ada yang bisa kami bantu hari ini?
           </p>
@@ -144,45 +126,59 @@ export default function UserDashboardPage() {
               <ChevronRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
           </div>
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {reports.map((report) => (
-              <Card key={report.id} className="overflow-hidden border-border bg-card">
-                <div className="aspect-video w-full bg-muted">
-                  {report.image ? (
-                    <img src={report.image} alt={report.title} className="h-full w-full object-cover" />
-                  ) : (
-                    <div className="flex h-full items-center justify-center text-muted-foreground">
-                      <LayoutDashboard className="h-10 w-10 opacity-20" />
+          
+          {loading ? (
+            <div className="flex h-40 items-center justify-center">
+              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {reports?.slice(0, 3).map((report: any) => (
+                <Card key={report.id} className="overflow-hidden border-border bg-card">
+                  <div className="aspect-video w-full bg-muted">
+                    {report.lampiranFoto ? (
+                      <img src={`http://localhost:5000/uploads/${report.lampiranFoto}`} alt={report.title} className="h-full w-full object-cover" />
+                    ) : (
+                      <div className="flex h-full items-center justify-center text-muted-foreground">
+                        <LayoutDashboard className="h-10 w-10 opacity-20" />
+                      </div>
+                    )}
+                  </div>
+                  <CardHeader className="p-5 pb-2">
+                    <div className="flex items-center justify-between mb-2">
+                      <Badge variant={getStatusVariant(report.status)}>{report.status || 'Menunggu'}</Badge>
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(report.createdAt).toLocaleDateString('id-ID')}
+                      </span>
                     </div>
-                  )}
+                    <CardTitle className="text-base line-clamp-1">{report.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-5 pt-0 pb-4">
+                    <p className="text-sm text-muted-foreground line-clamp-2">
+                      {report.description}
+                    </p>
+                  </CardContent>
+                  <Separator />
+                  <div className="flex items-center gap-3 p-4 px-5 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-1">
+                      <MapPin className="h-3 w-3" />
+                      {report.category}
+                    </div>
+                    <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
+                    <div className="flex items-center gap-1">
+                      <UserCircle className="h-3 w-3" />
+                      {report.username}
+                    </div>
+                  </div>
+                </Card>
+              ))}
+              {(!reports || reports.length === 0) && (
+                <div className="col-span-full py-12 text-center text-muted-foreground border-2 border-dashed rounded-3xl">
+                  Belum ada laporan yang tersedia.
                 </div>
-                <CardHeader className="p-5 pb-2">
-                  <div className="flex items-center justify-between mb-2">
-                    <Badge variant={report.statusVariant}>{report.status}</Badge>
-                    <span className="text-xs text-muted-foreground">{report.date}</span>
-                  </div>
-                  <CardTitle className="text-base line-clamp-1">{report.title}</CardTitle>
-                </CardHeader>
-                <CardContent className="p-5 pt-0 pb-4">
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {report.description}
-                  </p>
-                </CardContent>
-                <Separator />
-                <div className="flex items-center gap-3 p-4 px-5 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <MapPin className="h-3 w-3" />
-                    {report.location}
-                  </div>
-                  <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
-                  <div className="flex items-center gap-1">
-                    <UserCircle className="h-3 w-3" />
-                    {report.reporter}
-                  </div>
-                </div>
-              </Card>
-            ))}
-          </div>
+              )}
+            </div>
+          )}
         </section>
 
         {/* FAQ Section */}

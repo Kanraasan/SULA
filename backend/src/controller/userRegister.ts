@@ -1,5 +1,5 @@
 import { hashSync } from 'bcryptjs';
-import regist from '../regist';
+import userData from '../userData';
 
 export const createUser = (req: any, res: any) => {
   if (!req.body) {
@@ -10,17 +10,17 @@ export const createUser = (req: any, res: any) => {
   }
 
   interface RegisterUser {
-    NIK: number;
+    nik: string;
     username: string;
     password: string;
     passwordConfirm: string;
     alamatLengkap: string;
-    kecamatan: any;
-    kelurahan: any;
+    kecamatan: string;
+    kelurahan: string;
   }
 
   const {
-    NIK = 'untitled',
+    nik,
     username,
     password,
     passwordConfirm,
@@ -42,19 +42,20 @@ export const createUser = (req: any, res: any) => {
   }
 
   const hashedPassword = hashSync(password, 10);
-  const newRegist = {
-    NIK,
+  const newUserData = {
+    nik,
     username,
     password: hashedPassword,
     alamatLengkap,
     kecamatan,
     kelurahan,
+    role: "user",
   };
 
-  regist.push(newRegist);
+  userData.push(newUserData);
 
   return res.status(201).json({
     message: 'Registrasi berhasil',
-    data: newRegist,
+    data: newUserData,
   });
 };

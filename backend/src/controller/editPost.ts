@@ -1,12 +1,12 @@
-import post from '../post';
+import reportData from '../reportData';
 
-export const editPost = (req: any, res: any) => {
+export const editReport = (req: any, res: any) => {
   const { id } = req.params;
-  const { judul, kategori, deskripsi } = req.body;
-  const index = post.findIndex((n) => n.id === id);
+  const { title, category, description } = req.body;
+  const index = reportData.findIndex((n) => n.id === id);
 
   if (index !== -1) {
-    post[index] = { ...post[index], judul, kategori, deskripsi };
+    reportData[index] = { ...reportData[index], title, category, description };
     return res.json({
       message: 'Laporan berhasil diperbaharui',
     });
