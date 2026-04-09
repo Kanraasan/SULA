@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -44,6 +44,10 @@ import {
   Lock,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { useAuth } from "@/hooks/useAuth"
+import { useNavigate } from "react-router-dom"
+import { useApi } from "@/hooks/useApi"
+import { reportService } from "@/services/report.service"
 
 const categories = [
   {
@@ -143,12 +147,15 @@ function PrivacyOption({
 }
 
 export default function ReportFormPage() {
+  const { user } = useAuth()
+  const navigate = useNavigate()
+  const { execute, loading: isSubmitting } = useApi()
+  
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [judul, setJudul] = useState("")
-  const [deskripsi, setDeskripsi] = useState("")
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
   const [file, setFile] = useState<File | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
   const [reportType, setReportType] = useState<ReportType | null>(
     "confidential"
   )
@@ -162,25 +169,19 @@ export default function ReportFormPage() {
       return
     }
 
-    setIsSubmitting(true)
+    if (!user) {
+      alert("Anda harus login terlebih dahulu")
+      navigate("/")
+      return
+    }
 
     try {
-      // Ambil data user dari localStorage
-      const userData = localStorage.getItem("user")
-      if (!userData) {
-        alert("Anda harus login terlebih dahulu")
-        window.location.href = "/"
-        return
-      }
-
-      const user = JSON.parse(userData)
-
       // Buat FormData untuk upload file
       const formData = new FormData()
-      formData.append("judul", judul)
-      formData.append("kategori", selectedCategory)
-      formData.append("deskripsi", deskripsi)
-      formData.append("userNIK", user.NIK.toString())
+      formData.append("title", title)
+      formData.append("category", selectedCategory)
+      formData.append("description", description)
+      formData.append("userNik", user.nik.toString())
       formData.append("username", user.username)
       formData.append("reportType", reportType || "confidential")
 
@@ -188,48 +189,18 @@ export default function ReportFormPage() {
         formData.append("lampiranFoto", file)
       }
 
-      // Kirim ke backend
-      const response = await fetch("/api/post", {
-        method: "POST",
-        body: formData,
-      })
-
-      // Cek apakah response OK
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      // Ambil response sebagai text dulu untuk debug
-      const text = await response.text()
-
-      // Parse JSON
-      let result
-      try {
-        result = JSON.parse(text)
-      } catch (e) {
-        console.error("JSON parse error:", e)
-        console.error("Response text:", text)
-        throw new Error("Invalid JSON response from server")
-      }
+      // Kirim ke backend menggunakan useApi dan reportService
+      const result = await execute(reportService.create(formData))
 
       if (result.message) {
         alert(result.message)
-        // Reset form
-        setJudul("")
-        setDeskripsi("")
-        setSelectedCategory(null)
-        setFile(null)
-        // Redirect ke my-reports
-        window.location.href = "/my-reports"
       } else {
         alert("Laporan berhasil dikirim!")
-        window.location.href = "/my-reports"
       }
+      
+      navigate("/my-reports")
     } catch (error) {
-      console.error("Error:", error)
-      alert("Terjadi kesalahan saat mengirim laporan. Silakan coba lagi.")
-    } finally {
-      setIsSubmitting(false)
+      // Error handled by useApi
     }
   }
 
@@ -289,8 +260,8 @@ export default function ReportFormPage() {
                   </Label>
                   <Input
                     id="title"
-                    value={judul}
-                    onChange={(e) => setJudul(e.target.value)}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="Apa yang ingin Anda laporkan?"
                     className="h-14 rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required
@@ -385,8 +356,8 @@ export default function ReportFormPage() {
                   </Label>
                   <Textarea
                     id="description"
-                    value={deskripsi}
-                    onChange={(e) => setDeskripsi(e.target.value)}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Jelaskan detail lokasi, kondisi, dan kronologi kejadian..."
                     className="min-h-[180px] resize-none rounded-2xl border-muted-foreground/10 bg-muted/20 p-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required

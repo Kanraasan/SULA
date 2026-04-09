@@ -123,7 +123,6 @@ export function RightFilterMenu({
     <div className="flex gap-2">
       {/* FILTER KATEGORI */}
       <Combobox
-        items={kategoriLaporan}
         onValueChange={(val) =>
           onCategoryChange(typeof val === "string" ? val : "")
         }
@@ -140,18 +139,17 @@ export function RightFilterMenu({
         <ComboboxContent>
           <ComboboxEmpty>No categories found.</ComboboxEmpty>
           <ComboboxList>
-            {(item) => (
+            {kategoriLaporan.map((item) => (
               <ComboboxItem key={item.value} value={item.value}>
                 {item.label}
               </ComboboxItem>
-            )}
+            ))}
           </ComboboxList>
         </ComboboxContent>
       </Combobox>
 
       {/* FILTER STATUS */}
       <Combobox
-        items={statusLaporan}
         onValueChange={(val) =>
           onStatusChange(typeof val === "string" ? val : "")
         }
@@ -164,11 +162,11 @@ export function RightFilterMenu({
         <ComboboxContent>
           <ComboboxEmpty>No status found.</ComboboxEmpty>
           <ComboboxList>
-            {(item) => (
+            {statusLaporan.map((item) => (
               <ComboboxItem key={item.value} value={item.value}>
                 {item.label}
               </ComboboxItem>
-            )}
+            ))}
           </ComboboxList>
         </ComboboxContent>
       </Combobox>

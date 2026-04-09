@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { UserNavbar } from "@/components/users/user-navbar"
-import { UserFooter } from "@/components/users/user-footer"
+import { UserNavbar } from "@/components/user/user-navbar"
+import { UserFooter } from "@/components/user/user-footer"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -74,8 +74,8 @@ export default function EditReportPage() {
 
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [isSheetOpen, setIsSheetOpen] = useState(false)
-  const [judul, setJudul] = useState("")
-  const [deskripsi, setDeskripsi] = useState("")
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
   const [existingPhoto, setExistingPhoto] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isLoading, setIsLoading] = useState(true)
@@ -84,13 +84,13 @@ export default function EditReportPage() {
 
   useEffect(() => {
     // Fetch data laporan berdasarkan ID
-    fetch(`/api/post/${id}`)
+    fetch(`/api/report/${id}`)
       .then((res) => res.json())
       .then((result) => {
         if (result.data) {
-          setJudul(result.data.judul)
-          setDeskripsi(result.data.deskripsi)
-          setSelectedCategory(result.data.kategori)
+          setTitle(result.data.title)
+          setDescription(result.data.description)
+          setSelectedCategory(result.data.category)
           setExistingPhoto(result.data.lampiranFoto)
         }
         setIsLoading(false)
@@ -104,7 +104,7 @@ export default function EditReportPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!judul || !selectedCategory || !deskripsi) {
+    if (!title || !selectedCategory || !description) {
       alert("Mohon lengkapi semua field yang wajib diisi")
       return
     }
@@ -112,15 +112,15 @@ export default function EditReportPage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/post/${id}`, {
+      const response = await fetch(`/api/report/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          judul,
-          kategori: selectedCategory,
-          deskripsi,
+          title,
+          category: selectedCategory,
+          description,
         }),
       })
 
@@ -199,15 +199,15 @@ export default function EditReportPage() {
                   </Label>
                   <Input
                     id="title"
-                    value={judul}
-                    onChange={(e) => setJudul(e.target.value)}
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                     placeholder="Apa yang ingin Anda laporkan?"
                     className="h-14 rounded-2xl border-muted-foreground/10 bg-muted/20 px-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required
                   />
                   <p className="text-xs text-muted-foreground">
                     Judul saat ini:{" "}
-                    <span className="font-semibold">{judul}</span>
+                    <span className="font-semibold">{title}</span>
                   </p>
                 </div>
 
@@ -299,8 +299,8 @@ export default function EditReportPage() {
                   </Label>
                   <Textarea
                     id="description"
-                    value={deskripsi}
-                    onChange={(e) => setDeskripsi(e.target.value)}
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                     placeholder="Jelaskan detail lokasi, kondisi, dan kronologi kejadian..."
                     className="min-h-[180px] resize-none rounded-2xl border-muted-foreground/10 bg-muted/20 p-5 text-base shadow-none transition-all focus-visible:border-primary focus-visible:ring-primary/20"
                     required

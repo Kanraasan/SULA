@@ -1,58 +1,60 @@
-import post from '../post';
+import reportData from '../reportData';
 import { nanoid } from 'nanoid';
 
-export const postContent = (req: any, res: any) => {
+export const createReport = (req: any, res: any) => {
   try {
-    const { judul, kategori, deskripsi, userNIK, username } = req.body;
-    const id = nanoid(16);
+    const user = (req as any).user;
 
-    console.log('Received data:', { judul, kategori, deskripsi, userNIK, username });
-
-    if (!judul || !kategori || !deskripsi) {
-      return res.status(400).json({ message: 'Mohon lengkapi form' });
+    if (!user) {
+      return res.status(401).json({ message: 'user belum login nih' });
     }
 
-    interface laporan {
+    const { title, category, description } = req.body;
+    const id = nanoid(16);
+
+    if (!title || !category || !description) {
+      return res.status(400).json({ message: 'form-nya diisi semua dong' });
+    }
+
+    interface Laporan {
       id: string;
-      judul: string;
-      kategori: any;
-      deskripsi: string;
+      title: string;
+      category: any;
+      description: string;
       lampiranFoto: any;
-      userNIK?: any;
+      userNik?: any;
       username?: string;
       createdAt: string;
     }
 
-    const newPost = {
+    const newReport = {
       id,
-      judul,
-      kategori,
-      deskripsi,
+      title,
+      category,
+      description,
       lampiranFoto: req.file?.filename ?? null,
-      userNIK,
-      username,
+      userNik: user.nik, // ambil dari jwt
+      username: user.username, // ambil dari jwt
       createdAt: new Date().toISOString(),
-    } as laporan;
+    } as Laporan;
 
-    post.push(newPost);
+    reportData.push(newReport);
 
-    console.log('New post created:', newPost);
-
-    const isSuccess = post.filter((p) => p.id === id).length > 0;
+    const isSuccess = reportData.filter((p) => p.id === id).length > 0;
 
     if (!isSuccess) {
-      return res.status(400).json({ message: 'Laporan gagal dibuat' });
+      return res.status(400).json({ message: 'laporan gagal dibikin' });
     }
 
     return res.status(201).json({
-      message: 'Laporan berhasil dibuat',
-      data: newPost,
+      message: 'laporan berhasil dibikin',
+      data: newReport,
     });
   } catch (error) {
-    console.error('Error in postContent:', error);
+    console.error('error pas createReport:', error);
     return res.status(500).json({ 
-      message: 'Terjadi kesalahan server',
-      error: error instanceof Error ? error.message : 'Unknown error'
+      message: 'ada masalah di server',
+      error: error instanceof Error ? error.message : 'error gak tau kenapa'
     });
   }
 };
