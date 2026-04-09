@@ -2,7 +2,27 @@ import { BarChart3, CheckCircle2, ClipboardList, AlertCircle } from "lucide-reac
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export function StatisticCardsFigma() {
+type StatisticSummary = {
+  total: number
+  selesai: number
+  diproses: number
+  menunggu: number
+}
+
+type StatisticCardsFigmaProps = {
+  summary?: StatisticSummary
+}
+
+const fallbackSummary: StatisticSummary = {
+  total: 1284,
+  selesai: 856,
+  diproses: 312,
+  menunggu: 116,
+}
+
+export function StatisticCardsFigma({ summary }: StatisticCardsFigmaProps) {
+  const data = summary ?? fallbackSummary
+
   return (
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
       {/* Kartu 1: Total */}
@@ -17,7 +37,7 @@ export function StatisticCardsFigma() {
         </div>
         <div className="mt-4">
           <p className="text-sm font-medium text-muted-foreground">Total Laporan</p>
-          <h3 className="text-3xl font-bold mt-1">1,284</h3>
+          <h3 className="text-3xl font-bold mt-1">{data.total.toLocaleString("id-ID")}</h3>
         </div>
       </Card>
 
@@ -33,7 +53,7 @@ export function StatisticCardsFigma() {
         </div>
         <div className="mt-4">
           <p className="text-sm font-medium text-muted-foreground">Selesai</p>
-          <h3 className="text-3xl font-bold mt-1">856</h3>
+          <h3 className="text-3xl font-bold mt-1">{data.selesai.toLocaleString("id-ID")}</h3>
         </div>
       </Card>
 
@@ -49,7 +69,7 @@ export function StatisticCardsFigma() {
         </div>
         <div className="mt-4">
           <p className="text-sm font-medium text-muted-foreground">Diproses</p>
-          <h3 className="text-3xl font-bold mt-1">312</h3>
+          <h3 className="text-3xl font-bold mt-1">{data.diproses.toLocaleString("id-ID")}</h3>
         </div>
       </Card>
 
@@ -65,7 +85,7 @@ export function StatisticCardsFigma() {
         </div>
         <div className="mt-4">
           <p className="text-sm font-medium text-muted-foreground">Menunggu</p>
-          <h3 className="text-3xl font-bold mt-1">116</h3>
+          <h3 className="text-3xl font-bold mt-1">{data.menunggu.toLocaleString("id-ID")}</h3>
         </div>
       </Card>
     </div>

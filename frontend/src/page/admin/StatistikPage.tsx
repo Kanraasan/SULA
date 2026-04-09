@@ -6,8 +6,60 @@ import { TrenLineChart } from "@/components/tren-line-chart"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import Clock from "@/components/clock-02"
+import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { api, isHandledApiError } from "@/lib/api-client"
+
+type BackendPost = {
+  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
+}
 
 export default function StatistikPage() {
+  const [summary, setSummary] = useState({
+    total: 0,
+    selesai: 0,
+    diproses: 0,
+    menunggu: 0,
+  })
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const result = await api.get<{ data?: BackendPost[] }>("/api/post", {
+          fallbackMessage: "Gagal memuat statistik laporan",
+          showErrorToast: true,
+        })
+
+        if (!Array.isArray(result.data)) {
+          return
+        }
+
+        const posts: BackendPost[] = result.data
+        const selesai = posts.filter((item) => item.status === "selesai").length
+        const diproses = posts.filter((item) => item.status === "diproses").length
+        const menunggu = posts.filter((item) => !item.status || item.status === "menunggu").length
+
+        setSummary({
+          total: posts.length,
+          selesai,
+          diproses,
+          menunggu,
+        })
+      } catch (error) {
+        if (!isHandledApiError(error)) {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Gagal memuat statistik laporan"
+          )
+        }
+        console.error("Gagal memuat statistik laporan:", error)
+      }
+    }
+
+    void loadStats()
+  }, [])
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -32,7 +84,7 @@ export default function StatistikPage() {
               Ringkasan data laporan masyarakat secara real-time
             </p>
           </div>
-          <StatisticCardsFigma />
+          <StatisticCardsFigma summary={summary} />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <KategoriBarChart />
             <TrenLineChart />

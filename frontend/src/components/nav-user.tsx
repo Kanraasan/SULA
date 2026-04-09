@@ -5,6 +5,7 @@ import {
   LogOut,
   MoreVertical,
 } from "lucide-react"
+import { Link } from "react-router-dom"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -78,9 +79,11 @@ export function NavUser({
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Settings />
-                Setting
+              <DropdownMenuItem asChild>
+                <Link to="/setting">
+                  <Settings />
+                  Setting
+                </Link>
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuItem>

@@ -36,7 +36,7 @@ import {
 } from "@/components/ui/table"
 import { useState } from "react"
 
-type Laporan = {
+export type Laporan = {
   id: string
   date: string
   reporter: {
@@ -355,15 +355,31 @@ export const dataLaporan: Laporan[] = [
   },
 ]
 
+const formatTanggalIndonesia = (value: string) => {
+  const dateValue = new Date(value)
+
+  if (Number.isNaN(dateValue.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(dateValue)
+}
+
 const getColumns = (
-  onDeleteClick: () => void
+  onDeleteClick: (id: string) => void,
+  onViewDetailClick: (laporan: Laporan) => void,
+  onUpdateStatusClick: (laporan: Laporan) => void
 ): ColumnDef<Laporan>[] => [
   {
     accessorKey: "date",
     header: "TANGGAL",
     cell: ({ row }) => (
       <div className="whitespace-nowrap text-muted-foreground">
-        {row.original.date}
+        {formatTanggalIndonesia(row.original.date)}
       </div>
     ),
   },
@@ -438,7 +454,7 @@ const getColumns = (
   {
     id: "actions",
     header: "AKSI",
-    cell: () => (
+    cell: ({ row }) => (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="size-8 p-0 text-muted-foreground">
@@ -447,12 +463,16 @@ const getColumns = (
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Lihat Detail</DropdownMenuItem>
-          <DropdownMenuItem>Perbarui Status</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onViewDetailClick(row.original)}>
+            Lihat Detail
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onUpdateStatusClick(row.original)}>
+            Perbarui Status
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-destructive"
-            onClick={onDeleteClick}
+            onClick={() => onDeleteClick(row.original.id)}
           >
             Hapus Laporan
           </DropdownMenuItem>
@@ -462,9 +482,47 @@ const getColumns = (
   },
 ]
 
-export function ReportTable({ data }: { data: Laporan[] }) {
+type ReportTableProps = {
+  data: Laporan[]
+  onDelete?: (id: string) => Promise<void> | void
+  onViewDetail?: (laporan: Laporan) => void
+  onUpdateStatus?: (laporan: Laporan) => void
+  deletingId?: string | null
+}
+
+export function ReportTable({
+  data,
+  onDelete,
+  onViewDetail,
+  onUpdateStatus,
+  deletingId = null,
+}: ReportTableProps) {
   const [isDialogAlertOpen, setIsDialogAlertOpen] = useState(false)
-  const columns = getColumns(() => setIsDialogAlertOpen(true))
+  const [selectedId, setSelectedId] = useState<string | null>(null)
+
+  const columns = getColumns(
+    (id) => {
+      setSelectedId(id)
+      setIsDialogAlertOpen(true)
+    },
+    (laporan) => {
+      onViewDetail?.(laporan)
+    },
+    (laporan) => {
+      onUpdateStatus?.(laporan)
+    }
+  )
+
+  const handleDeleteConfirm = async () => {
+    if (!selectedId || !onDelete) {
+      setIsDialogAlertOpen(false)
+      return
+    }
+
+    await onDelete(selectedId)
+    setIsDialogAlertOpen(false)
+    setSelectedId(null)
+  }
 
   const table = useReactTable({
     data: data,
@@ -621,7 +679,14 @@ export function ReportTable({ data }: { data: Laporan[] }) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Batal</AlertDialogCancel>
-            <AlertDialogAction>Hapus</AlertDialogAction>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={Boolean(deletingId && deletingId === selectedId)}
+            >
+              {deletingId && deletingId === selectedId
+                ? "Menghapus..."
+                : "Hapus"}
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
