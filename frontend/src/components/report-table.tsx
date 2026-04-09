@@ -355,15 +355,31 @@ export const dataLaporan: Laporan[] = [
   },
 ]
 
+const formatTanggalIndonesia = (value: string) => {
+  const dateValue = new Date(value)
+
+  if (Number.isNaN(dateValue.getTime())) {
+    return value
+  }
+
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(dateValue)
+}
+
 const getColumns = (
-  onDeleteClick: (id: string) => void
+  onDeleteClick: (id: string) => void,
+  onViewDetailClick: (laporan: Laporan) => void,
+  onUpdateStatusClick: (laporan: Laporan) => void
 ): ColumnDef<Laporan>[] => [
   {
     accessorKey: "date",
     header: "TANGGAL",
     cell: ({ row }) => (
       <div className="whitespace-nowrap text-muted-foreground">
-        {row.original.date}
+        {formatTanggalIndonesia(row.original.date)}
       </div>
     ),
   },
@@ -447,8 +463,12 @@ const getColumns = (
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>Lihat Detail</DropdownMenuItem>
-          <DropdownMenuItem>Perbarui Status</DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onViewDetailClick(row.original)}>
+            Lihat Detail
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => onUpdateStatusClick(row.original)}>
+            Perbarui Status
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="text-destructive"
@@ -465,17 +485,33 @@ const getColumns = (
 type ReportTableProps = {
   data: Laporan[]
   onDelete?: (id: string) => Promise<void> | void
+  onViewDetail?: (laporan: Laporan) => void
+  onUpdateStatus?: (laporan: Laporan) => void
   deletingId?: string | null
 }
 
-export function ReportTable({ data, onDelete, deletingId = null }: ReportTableProps) {
+export function ReportTable({
+  data,
+  onDelete,
+  onViewDetail,
+  onUpdateStatus,
+  deletingId = null,
+}: ReportTableProps) {
   const [isDialogAlertOpen, setIsDialogAlertOpen] = useState(false)
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const columns = getColumns((id) => {
-    setSelectedId(id)
-    setIsDialogAlertOpen(true)
-  })
+  const columns = getColumns(
+    (id) => {
+      setSelectedId(id)
+      setIsDialogAlertOpen(true)
+    },
+    (laporan) => {
+      onViewDetail?.(laporan)
+    },
+    (laporan) => {
+      onUpdateStatus?.(laporan)
+    }
+  )
 
   const handleDeleteConfirm = async () => {
     if (!selectedId || !onDelete) {

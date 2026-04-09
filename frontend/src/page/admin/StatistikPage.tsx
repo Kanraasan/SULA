@@ -7,30 +7,11 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { ThemeToggle } from "@/components/theme-toggle"
 import Clock from "@/components/clock-02"
 import { useEffect, useState } from "react"
+import { toast } from "sonner"
+import { api, isHandledApiError } from "@/lib/api-client"
 
 type BackendPost = {
   status?: "menunggu" | "diproses" | "selesai" | "ditolak"
-}
-
-const API_BASE_URL =
-  (import.meta.env.VITE_API_URL as string | undefined)?.trim() || ""
-
-const toApiUrl = (path: string) => {
-  const normalizedPath = path.startsWith("/") ? path : `/${path}`
-
-  if (!API_BASE_URL) {
-    return normalizedPath
-  }
-
-  const normalizedBase = API_BASE_URL.replace(/\/+$/, "")
-  const baseEndsWithApi = /\/api$/i.test(normalizedBase)
-  const pathStartsWithApi = normalizedPath.startsWith("/api/")
-
-  if (baseEndsWithApi && pathStartsWithApi) {
-    return `${normalizedBase}${normalizedPath.replace(/^\/api/, "")}`
-  }
-
-  return `${normalizedBase}${normalizedPath}`
 }
 
 export default function StatistikPage() {
@@ -44,10 +25,12 @@ export default function StatistikPage() {
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const response = await fetch(toApiUrl("/api/post"))
-        const result = await response.json()
+        const result = await api.get<{ data?: BackendPost[] }>("/api/post", {
+          fallbackMessage: "Gagal memuat statistik laporan",
+          showErrorToast: true,
+        })
 
-        if (!response.ok || !Array.isArray(result.data)) {
+        if (!Array.isArray(result.data)) {
           return
         }
 
@@ -63,6 +46,13 @@ export default function StatistikPage() {
           menunggu,
         })
       } catch (error) {
+        if (!isHandledApiError(error)) {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Gagal memuat statistik laporan"
+          )
+        }
         console.error("Gagal memuat statistik laporan:", error)
       }
     }

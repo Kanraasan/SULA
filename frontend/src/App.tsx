@@ -5,6 +5,7 @@ import DashboardPage from "./page/admin/DashboardPage"
 import LaporanPage from "./page/admin/LaporanPage"
 import PetaWilayahPage from "./page/admin/PetaWilayahPage"
 import StatistikPage from "./page/admin/StatistikPage"
+import AdminSettingPage from "./page/admin/SettingPage"
 import UserDashboardPage from "./page/users/DashboardPage"
 import ReportFormPage from "./page/users/ReportForm"
 import StatusLaporanPage from "./page/users/StatusLaporanPage"
@@ -29,6 +30,7 @@ export function App() {
       <Route path="/laporan" element={<LaporanPage />} />
       <Route path="/peta-wilayah" element={<PetaWilayahPage />} />
       <Route path="/statistik" element={<StatistikPage />} />
+      <Route path="/setting" element={<AdminSettingPage />} />
     </Routes>
   )
 }
