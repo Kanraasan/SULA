@@ -1,4 +1,4 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/AppSidebar"
 import {
   Map,
   MapControls,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useState, useEffect, useRef } from "react"
 import { ThemeToggle } from "@/components/theme-toggle"
-import Clock from "@/components/clock-02"
+import Clock02 from "@/components/Clock02"
 
 const styles = {
   // default: undefined,
@@ -22,7 +22,7 @@ const styles = {
 
 type StyleKey = keyof typeof styles
 
-export default function PetaWilayahPage() {
+export default function MapPage() {
   const mapRef = useRef<MapRef>(null)
   const [style, setStyle] = useState<StyleKey>("openstreetmap")
   const selectedStyle = styles[style]
@@ -49,7 +49,7 @@ export default function PetaWilayahPage() {
             <h2 className="font-bold">Laporan</h2>
           </div>
           <div className="flex items-center gap-4">
-            <Clock />
+            <Clock02 />
             <ThemeToggle />
           </div>
         </header>

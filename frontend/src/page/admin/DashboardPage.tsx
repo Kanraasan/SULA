@@ -1,13 +1,13 @@
-import { AppSidebar } from "@/components/app-sidebar"
+import { AppSidebar } from "@/components/AppSidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
-import { DashboardCards } from "@/components/dashboard-cards"
+import { DashboardCards } from "@/components/admin/DashboardCards"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
-import Clock from "@/components/clock-02"
+import Clock02 from "@/components/Clock02"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
@@ -111,7 +111,7 @@ export default function DashboardPage() {
             <h2 className="font-bold">Laporan</h2>
           </div>
           <div className="flex items-center gap-4">
-            <Clock />
+            <Clock02 />
             <ThemeToggle />
           </div>
         </header>

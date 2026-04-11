@@ -1,6 +1,6 @@
-import { useMemo, useState } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SearchForm } from "@/components/search-form"
+import { useState, useMemo } from "react"
+import { AppSidebar } from "@/components/AppSidebar"
+import { SearchForm } from "@/components/SearchForm"
 import { Button } from "@/components/ui/button"
 import {
   SidebarInset,
@@ -8,11 +8,11 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
-import { RightFilterMenu } from "@/components/right-filter-menu"
-import { ReportTable, type Laporan } from "@/components/report-table"
+import { RightFilterMenu } from "@/components/admin/RightFilterMenu"
+import { ReportTable, type Laporan } from "@/components/admin/ReportTable"
 import { type DateRange } from "react-day-picker"
 import { ThemeToggle } from "@/components/theme-toggle"
-import Clock from "@/components/clock-02"
+import Clock02 from "@/components/Clock02"
 import { CreateReportDialog } from "@/components/admin/create-report-dialog"
 import { ReportDetailDialog } from "@/components/admin/report-detail-dialog"
 import { UpdateStatusDialog } from "@/components/admin/update-status-dialog"
@@ -28,7 +28,8 @@ const kategoriMasalah = [
   { value: "bencana", label: "Bencana & Keadaan Darurat" },
 ]
 
-export default function LaporanPage() {
+export default function AdminReportsPage() {
+  // 1. Definisikan semua State
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
   const [selectedStatus, setSelectedStatus] = useState("")
@@ -122,7 +123,7 @@ export default function LaporanPage() {
               <h2 className="font-bold">Laporan</h2>
             </div>
             <div className="flex items-center gap-4">
-              <Clock />
+              <Clock02 />
               <ThemeToggle />
             </div>
           </header>

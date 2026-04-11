@@ -2,15 +2,9 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { ThumbsUp, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { IReportUI } from "@/types/report"
 
-interface ReportCardProps {
-  title: string
-  category: string
-  status: "Menunggu" | "Diproses" | "Selesai"
-  time: string
-  author: string
-  votes: number
-  imageUrl: string
+interface ReportCardProps extends Omit<IReportUI, 'createdAt'> {
   authorImage?: string
 }
 

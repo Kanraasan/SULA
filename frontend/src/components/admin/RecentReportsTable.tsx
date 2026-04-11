@@ -19,9 +19,8 @@ const fallbackRecentReports: RecentReport[] = [
   { id: "#REP-202302", kategori: "Kebersihan", ket: "Sampah menumpuk di taman", status: "DIPROSES", tgl: "Oct 25, 2023" },
 ]
 
-export function LaporanTerbaruTable({ rows }: LaporanTerbaruTableProps) {
+export function RecentReportsTable({ rows }: LaporanTerbaruTableProps) {
   const recentReports = rows && rows.length > 0 ? rows : fallbackRecentReports
-
   return (
     <Card className="rounded-2xl border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-5">

@@ -40,11 +40,18 @@ export const reportService = {
     return result.data;
   },
 
-  update: async (id: string, formData: FormData) => {
+  update: async (id: string, data: FormData | any) => {
+    const isFormData = data instanceof FormData;
+    const headers: Record<string, string> = { ...getAuthHeader() };
+    
+    if (!isFormData) {
+      headers["Content-Type"] = "application/json";
+    }
+
     const response = await fetch(`/api/report/${id}`, {
       method: "PUT",
-      headers: { ...getAuthHeader() },
-      body: formData,
+      headers,
+      body: isFormData ? data : JSON.stringify(data),
     });
 
     const result = await response.json();
@@ -65,5 +72,14 @@ export const reportService = {
       throw new Error(result.message || "Gagal menghapus laporan");
     }
     return result;
+  },
+
+  getLeaderboard: async () => {
+    const response = await fetch("/api/leaderboard");
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "Gagal memuat leaderboard");
+    }
+    return result.data;
   },
 };

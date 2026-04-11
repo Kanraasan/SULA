@@ -1,6 +1,6 @@
 import * as React from "react"
 
-import { VersionSwitcher } from "@/components/version-switcher"
+import { VersionSwitcher } from "@/components/VersionSwitcher"
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +12,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { ChartNoAxesColumn, Map, FileText, LayoutDashboard } from "lucide-react"
-import { NavUser } from "@/components/nav-user"
+import { NavUser } from "@/components/NavUser"
 
 const data = {
   user: {

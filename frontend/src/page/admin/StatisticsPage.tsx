@@ -1,11 +1,11 @@
-import { AppSidebar } from "@/components/app-sidebar"
-import { KategoriBarChart } from "@/components/kategori-bar-chart"
-import { LaporanTerbaruTable } from "@/components/laporan-terbaru-table"
-import { StatisticCardsFigma } from "@/components/statistic-cards-figma"
-import { TrenLineChart } from "@/components/tren-line-chart"
+import { AppSidebar } from "@/components/AppSidebar"
+import { CategoryBarChart } from "@/components/admin/CategoryBarChart"
+import { RecentReportsTable } from "@/components/admin/RecentReportsTable"
+import { StatisticCardsFigma } from "@/components/admin/StatisticCardsFigma"
+import { TrendLineChart } from "@/components/admin/TrendLineChart"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
-import Clock from "@/components/clock-02"
+import Clock02 from "@/components/Clock02"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
@@ -19,7 +19,7 @@ type BackendPost = {
   status?: "menunggu" | "diproses" | "selesai" | "ditolak"
 }
 
-export default function StatistikPage() {
+export default function StatisticsPage() {
   const [posts, setPosts] = useState<BackendPost[]>([])
   const [summary, setSummary] = useState({
     total: 0,
@@ -146,6 +146,7 @@ export default function StatistikPage() {
       }))
   }, [posts])
 
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -156,7 +157,7 @@ export default function StatistikPage() {
             <h2 className="font-bold">Laporan</h2>
           </div>
           <div className="flex items-center gap-4">
-            <Clock />
+            <Clock02 />
             <ThemeToggle />
           </div>
         </header>
@@ -172,10 +173,10 @@ export default function StatistikPage() {
           </div>
           <StatisticCardsFigma summary={summary} />
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <KategoriBarChart data={categoryChartData} />
-            <TrenLineChart data={trendData} />
+            <CategoryBarChart data={categoryChartData} />
+            <TrendLineChart data={trendData} />
           </div>
-          <LaporanTerbaruTable rows={latestReports} />
+          <RecentReportsTable rows={latestReports} />
         </div>
       </SidebarInset>
     </SidebarProvider>

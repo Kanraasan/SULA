@@ -1,5 +1,5 @@
 import { hashSync } from 'bcryptjs';
-import userData from '../userData';
+import userData from '../mock/userData';
 
 export const createUser = (req: any, res: any) => {
   if (!req.body) {

@@ -1,4 +1,4 @@
-import reportData from '../reportData';
+import reportData from '../mock/reportData';
 
 export const getReportById = (req: any, res: any) => {
   const { id } = req.params;

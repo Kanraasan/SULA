@@ -2,16 +2,16 @@ import { Route, Routes } from "react-router-dom"
 import LoginPage from "./page/LoginPage"
 import RegisterPage from "./page/RegisterPage"
 import DashboardPage from "./page/admin/DashboardPage"
-import LaporanPage from "./page/admin/LaporanPage"
-import PetaWilayahPage from "./page/admin/PetaWilayahPage"
-import StatistikPage from "./page/admin/StatistikPage"
+import AdminReportsPage from "./page/admin/AdminReportsPage"
+import MapPage from "./page/admin/MapPage"
+import StatisticsPage from "./page/admin/StatisticsPage"
 import UserDashboardPage from "./page/user/DashboardPage"
-import ReportFormPage from "./page/user/ReportForm"
-import StatusLaporanPage from "./page/user/StatusLaporanPage"
+import ReportFormPage from "./page/user/ReportFormPage"
+import ReportStatusPage from "./page/user/ReportStatusPage"
 import ReportDetailPage from "./page/user/ReportDetailPage"
 import MyReportsPage from "./page/user/MyReportsPage"
 import EditReportPage from "./page/user/EditReportPage"
-import LeaderboardPage from "./page/user/Leaderboard"
+import LeaderboardPage from "./page/user/LeaderboardPage"
 import { ProtectedRoute } from "./hooks/ProtectedRoute"
 
 export function App() {
@@ -44,7 +44,7 @@ export function App() {
       } />
       <Route path="/status-laporan" element={
         <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <StatusLaporanPage />
+          <ReportStatusPage />
         </ProtectedRoute>
       } />
       <Route path="/report-detail/:id" element={
@@ -66,17 +66,17 @@ export function App() {
       } />
       <Route path="/laporan" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <LaporanPage />
+          <AdminReportsPage />
         </ProtectedRoute>
       } />
       <Route path="/peta-wilayah" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <PetaWilayahPage />
+          <MapPage />
         </ProtectedRoute>
       } />
       <Route path="/statistik" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <StatistikPage />
+          <StatisticsPage />
         </ProtectedRoute>
       } />
     </Routes>

@@ -28,9 +28,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function KategoriBarChart({ data }: KategoriBarChartProps) {
+export function CategoryBarChart({ data }: KategoriBarChartProps) {
   const chartData = data && data.length > 0 ? data : fallbackChartData
-
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">

@@ -32,9 +32,8 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function TrenLineChart({ data }: TrenLineChartProps) {
+export function TrendLineChart({ data }: TrenLineChartProps) {
   const lineData = data && data.length > 0 ? data : fallbackLineData
-
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">

@@ -1,4 +1,4 @@
-import reportData from '../reportData';
+import reportData from '../mock/reportData';
 import { nanoid } from 'nanoid';
 
 export const createReport = (req: any, res: any) => {
