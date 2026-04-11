@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { type Laporan } from "@/components/report-table"
+import { type Laporan } from "./ReportTable"
 import {
   Dialog,
   DialogClose,
