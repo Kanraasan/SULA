@@ -67,9 +67,9 @@ export default function ReportDetailPage() {
 
   const timeline = [
     { label: "Laporan Diterima", date: report.created_at, status: "completed" },
-    { label: "Diverifikasi", date: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? report.created_at : null, status: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? "completed" : "pending" },
-    { label: "Dalam Perbaikan", date: report.status === 'Selesai' ? report.created_at : null, status: report.status === 'Selesai' ? "completed" : "pending" },
-    { label: "Selesai", date: report.status === 'Selesai' ? report.created_at : null, status: report.status === 'Selesai' ? "completed" : "pending" },
+    { label: "Diverifikasi", date: (report.status === 'diproses' || report.status === 'selesai') ? report.created_at : null, status: (report.status === 'diproses' || report.status === 'selesai') ? "completed" : "pending" },
+    { label: "Dalam Perbaikan", date: report.status === 'selesai' ? report.created_at : null, status: report.status === 'selesai' ? "completed" : "pending" },
+    { label: "Selesai", date: report.status === 'selesai' ? report.created_at : null, status: report.status === 'selesai' ? "completed" : "pending" },
   ]
 
   const imageUrl = report.complaint_image 
@@ -123,11 +123,11 @@ export default function ReportDetailPage() {
                   <div className="flex flex-wrap gap-2">
                     <Badge className={cn(
                       "border-none px-3 py-1 font-bold uppercase tracking-wide text-[10px]",
-                      report.status === 'Selesai' ? "bg-green-100 text-green-700" : 
-                      report.status === 'Diverifikasi' ? "bg-blue-100 text-blue-700" :
+                      report.status === 'selesai' ? "bg-green-100 text-green-700" : 
+                      report.status === 'diproses' ? "bg-blue-100 text-blue-700" :
                       "bg-red-100 text-red-700"
                     )}>
-                      {report.status || "Menunggu"}
+                      {report.status || "menunggu"}
                     </Badge>
                     <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted border-none px-3 py-1 font-medium">
                       {report.complaint_category}
@@ -148,7 +148,7 @@ export default function ReportDetailPage() {
                 <div className="space-y-3 pt-2">
                   <Button className="w-full h-12 rounded-2xl bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-700/20 dark:shadow-blue-600/10">
                     <ThumbsUp className="w-4 h-4 fill-white" />
-                    Dukung Laporan ({report.votes || 0})
+                    Dukung Laporan ({report.upvotes || 0})
                   </Button>
                   <Button variant="outline" className="w-full h-12 rounded-2xl border-border bg-muted/30 hover:bg-muted transition-all font-bold gap-2">
                     <Share2 className="w-4 h-4" />

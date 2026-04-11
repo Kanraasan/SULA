@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { ThumbsUp, Clock } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { IReportUI } from "@/types/report"
+import type { IReportUI } from "@/types/report"
 
 interface ReportCardProps extends Omit<IReportUI, 'createdAt'> {
   authorImage?: string
@@ -34,7 +34,7 @@ export function ReportCard({
           className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
         <div className="absolute right-3 top-3">
-          <Badge className={cn("px-3 py-1 font-bold shadow-sm backdrop-blur-[2px]", statusConfig[status])}>
+          <Badge className={cn("px-3 py-1 font-bold shadow-sm backdrop-blur-[2px]", statusConfig[status as keyof typeof statusConfig])}>
             {status}
           </Badge>
         </div>

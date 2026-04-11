@@ -54,12 +54,12 @@ export const createUser = async (req: any, res: any) => {
           id: authData.user.id,
           nik,
           username,
-          password: password, // Sesuai kolom 'password' di SQL Anda
-          alamatLengkap,      // CamelCase sesuai SQL
+          password: password,
+          alamat_lengkap: alamatLengkap,
           kecamatan,
           kelurahan,
-          tanggalLahir,       // Sesuai SQL
-          role: 'user',       // Default role
+          tanggal_lahir: tanggalLahir,
+          role: 'user',
         },
       ]);
 

@@ -8,7 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { type Laporan } from "@/components/report-table"
+import { type Laporan } from "./ReportTable"
 
 const formatTanggalIndonesia = (value: string) => {
   const dateValue = new Date(value)

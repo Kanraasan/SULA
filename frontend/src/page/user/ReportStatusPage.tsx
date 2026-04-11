@@ -4,7 +4,7 @@ import { UserFooter } from "@/components/user/UserFooter"
 import { ReportCard } from "@/components/user/ReportCard"
 import { Button } from "@/components/ui/button"
 import { Filter, ListFilter, Check } from "lucide-react"
-import { IReport, IReportUI } from "@/types/report"
+import type { IReport, IReportUI } from "@/types/report"
 import { reportService } from "@/services/report.service"
 import {
   DropdownMenu,

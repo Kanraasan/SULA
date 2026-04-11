@@ -1,5 +1,5 @@
 import { AppSidebar } from "@/components/AppSidebar"
-import Clock from "@/components/Clock02"
+import Clock02 from "@/components/Clock02"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
@@ -27,7 +27,7 @@ export default function AdminSettingPage() {
             <h2 className="font-bold">Pengaturan</h2>
           </div>
           <div className="flex items-center gap-4">
-            <Clock />
+            <Clock02 />
             <ThemeToggle />
           </div>
         </header>

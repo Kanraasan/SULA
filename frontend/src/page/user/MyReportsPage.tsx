@@ -4,7 +4,7 @@ import { UserFooter } from "@/components/user/UserFooter"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { IReport } from "@/types/report"
+import type { IReport } from "@/types/report"
 import { reportService } from "@/services/report.service"
 
 import { FileText as FileTextIcon, Calendar as CalendarIcon, Trash2 as Trash2Icon, Edit as EditIcon } from "lucide-react"

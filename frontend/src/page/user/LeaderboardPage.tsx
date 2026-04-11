@@ -19,7 +19,7 @@ export default function LeaderboardPage() {
   const { user: currentUser } = useAuth()
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [_error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     const fetchLeaderboard = async () => {
@@ -49,11 +49,7 @@ export default function LeaderboardPage() {
     )
   }
 
-  const topThree = [
-    leaderboard[1], // Rank 2
-    leaderboard[0], // Rank 1
-    leaderboard[2], // Rank 3
-  ].filter(Boolean)
+
 
   const restOfLeaderboard = leaderboard.slice(3)
 

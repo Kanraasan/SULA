@@ -3,7 +3,6 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import {
   Field,
-  FieldDescription,
   FieldGroup,
   FieldLabel,
 } from "@/components/ui/field"
@@ -12,7 +11,6 @@ import { Textarea } from "@/components/ui/textarea"
 import {
   Combobox,
   ComboboxContent,
-  ComboboxEmpty,
   ComboboxInput,
   ComboboxItem,
   ComboboxList,
@@ -193,10 +191,12 @@ export default function RegisterPage() {
                   <Field>
                     <FieldLabel htmlFor="nik">NIK</FieldLabel>
                     <Input id="nik" value={nik} onChange={(e) => setNik(e.target.value)} required placeholder="3372..." />
+                    {errors.nik && <p className="text-xs text-destructive mt-1">{errors.nik}</p>}
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="email">Email</FieldLabel>
                     <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="nama@email.com" />
+                    {errors.email && <p className="text-xs text-destructive mt-1">{errors.email}</p>}
                   </Field>
                 </div>
 
@@ -204,6 +204,7 @@ export default function RegisterPage() {
                   <Field>
                     <FieldLabel htmlFor="username">Username</FieldLabel>
                     <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="johndoe" />
+                    {errors.username && <p className="text-xs text-destructive mt-1">{errors.username}</p>}
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="tanggalLahir">Tanggal Lahir</FieldLabel>
@@ -215,10 +216,12 @@ export default function RegisterPage() {
                   <Field>
                     <FieldLabel htmlFor="password">Kata Sandi</FieldLabel>
                     <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="******" />
+                    {errors.password && <p className="text-xs text-destructive mt-1">{errors.password}</p>}
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="passwordConfirm">Konfirmasi</FieldLabel>
                     <Input id="passwordConfirm" type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required placeholder="******" />
+                    {errors.passwordConfirm && <p className="text-xs text-destructive mt-1">{errors.passwordConfirm}</p>}
                   </Field>
                 </div>
 
@@ -227,8 +230,8 @@ export default function RegisterPage() {
                     <FieldLabel htmlFor="kecamatan">Kecamatan</FieldLabel>
                     <Combobox
                       items={kecamatan}
-                      itemToStringValue={(k) => k.name}
-                      onValueChange={(val) => { setSelectedKecamatan(val); setSelectedKelurahan(null); }}
+                      itemToStringValue={(k: Kecamatan) => k.name}
+                      onValueChange={(val: Kecamatan | null) => { setSelectedKecamatan(val); setSelectedKelurahan(null); }}
                     >
                       <ComboboxInput placeholder="Pilih..." value={selectedKecamatan?.name ?? ""} />
                       <ComboboxContent>
@@ -244,8 +247,8 @@ export default function RegisterPage() {
                     <FieldLabel htmlFor="kelurahan">Kelurahan</FieldLabel>
                     <Combobox
                       items={filteredKelurahan}
-                      itemToStringValue={(k) => k.name}
-                      onValueChange={(val) => setSelectedKelurahan(val)}
+                      itemToStringValue={(k: Kelurahan) => k.name}
+                      onValueChange={(val: Kelurahan | null) => setSelectedKelurahan(val)}
                     >
                       <ComboboxInput placeholder="Pilih..." value={selectedKelurahan?.name ?? ""} disabled={!selectedKecamatan} />
                       <ComboboxContent>
