@@ -55,10 +55,10 @@ export const createUser = async (req: any, res: any) => {
           nik,
           username,
           password: password,
-          alamat_lengkap: alamatLengkap,
+          alamatLengkap,
           kecamatan,
           kelurahan,
-          tanggal_lahir: tanggalLahir,
+          tanggalLahir,
           role: 'user',
         },
       ]);
