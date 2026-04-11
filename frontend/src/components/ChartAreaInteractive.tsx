@@ -81,7 +81,7 @@ export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
   const [timeRange, setTimeRange] = React.useState("90d")
 
   const sourceData = React.useMemo(() => {
-    if (data && data.length > 0) {
+    if (data !== undefined) {
       return data
     }
 

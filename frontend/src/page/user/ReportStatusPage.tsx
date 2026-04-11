@@ -61,15 +61,22 @@ export default function ReportStatusPage() {
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest")
   const [reports, setReports] = useState<IReportUI[]>([])
   const [isLoading, setIsLoading] = useState(true)
+  const [isLoadingMore, setIsLoadingMore] = useState(false)
+  const [offset, setOffset] = useState(0)
+  const [hasMore, setHasMore] = useState(true)
+  const limit = 12
 
   // Fetch data dari backend
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const data = await reportService.getAll()
-        if (data) {
-          // Transform data dari backend ke format yang dibutuhkan
-          const transformedReports: IReportUI[] = data.map((report: IReport) => ({
+  const fetchReports = async (currentOffset: number, isLoadMore = false) => {
+    try {
+      if (isLoadMore) setIsLoadingMore(true)
+      else setIsLoading(true)
+
+      const data = await reportService.getAll(limit, currentOffset)
+      
+      if (data) {
+        // Transform data dari backend ke format yang dibutuhkan
+        const transformedReports: IReportUI[] = data.map((report: IReport) => ({
             id: report.id,
             title: report.complaint_title,
             category: mapCategory(report.complaint_category),
@@ -80,20 +87,39 @@ export default function ReportStatusPage() {
             author: report.username || "Anonim",
             votes: report.upvotes || 0,
             imageUrl: report.complaint_image
-              ? `http://localhost:5000/uploads/${report.complaint_image}`
+              ? (report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:5000/uploads/${report.complaint_image}`)
               : "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop",
-          }))
+        }))
+
+        if (data.length < limit) {
+          setHasMore(false)
+        } else {
+          setHasMore(true)
+        }
+
+        if (isLoadMore) {
+          setReports((prev) => [...prev, ...transformedReports])
+        } else {
           setReports(transformedReports)
         }
-      } catch (error) {
-        console.error("Error fetching reports:", error)
-      } finally {
-        setIsLoading(false)
       }
+    } catch (error) {
+      console.error("Error fetching reports:", error)
+    } finally {
+      setIsLoading(false)
+      setIsLoadingMore(false)
     }
+  }
 
-    fetchReports()
+  useEffect(() => {
+    fetchReports(0)
   }, [])
+
+  const handleLoadMore = () => {
+    const newOffset = offset + limit
+    setOffset(newOffset)
+    fetchReports(newOffset, true)
+  }
 
   // Logic for filtering and sorting
   const processedReports = useMemo(() => {
@@ -264,13 +290,15 @@ export default function ReportStatusPage() {
           )}
 
           {/* Load More */}
-          {processedReports.length > 0 && (
+          {processedReports.length > 0 && hasMore && (
             <div className="flex justify-center pt-6">
               <Button
                 variant="outline"
                 className="h-12 rounded-2xl border-border px-8 font-semibold text-foreground shadow-sm transition-all hover:bg-accent"
+                onClick={handleLoadMore}
+                disabled={isLoadingMore}
               >
-                Muat Lebih Banyak
+                {isLoadingMore ? "Memuat..." : "Muat Lebih Banyak"}
               </Button>
             </div>
           )}

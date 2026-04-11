@@ -11,40 +11,66 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { ChartNoAxesColumn, Map, FileText, LayoutDashboard } from "lucide-react"
+import { ChartNoAxesColumn, Map, FileText, LayoutDashboard, Settings } from "lucide-react"
 import { NavUser } from "@/components/NavUser"
 
-const data = {
-  user: {
-    name: "admin",
-    email: "admin@gmail.com",
-    avatar: "/avatars/shadcn.jpg",
+const navMain = [
+  {
+    name: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
   },
-  navMain: [
-    {
-      name: "Dashboard",
-      url: "/dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      name: "Laporan",
-      url: "/laporan",
-      icon: FileText,
-    },
-    {
-      name: "Statistik",
-      url: "/statistik",
-      icon: ChartNoAxesColumn,
-    },
-    {
-      name: "Peta Wilayah",
-      url: "/peta-wilayah",
-      icon: Map,
-    },
-  ],
+  {
+    name: "Laporan",
+    url: "/laporan",
+    icon: FileText,
+  },
+  {
+    name: "Statistik",
+    url: "/statistik",
+    icon: ChartNoAxesColumn,
+  },
+  {
+    name: "Peta Wilayah",
+    url: "/peta-wilayah",
+    icon: Map,
+  },
+  {
+    name: "Pengaturan",
+    url: "/setting",
+    icon: Settings,
+  },
+]
+
+/**
+ * Ambil data user dari localStorage/sessionStorage
+ * agar sidebar menampilkan nama & email admin yang sedang login
+ */
+function getStoredUser() {
+  const raw = localStorage.getItem("user") || sessionStorage.getItem("user")
+  if (!raw) return null
+
+  try {
+    return JSON.parse(raw) as {
+      username?: string
+      email?: string
+      nik?: string
+      role?: string
+    }
+  } catch {
+    return null
+  }
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const storedUser = getStoredUser()
+
+  const userData = {
+    name: storedUser?.username || "Admin",
+    email: storedUser?.email || "",
+    avatar: "/avatars/shadcn.jpg",
+  }
+
   return (
     <Sidebar {...props}>
       <SidebarHeader className="mb-4 p-2">
@@ -52,7 +78,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarMenu className="p-3">
-          {data.navMain.map((item) => {
+          {navMain.map((item) => {
             const isActive = location.pathname === item.url
             return (
               <SidebarMenuItem key={item.name}>
@@ -69,7 +95,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarContent>
       <SidebarRail />
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   )

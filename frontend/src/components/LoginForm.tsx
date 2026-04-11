@@ -19,7 +19,7 @@ export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"form">) {
-  const [email, setEmail] = useState("") 
+  const [identifier, setIdentifier] = useState("") 
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
@@ -31,8 +31,8 @@ export function LoginForm({
 
   const validate = () => {
     const newErrors: Record<string, string> = {}
-    if (!email.trim()) {
-      newErrors.email = "Email wajib diisi"
+    if (!identifier.trim()) {
+      newErrors.identifier = "Email atau Username wajib diisi"
     }
     if (!password.trim()) {
       newErrors.password = "Kata sandi wajib diisi"
@@ -49,7 +49,7 @@ export function LoginForm({
     }
 
     try {
-      const userData = await execute(authService.login(email, password))
+      const userData = await execute(authService.login(identifier, password))
       login(userData, rememberMe)
       
       if (userData.role === "admin") {
@@ -86,18 +86,18 @@ export function LoginForm({
         )}
 
         <Field>
-          <FieldLabel htmlFor="email">Email</FieldLabel>
+          <FieldLabel htmlFor="identifier">Email atau Username</FieldLabel>
           <Input
-            id="email"
-            type="email"
-            placeholder="Masukkan Email Anda"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            id="identifier"
+            type="text"
+            placeholder="Masukkan Email atau Username Anda"
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             required
             className="bg-background"
           />
-          {formErrors.email && (
-            <p className="text-sm text-destructive">{formErrors.email}</p>
+          {formErrors.identifier && (
+            <p className="text-sm text-destructive">{formErrors.identifier}</p>
           )}
         </Field>
 

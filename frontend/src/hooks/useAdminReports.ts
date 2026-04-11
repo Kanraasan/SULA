@@ -14,6 +14,9 @@ export type BackendPost = {
   complaint_image: string | null
   status: "menunggu" | "diproses" | "selesai" | "ditolak"
   upvotes: number
+  latitude: number | null
+  longitude: number | null
+  catatan_admin: string | null
   created_at: string
   updated_at?: string
 }
@@ -103,7 +106,7 @@ export function useAdminReports() {
     setErrorMessage(null)
 
     try {
-      const result = await api.get<{ data?: BackendPost[] }>("/api/report", {
+      const result = await api.get<{ data?: BackendPost[] }>("/api/report?limit=1000&offset=0", {
         fallbackMessage: "Gagal mengambil data laporan",
       })
 

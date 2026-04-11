@@ -12,24 +12,34 @@ import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
 
-type BackendPost = {
-  created_at: string
-  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
-}
-
 export default function DashboardPage() {
-  const [posts, setPosts] = useState<BackendPost[]>([])
+  const [summary, setSummary] = useState({
+    total: 0,
+    selesai: 0,
+    diproses: 0,
+    menunggu: 0,
+  })
+  const [laporanHariIni, setLaporanHariIni] = useState(0)
+  const [trendData, setTrendData] = useState<any[]>([])
 
   useEffect(() => {
-    const loadPosts = async () => {
+    const loadStats = async () => {
       try {
-        const result = await api.get<{ data?: BackendPost[] }>("/api/report", {
+        const result = await api.get<{
+          data?: {
+            summary: any
+            todayCount: number
+            trendDataDaily: any[]
+          }
+        }>("/api/admin/stats", {
           fallbackMessage: "Gagal memuat ringkasan dashboard",
           showErrorToast: true,
         })
 
-        if (Array.isArray(result.data)) {
-          setPosts(result.data)
+        if (result.data) {
+          setSummary(result.data.summary || { total: 0, selesai: 0, diproses: 0, menunggu: 0 })
+          setLaporanHariIni(result.data.todayCount || 0)
+          setTrendData(result.data.trendDataDaily || [])
         }
       } catch (error) {
         if (!isHandledApiError(error)) {
@@ -43,63 +53,8 @@ export default function DashboardPage() {
       }
     }
 
-    void loadPosts()
+    void loadStats()
   }, [])
-
-  const laporanHariIni = useMemo(() => {
-    const today = new Date()
-    today.setHours(0, 0, 0, 0)
-    return posts.filter((item) => {
-      const createdAt = new Date(item.created_at)
-      createdAt.setHours(0, 0, 0, 0)
-      return createdAt.getTime() === today.getTime()
-    }).length
-  }, [posts])
-
-  const summary = useMemo(() => {
-    const selesai = posts.filter((item) => item.status === "selesai").length
-    const diproses = posts.filter((item) => item.status === "diproses").length
-    const menunggu = posts.filter(
-      (item) => !item.status || item.status === "menunggu"
-    ).length
-
-    return {
-      total: posts.length,
-      selesai,
-      diproses,
-      menunggu,
-    }
-  }, [posts])
-
-  const trendData = useMemo(() => {
-    const grouped = posts.reduce<
-      Record<string, { baru: number; diproses: number; selesai: number }>
-    >((acc, item) => {
-      const date = new Date(item.created_at)
-      if (Number.isNaN(date.getTime())) return acc
-
-      const dateKey = date.toISOString().slice(0, 10)
-      if (!acc[dateKey]) {
-        acc[dateKey] = { baru: 0, diproses: 0, selesai: 0 }
-      }
-
-      const status = item.status || "menunggu"
-      if (status === "diproses") {
-        acc[dateKey].diproses += 1
-      } else if (status === "selesai") {
-        acc[dateKey].selesai += 1
-      } else {
-        acc[dateKey].baru += 1
-      }
-
-      return acc
-    }, {})
-
-    return Object.entries(grouped)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([date, value]) => ({ date, ...value }))
-      .slice(-90)
-  }, [posts])
 
   return (
     <SidebarProvider>

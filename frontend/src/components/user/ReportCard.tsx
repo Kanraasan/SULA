@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { ThumbsUp, Clock } from "lucide-react"
+import { Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import type { IReportUI } from "@/types/report"
 
@@ -15,6 +16,7 @@ const statusConfig = {
 }
 
 export function ReportCard({
+  id,
   title,
   category,
   status,
@@ -25,7 +27,8 @@ export function ReportCard({
   authorImage,
 }: ReportCardProps) {
   return (
-    <Card className="overflow-hidden border-border bg-card shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-2 rounded-3xl group cursor-pointer">
+    <Link to={`/report-detail/${id}`} className="block h-full group">
+      <Card className="h-full overflow-hidden border-border bg-card shadow-sm transition-all duration-300 group-hover:shadow-xl group-hover:-translate-y-2 rounded-3xl cursor-pointer">
       {/* Image Section */}
       <div className="relative h-48 overflow-hidden bg-muted">
         <img
@@ -86,6 +89,7 @@ export function ReportCard({
           <span className="text-xs font-medium text-muted-foreground">{author}</span>
         </div>
       </CardFooter>
-    </Card>
+      </Card>
+    </Link>
   )
 }

@@ -9,19 +9,24 @@ import {
   Share2, 
   User, 
   CheckCircle2,
-  Loader2
+  Loader2,
+  MessageSquareText
 } from "lucide-react"
 import { useNavigate, useParams } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { useEffect, useState } from "react"
 import { reportService } from "@/services/report.service"
+import { useAuth } from "@/hooks/useAuth"
+import { toast } from "sonner"
 
 export default function ReportDetailPage() {
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
+  const { user } = useAuth()
   const [report, setReport] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [isUpvoting, setIsUpvoting] = useState(false)
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -73,7 +78,7 @@ export default function ReportDetailPage() {
   ]
 
   const imageUrl = report.complaint_image 
-    ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${report.complaint_image}`
+    ? (report.complaint_image.startsWith('http') ? report.complaint_image : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${report.complaint_image}`)
     : "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop"
 
   return (
@@ -146,9 +151,46 @@ export default function ReportDetailPage() {
                 </div>
 
                 <div className="space-y-3 pt-2">
-                  <Button className="w-full h-12 rounded-2xl bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-700 text-white font-bold gap-2 shadow-lg shadow-blue-700/20 dark:shadow-blue-600/10">
-                    <ThumbsUp className="w-4 h-4 fill-white" />
-                    Dukung Laporan ({report.upvotes || 0})
+                  <Button 
+                    className={cn(
+                      "w-full h-12 rounded-2xl text-white font-bold gap-2 shadow-lg transition-all",
+                      report.upvoted_by?.includes(user?.id)
+                        ? "bg-muted-foreground/30 hover:bg-muted-foreground/40 shadow-none border border-border"
+                        : "bg-blue-700 dark:bg-blue-600 hover:bg-blue-800 dark:hover:bg-blue-700 shadow-blue-700/20 dark:shadow-blue-600/10"
+                    )}
+                    disabled={isUpvoting || !user}
+                    onClick={async () => {
+                      if (!user) {
+                        toast.error("Anda harus login untuk mendukung laporan")
+                        return
+                      }
+                      setIsUpvoting(true)
+                      try {
+                        const result = await reportService.upvote(report.id)
+                        setReport((prev: any) => ({ 
+                          ...prev, 
+                          upvotes: result.upvotes,
+                          upvoted_by: result.hasUpvoted 
+                            ? [...(prev.upvoted_by || []), user.id]
+                            : (prev.upvoted_by || []).filter((id: string) => id !== user.id)
+                        }))
+                        toast.success(result.hasUpvoted ? "Berhasil mendukung laporan!" : "Dukungan dibatalkan")
+                      } catch (err: any) {
+                        toast.error(err.message || "Gagal mendukung laporan")
+                      } finally {
+                        setIsUpvoting(false)
+                      }
+                    }}
+                  >
+                    {isUpvoting ? (
+                      <Loader2 className="w-4 h-4 animate-spin text-current" />
+                    ) : (
+                      <ThumbsUp className={cn(
+                        "w-4 h-4",
+                        report.upvoted_by?.includes(user?.id) ? "fill-foreground text-foreground" : "fill-white"
+                      )} />
+                    )}
+                    {report.upvoted_by?.includes(user?.id) ? "Sudah Didukung" : "Dukung Laporan"} ({report.upvotes || 0})
                   </Button>
                   <Button variant="outline" className="w-full h-12 rounded-2xl border-border bg-muted/30 hover:bg-muted transition-all font-bold gap-2">
                     <Share2 className="w-4 h-4" />
@@ -197,6 +239,26 @@ export default function ReportDetailPage() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Admin Feedback Card */}
+            {report.catatan_admin && (report.status === 'selesai' || report.status === 'ditolak') && (
+              <Card className="rounded-3xl border-border bg-card shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden">
+                <div className={cn(
+                  "px-8 py-3 flex items-center gap-2",
+                  report.status === 'selesai' 
+                    ? "bg-green-50 dark:bg-green-950/20 text-green-700 dark:text-green-400"
+                    : "bg-red-50 dark:bg-red-950/20 text-red-700 dark:text-red-400"
+                )}>
+                  <MessageSquareText className="w-4 h-4" />
+                  <span className="text-sm font-bold">Tanggapan Admin</span>
+                </div>
+                <CardContent className="p-8 pt-5">
+                  <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
+                    {report.catatan_admin}
+                  </p>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>

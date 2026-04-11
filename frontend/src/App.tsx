@@ -1,10 +1,11 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, Navigate } from "react-router-dom"
 import LoginPage from "./page/LoginPage"
 import RegisterPage from "./page/RegisterPage"
 import DashboardPage from "./page/admin/DashboardPage"
 import AdminReportsPage from "./page/admin/AdminReportsPage"
 import MapPage from "./page/admin/MapPage"
 import StatisticsPage from "./page/admin/StatisticsPage"
+import AdminSettingPage from "./page/admin/SettingPage"
 import UserDashboardPage from "./page/user/DashboardPage"
 import ReportFormPage from "./page/user/ReportFormPage"
 import ReportStatusPage from "./page/user/ReportStatusPage"
@@ -12,13 +13,24 @@ import ReportDetailPage from "./page/user/ReportDetailPage"
 import MyReportsPage from "./page/user/MyReportsPage"
 import EditReportPage from "./page/user/EditReportPage"
 import LeaderboardPage from "./page/user/LeaderboardPage"
+import UserSettingPage from "./page/user/SettingPage"
 import { ProtectedRoute } from "./hooks/ProtectedRoute"
+import { useAuth } from "./hooks/useAuth"
+
+function RootRoute() {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (user?.role === "admin") {
+    return <Navigate to="/dashboard" replace />
+  }
+  return <UserDashboardPage />
+}
 
 export function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<UserDashboardPage />} />
+      <Route path="/" element={<RootRoute />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/report-detail/:id" element={<ReportDetailPage />} />
@@ -45,6 +57,11 @@ export function App() {
           <ReportStatusPage />
         </ProtectedRoute>
       } />
+      <Route path="/user-settings" element={
+        <ProtectedRoute allowedRoles={["user", "admin"]}>
+          <UserSettingPage />
+        </ProtectedRoute>
+      } />
       {/* Admin ONLY Protected Routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute allowedRoles={["admin"]}>
@@ -66,6 +83,14 @@ export function App() {
           <StatisticsPage />
         </ProtectedRoute>
       } />
+      <Route path="/setting" element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminSettingPage />
+        </ProtectedRoute>
+      } />
+      
+      {/* 404 Fallback Route - Redirect to Dashboard */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

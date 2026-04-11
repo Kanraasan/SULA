@@ -9,6 +9,10 @@ export interface IReport {
   complaint_image: string | null;
   status: "menunggu" | "diproses" | "selesai" | "ditolak";
   upvotes: number;
+  upvoted_by?: string[];
+  latitude: number | null;
+  longitude: number | null;
+  catatan_admin: string | null;
   userNik?: string;
   created_at: string;
   updated_at?: string;

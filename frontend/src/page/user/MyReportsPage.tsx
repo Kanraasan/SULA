@@ -12,14 +12,14 @@ import { FileText as FileTextIcon, Calendar as CalendarIcon, Trash2 as Trash2Ico
 export default function MyReportsPage() {
   const [reports, setReports] = useState<IReport[]>([])
   const [isLoading, setIsLoading] = useState(true)
-  const [userNik, setUserNik] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
     // ambil data user dari localstorage
     const userData = localStorage.getItem("user")
     if (userData) {
       const user = JSON.parse(userData)
-      setUserNik(user.nik)
+      setUserId(user.id)
     }
 
     // fetch semua laporan menggunakan service
@@ -37,11 +37,8 @@ export default function MyReportsPage() {
     fetchReports()
   }, [])
 
-  // filter laporan biar cuma punya user yang lagi login
   const myReports = reports.filter((report) => {
-    const reportNik = report.userNik?.toString()
-    const currentUserNik = userNik?.toString()
-    return reportNik === currentUserNik
+    return report.user_id === userId
   })
 
   const handleDelete = async (id: string) => {
@@ -129,7 +126,7 @@ export default function MyReportsPage() {
                   </p>
                   {report.complaint_image && (
                     <img
-                      src={`http://localhost:5000/uploads/${report.complaint_image}`}
+                      src={report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:5000/uploads/${report.complaint_image}`}
                       alt={report.complaint_title}
                       className="w-full h-40 object-cover rounded-md"
                     />

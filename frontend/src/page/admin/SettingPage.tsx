@@ -8,13 +8,196 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Textarea } from "@/components/ui/textarea"
-import { AlertCircle, BriefcaseMedical } from "lucide-react"
-import { type FormEvent } from "react"
+import { AlertCircle, BriefcaseMedical, Loader2 } from "lucide-react"
+import { useEffect, useState, type FormEvent } from "react"
+import { api, isHandledApiError } from "@/lib/api-client"
+import { toast } from "sonner"
+import { useAuth } from "@/hooks/useAuth"
+
+type AdminProfile = {
+  username: string
+  email: string
+  alamatLengkap: string
+  kecamatan: string
+  kelurahan: string
+}
 
 export default function AdminSettingPage() {
   const currentYear = new Date().getFullYear()
-  const handleSaveProfile = (event: FormEvent<HTMLFormElement>) => {
+  const { logout } = useAuth()
+
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  const [profile, setProfile] = useState<AdminProfile>({
+    username: "",
+    email: "",
+    alamatLengkap: "",
+    kecamatan: "",
+    kelurahan: "",
+  })
+
+  // Ambil auth headers dari localStorage
+  const getAuthHeaders = (): Record<string, string> => {
+    const rawUser = localStorage.getItem("user")
+    if (!rawUser) return {}
+    try {
+      const parsedUser = JSON.parse(rawUser) as { token?: string }
+      if (!parsedUser.token) return {}
+      return { Authorization: `Bearer ${parsedUser.token}` }
+    } catch {
+      return {}
+    }
+  }
+
+  // Fetch profil admin saat halaman dimuat
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const result = await api.get<{ data?: AdminProfile }>("/api/admin/profile", {
+          fallbackMessage: "Gagal memuat profil",
+          showErrorToast: true,
+        })
+
+        // Tambahkan Authorization header secara manual karena api.get tidak mendukungnya by default
+        // Jadi kita pakai fetch langsung
+      } catch (error) {
+        if (!isHandledApiError(error)) {
+          console.error("Gagal memuat profil:", error)
+        }
+      }
+    }
+
+    // Gunakan fetch langsung karena api.get tidak support custom headers
+    const loadProfile = async () => {
+      try {
+        const headers = getAuthHeaders()
+        const response = await fetch(
+          import.meta.env.VITE_API_URL
+            ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/profile`
+            : "/api/admin/profile",
+          { headers }
+        )
+
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}))
+          toast.error((errData as any).message || "Gagal memuat profil")
+          return
+        }
+
+        const result = await response.json()
+        if (result.data) {
+          setProfile({
+            username: result.data.username || "",
+            email: result.data.email || "",
+            alamatLengkap: result.data.alamatLengkap || "",
+            kecamatan: result.data.kecamatan || "",
+            kelurahan: result.data.kelurahan || "",
+          })
+        }
+      } catch (error) {
+        console.error("Gagal memuat profil:", error)
+        toast.error("Gagal memuat profil admin")
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    void loadProfile()
+  }, [])
+
+  // Simpan perubahan profil
+  const handleSaveProfile = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    setIsSaving(true)
+
+    try {
+      const headers = {
+        "Content-Type": "application/json",
+        ...getAuthHeaders(),
+      }
+
+      const response = await fetch(
+        import.meta.env.VITE_API_URL
+          ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/profile`
+          : "/api/admin/profile",
+        {
+          method: "PUT",
+          headers,
+          body: JSON.stringify({
+            username: profile.username,
+            alamatLengkap: profile.alamatLengkap,
+            kecamatan: profile.kecamatan,
+            kelurahan: profile.kelurahan,
+          }),
+        }
+      )
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        toast.error(result.message || "Gagal menyimpan perubahan")
+        return
+      }
+
+      toast.success(result.message || "Profil berhasil diperbarui")
+
+      // Perbarui data user di localStorage agar sidebar ikut update
+      const rawUser = localStorage.getItem("user")
+      if (rawUser) {
+        try {
+          const userData = JSON.parse(rawUser)
+          userData.username = profile.username
+          localStorage.setItem("user", JSON.stringify(userData))
+        } catch { /* ignore */ }
+      }
+    } catch (error) {
+      console.error("Gagal menyimpan profil:", error)
+      toast.error("Terjadi kesalahan saat menyimpan profil")
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  // Hapus akun admin
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true)
+
+    try {
+      const headers = {
+        ...getAuthHeaders(),
+      }
+
+      const response = await fetch(
+        import.meta.env.VITE_API_URL
+          ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/account`
+          : "/api/admin/account",
+        {
+          method: "DELETE",
+          headers,
+        }
+      )
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        toast.error(result.message || "Gagal menghapus akun")
+        return
+      }
+
+      toast.success("Akun berhasil dihapus. Anda akan dialihkan...")
+
+      // Logout dan redirect
+      setTimeout(() => {
+        logout()
+      }, 1500)
+    } catch (error) {
+      console.error("Gagal menghapus akun:", error)
+      toast.error("Terjadi kesalahan saat menghapus akun")
+    } finally {
+      setIsDeleting(false)
+    }
   }
 
   return (
@@ -48,35 +231,97 @@ export default function AdminSettingPage() {
                 <div className="rounded-lg bg-blue-100 p-2 text-blue-600 dark:bg-blue-950/40 dark:text-blue-400">
                   <BriefcaseMedical className="h-4 w-4" />
                 </div>
-                <h2 className="text-2xl font-semibold tracking-tight">Profile information</h2>
+                <h2 className="text-2xl font-semibold tracking-tight">Informasi Profil</h2>
               </div>
 
-              <form className="space-y-6" onSubmit={handleSaveProfile}>
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Nama</Label>
-                    <Input id="fullName" placeholder="Ubah nama panjang Anda..." />
+              {isLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                  <span className="ml-2 text-muted-foreground">Memuat data profil...</span>
+                </div>
+              ) : (
+                <form className="space-y-6" onSubmit={handleSaveProfile}>
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="fullName">Nama</Label>
+                      <Input
+                        id="fullName"
+                        placeholder="Ubah nama panjang Anda..."
+                        value={profile.username}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, username: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="email">Email address</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        value={profile.email}
+                        disabled
+                        className="cursor-not-allowed opacity-60"
+                        title="Email tidak bisa diubah dari sini"
+                      />
+                      <p className="text-xs text-muted-foreground">
+                        Email dikelola oleh sistem autentikasi dan tidak bisa diubah langsung.
+                      </p>
+                    </div>
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
-                    <Input id="email" type="email" placeholder="Ubah alamat email Anda" />
+                    <Label htmlFor="alamat">Alamat Lengkap</Label>
+                    <Textarea
+                      id="alamat"
+                      rows={3}
+                      placeholder="Masukkan alamat lengkap Anda..."
+                      value={profile.alamatLengkap}
+                      onChange={(e) =>
+                        setProfile((prev) => ({ ...prev, alamatLengkap: e.target.value }))
+                      }
+                    />
                   </div>
-                </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    rows={4}
-                    placeholder="Berikan informasi kredensial anda kepada kami...."
-                  />
-                </div>
+                  <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+                    <div className="space-y-2">
+                      <Label htmlFor="kecamatan">Kecamatan</Label>
+                      <Input
+                        id="kecamatan"
+                        placeholder="Masukkan kecamatan..."
+                        value={profile.kecamatan}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, kecamatan: e.target.value }))
+                        }
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="kelurahan">Kelurahan</Label>
+                      <Input
+                        id="kelurahan"
+                        placeholder="Masukkan kelurahan..."
+                        value={profile.kelurahan}
+                        onChange={(e) =>
+                          setProfile((prev) => ({ ...prev, kelurahan: e.target.value }))
+                        }
+                      />
+                    </div>
+                  </div>
 
-                <div className="flex flex-col items-start justify-between gap-4 pt-4 text-sm text-muted-foreground md:flex-row md:items-center">
-                  <p>Perubahan ini akan tersimpan di sistem SULA</p>
-                  <Button type="submit" className="min-w-40">Simpan Perubahan</Button>
-                </div>
-              </form>
+                  <div className="flex flex-col items-start justify-between gap-4 pt-4 text-sm text-muted-foreground md:flex-row md:items-center">
+                    <p>Perubahan ini akan tersimpan di sistem SULA</p>
+                    <Button type="submit" className="min-w-40" disabled={isSaving}>
+                      {isSaving ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Menyimpan...
+                        </>
+                      ) : (
+                        "Simpan Perubahan"
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )}
             </CardContent>
           </Card>
 
@@ -111,7 +356,20 @@ export default function AdminSettingPage() {
                   </AlertDialogHeader>
                   <AlertDialogFooter>
                     <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction className="bg-red-600 hover:bg-red-700">Lanjut Hapus</AlertDialogAction>
+                    <AlertDialogAction
+                      className="bg-red-600 hover:bg-red-700"
+                      onClick={handleDeleteAccount}
+                      disabled={isDeleting}
+                    >
+                      {isDeleting ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Menghapus...
+                        </>
+                      ) : (
+                        "Lanjut Hapus"
+                      )}
+                    </AlertDialogAction>
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>

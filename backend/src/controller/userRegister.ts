@@ -1,10 +1,33 @@
 import { supabase } from '../lib/supabase';
+import { z } from 'zod';
+
+const registerSchema = z.object({
+  nik: z.string().length(16, "NIK harus tepat 16 digit angka").regex(/^\d+$/, "NIK hanya boleh berisi angka"),
+  username: z.string().min(3, "Username minimal 3 karakter"),
+  email: z.string().email("Format email tidak valid"),
+  password: z.string().min(6, "Password minimal 6 karakter"),
+  passwordConfirm: z.string(),
+  alamatLengkap: z.string().optional(),
+  kecamatan: z.string().optional(),
+  kelurahan: z.string().optional(),
+  tanggalLahir: z.string()
+}).refine((data) => data.password === data.passwordConfirm, {
+  message: "Password dan Konfirmasi Password tidak sama",
+  path: ["passwordConfirm"],
+});
 
 export const createUser = async (req: any, res: any) => {
   if (!req.body) {
     return res.status(400).json({
-      message:
-        'Request body tidak ditemukan. Pastikan Content-Type: application/json',
+      message: 'Request body tidak ditemukan. Pastikan Content-Type: application/json',
+    });
+  }
+
+  const parseResult = registerSchema.safeParse(req.body);
+  
+  if (!parseResult.success) {
+    return res.status(400).json({
+      message: parseResult.error.issues?.[0]?.message || 'Validasi gagal',
     });
   }
 
@@ -13,24 +36,11 @@ export const createUser = async (req: any, res: any) => {
     username,
     email,
     password,
-    passwordConfirm,
     alamatLengkap,
     kecamatan,
     kelurahan,
-    tanggalLahir, // Tambahkan field ini sesuai SQL
-  } = req.body;
-
-  if (!username || !email || !password || !passwordConfirm || !nik || !tanggalLahir) {
-    return res.status(400).json({
-      message: 'Username, email, password, NIK, dan Tanggal Lahir wajib diisi',
-    });
-  }
-
-  if (password !== passwordConfirm) {
-    return res.status(400).json({
-      message: 'Password tidak sama',
-    });
-  }
+    tanggalLahir,
+  } = parseResult.data;
 
   try {
     // 1. SignUp ke Supabase Auth (untuk autentikasi)
@@ -54,7 +64,6 @@ export const createUser = async (req: any, res: any) => {
           id: authData.user.id,
           nik,
           username,
-          password: password,
           alamatLengkap,
           kecamatan,
           kelurahan,

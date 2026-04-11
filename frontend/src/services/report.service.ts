@@ -22,17 +22,21 @@ export const reportService = {
     return result;
   },
 
-  getAll: async () => {
-    const response = await fetch("/api/report");
+  getAll: async (limit = 100, offset = 0) => {
+    const response = await fetch(`/api/report?limit=${limit}&offset=${offset}`, {
+      headers: { ...getAuthHeader() },
+    });
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.message || "Gagal memuat laporan");
     }
-    return result.data;
+    return result.data; // You may want to return {data, pagination} if you need total count, but keeping this for backward compatibility
   },
 
   getById: async (id: string) => {
-    const response = await fetch(`/api/report/${id}`);
+    const response = await fetch(`/api/report/${id}`, {
+      headers: { ...getAuthHeader() },
+    });
     const result = await response.json();
     if (!response.ok) {
       throw new Error(result.message || "Gagal memuat detail laporan");
@@ -82,4 +86,18 @@ export const reportService = {
     }
     return result.data;
   },
+
+  upvote: async (id: string) => {
+    const response = await fetch(`/api/report/${id}/upvote`, {
+      method: "POST",
+      headers: { ...getAuthHeader() },
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "Gagal mendukung laporan");
+    }
+    return result.data;
+  },
 };
+

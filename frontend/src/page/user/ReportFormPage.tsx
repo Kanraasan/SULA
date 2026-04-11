@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Checkbox } from "@/components/ui/checkbox"
+import { toast } from "sonner"
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -42,6 +43,9 @@ import {
   Leaf,
   EyeOff,
   Lock,
+  MapPin,
+  Navigation,
+  Loader2,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
@@ -94,6 +98,7 @@ interface PrivacyOptionProps {
 }
 
 function PrivacyOption({
+  id,
   title,
   description,
   icon: Icon,
@@ -101,8 +106,8 @@ function PrivacyOption({
   onClick,
 }: PrivacyOptionProps) {
   return (
-    <div
-      onClick={onClick}
+    <label
+      htmlFor={id}
       className={cn(
         "group flex w-full cursor-pointer items-center gap-4 rounded-xl border transition-all",
         selected
@@ -112,6 +117,7 @@ function PrivacyOption({
     >
       <div className="shrink-0 pl-4 pt-0.5">
         <Checkbox
+          id={id}
           checked={selected}
           onCheckedChange={onClick}
           className="size-5 rounded-md border-muted-foreground/30 transition-all data-checked:border-primary data-checked:bg-primary"
@@ -142,7 +148,7 @@ function PrivacyOption({
           {description}
         </p>
       </div>
-    </div>
+    </label>
   )
 }
 
@@ -157,20 +163,49 @@ export default function ReportFormPage() {
   const [description, setDescription] = useState("")
   const [file, setFile] = useState<File | null>(null)
   const [reportType, setReportType] = useState<ReportType | null>(
-    "confidential"
+    null
   )
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
+  const [isLocating, setIsLocating] = useState(false)
+  const [locationError, setLocationError] = useState<string | null>(null)
+
+  const handleDetectLocation = () => {
+    if (!navigator.geolocation) {
+      setLocationError("Browser Anda tidak mendukung GPS")
+      return
+    }
+    setIsLocating(true)
+    setLocationError(null)
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLatitude(position.coords.latitude)
+        setLongitude(position.coords.longitude)
+        setIsLocating(false)
+      },
+      (error) => {
+        setLocationError(
+          error.code === 1
+            ? "Izin lokasi ditolak. Aktifkan GPS di pengaturan browser."
+            : "Gagal mendeteksi lokasi. Coba lagi."
+        )
+        setIsLocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }
 
   const categoryLabel = categories.find((c) => c.id === selectedCategory)?.label
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedCategory) {
-      alert("Pilih kategori terlebih dahulu")
+      toast.error("Pilih kategori terlebih dahulu")
       return
     }
 
     if (!user) {
-      alert("Anda harus login terlebih dahulu")
+      toast.error("Anda harus login terlebih dahulu")
       navigate("/login")
       return
     }
@@ -183,7 +218,9 @@ export default function ReportFormPage() {
       formData.append("description", description)
       formData.append("userNik", user.nik.toString())
       formData.append("username", user.username)
-      formData.append("reportType", reportType || "confidential")
+      if (reportType) formData.append("reportType", reportType)
+      if (latitude !== null) formData.append("latitude", latitude.toString())
+      if (longitude !== null) formData.append("longitude", longitude.toString())
 
       if (file) {
         formData.append("lampiranFoto", file)
@@ -193,14 +230,14 @@ export default function ReportFormPage() {
       const result = await execute(reportService.create(formData))
 
       if (result.message) {
-        alert(result.message)
+        toast.success(result.message)
       } else {
-        alert("Laporan berhasil dikirim!")
+        toast.success("Laporan berhasil dikirim!")
       }
       
       navigate("/my-reports")
-    } catch (error) {
-      // Error handled by useApi
+    } catch (error: any) {
+      toast.error(error.message || "Laporan gagal dikirim")
     }
   }
 
@@ -390,6 +427,44 @@ export default function ReportFormPage() {
                         PNG, JPG atau WEBP (Maks. 10MB)
                       </p>
                     </div>
+                  </div>
+                </div>
+
+                {/* Lokasi GPS */}
+                <div className="group space-y-3">
+                  <Label className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                    Lokasi Kejadian
+                  </Label>
+                  <div className="flex flex-col gap-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleDetectLocation}
+                      disabled={isLocating}
+                      className="h-14 w-full justify-center gap-3 rounded-2xl border-muted-foreground/10 bg-muted/20 text-base font-normal shadow-none transition-all hover:border-primary/40 hover:bg-primary/[0.03]"
+                    >
+                      {isLocating ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                          Mendeteksi lokasi...
+                        </>
+                      ) : latitude !== null ? (
+                        <>
+                          <MapPin className="h-5 w-5 text-green-600" />
+                          <span className="text-green-700 dark:text-green-500 font-medium">
+                            Lokasi terdeteksi ({latitude.toFixed(5)}, {longitude?.toFixed(5)})
+                          </span>
+                        </>
+                      ) : (
+                        <>
+                          <Navigation className="h-5 w-5 text-primary" />
+                          Deteksi Lokasi Otomatis (GPS)
+                        </>
+                      )}
+                    </Button>
+                    {locationError && (
+                      <p className="text-xs text-destructive">{locationError}</p>
+                    )}
                   </div>
                 </div>
 

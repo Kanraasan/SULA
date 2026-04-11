@@ -1,6 +1,6 @@
 import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
-import { Bell, UserCircle, Megaphone, LogOut, User } from "lucide-react"
+import { Bell, UserCircle, Megaphone, LogOut, User, Settings, FileText } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"
 import { cn } from "@/lib/utils"
 import { useAuth } from "@/hooks/useAuth"
@@ -83,9 +83,21 @@ export function UserNavbar() {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem asChild>
-                    <Link to="/profile" className="cursor-pointer">
+                    <Link to="/user-settings" className="cursor-pointer">
                       <User className="mr-2 h-4 w-4" />
                       <span>Profil Saya</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/my-reports" className="cursor-pointer">
+                      <FileText className="mr-2 h-4 w-4" />
+                      <span>Laporan Saya</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/user-settings" className="cursor-pointer">
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>Pengaturan</span>
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

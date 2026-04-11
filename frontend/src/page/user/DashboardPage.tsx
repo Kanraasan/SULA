@@ -152,7 +152,7 @@ export default function UserDashboardPage() {
                 <Card key={report.id} className="overflow-hidden border-border bg-card">
                   <div className="aspect-video w-full bg-muted">
                     {report.complaint_image ? (
-                      <img src={`http://localhost:5000/uploads/${report.complaint_image}`} alt={report.complaint_title} className="h-full w-full object-cover" />
+                      <img src={report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:5000/uploads/${report.complaint_image}`} alt={report.complaint_title} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-muted-foreground">
                         <LayoutDashboard className="h-10 w-10 opacity-20" />

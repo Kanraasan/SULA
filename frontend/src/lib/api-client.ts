@@ -73,7 +73,27 @@ const request = async <TResponse extends ApiEnvelope>(
   options: RequestInit,
   config: ApiRequestConfig = {}
 ) => {
-  const response = await fetch(toApiUrl(path), options)
+  // Otomatis pasang Authorization header jika user login
+  let authHeaders: Record<string, string> = {}
+  try {
+    const rawUser = localStorage.getItem("user")
+    if (rawUser) {
+      const parsedUser = JSON.parse(rawUser) as { token?: string }
+      if (parsedUser.token) {
+        authHeaders.Authorization = `Bearer ${parsedUser.token}`
+      }
+    }
+  } catch {}
+
+  const mergedOptions = {
+    ...options,
+    headers: {
+      ...authHeaders,
+      ...options.headers,
+    },
+  }
+
+  const response = await fetch(toApiUrl(path), mergedOptions)
   const result = (await parseJsonResponse(response)) as TResponse
 
   if (!response.ok) {

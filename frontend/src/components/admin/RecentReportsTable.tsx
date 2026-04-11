@@ -20,7 +20,7 @@ const fallbackRecentReports: RecentReport[] = [
 ]
 
 export function RecentReportsTable({ rows }: LaporanTerbaruTableProps) {
-  const recentReports = rows && rows.length > 0 ? rows : fallbackRecentReports
+  const recentReports = rows !== undefined ? rows : fallbackRecentReports
   return (
     <Card className="rounded-2xl border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-5">

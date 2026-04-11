@@ -7,7 +7,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { Plus } from "lucide-react"
+import { Plus, Download } from "lucide-react"
 import { RightFilterMenu } from "@/components/admin/RightFilterMenu"
 import { ReportTable, type Laporan } from "@/components/admin/ReportTable"
 import { type DateRange } from "react-day-picker"
@@ -137,7 +137,35 @@ export default function AdminReportsPage() {
                   disampaikan masyarakat.
                 </p>
               </div>
-              <div>
+              <div className="flex gap-3">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  onClick={() => {
+                    // Build CSV from filteredData
+                    const headers = ["ID", "Tanggal", "Pelapor", "Judul", "Kategori", "Status", "Upvotes"]
+                    const rows = filteredData.map((item) => [
+                      item.id,
+                      new Date(item.date).toLocaleDateString("id-ID"),
+                      item.reporter.name,
+                      `"${item.complaint.title.replace(/"/g, '""')}"`,
+                      item.complaint.category,
+                      item.status,
+                      item.upvotes,
+                    ])
+                    const csvContent = [headers.join(","), ...rows.map((r) => r.join(","))].join("\n")
+                    const blob = new Blob(["\uFEFF" + csvContent], { type: "text/csv;charset=utf-8;" })
+                    const url = URL.createObjectURL(blob)
+                    const link = document.createElement("a")
+                    link.href = url
+                    link.download = `laporan-sula-${new Date().toISOString().slice(0, 10)}.csv`
+                    link.click()
+                    URL.revokeObjectURL(url)
+                  }}
+                >
+                  <Download className="mr-2" />
+                  Unduh CSV
+                </Button>
                 <Button size="lg" onClick={() => setIsCreateOpen(true)}>
                   <Plus className="mr-2" />
                   Laporan Baru

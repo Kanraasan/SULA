@@ -10,50 +10,44 @@ import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
 
-type BackendPost = {
-  id: string
-  complaint_title: string
-  complaint_category: string
-  complaint_description: string
-  created_at: string
-  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
-}
-
 export default function StatisticsPage() {
-  const [posts, setPosts] = useState<BackendPost[]>([])
   const [summary, setSummary] = useState({
     total: 0,
     selesai: 0,
     diproses: 0,
     menunggu: 0,
   })
+  
+  const [categoryChartData, setCategoryChartData] = useState<any[]>([])
+  const [trendData, setTrendData] = useState<any[]>([])
+  const [latestReports, setLatestReports] = useState<any[]>([])
 
   useEffect(() => {
     const loadStats = async () => {
       try {
-        const result = await api.get<{ data?: BackendPost[] }>("/api/report", {
+        const result = await api.get<{
+          data?: {
+            summary: any
+            categoryData: any[]
+            trendDataMonthly: any[]
+            latestReports: any[]
+          }
+        }>("/api/admin/stats", {
           fallbackMessage: "Gagal memuat statistik laporan",
           showErrorToast: true,
         })
 
-        if (!Array.isArray(result.data)) {
+        if (!result.data) {
           return
         }
 
-        const loadedPosts: BackendPost[] = result.data
-        const selesai = loadedPosts.filter((item) => item.status === "selesai").length
-        const diproses = loadedPosts.filter((item) => item.status === "diproses").length
-        const menunggu = loadedPosts.filter(
-          (item) => !item.status || item.status === "menunggu"
-        ).length
+        const data = result.data
 
-        setPosts(loadedPosts)
-        setSummary({
-          total: loadedPosts.length,
-          selesai,
-          diproses,
-          menunggu,
-        })
+        setSummary(data.summary || { total: 0, selesai: 0, diproses: 0, menunggu: 0 })
+        setCategoryChartData(data.categoryData || [])
+        setTrendData(data.trendDataMonthly || [])
+        setLatestReports(data.latestReports || [])
+        
       } catch (error) {
         if (!isHandledApiError(error)) {
           toast.error(
@@ -68,83 +62,6 @@ export default function StatisticsPage() {
 
     void loadStats()
   }, [])
-
-  const categoryChartData = useMemo(() => {
-    const normalizedLabel: Record<string, string> = {
-      infrastruktur: "Infrastruktur",
-      kebersihan: "Kebersihan",
-      penerangan: "Penerangan",
-      ketertiban: "Ketertiban",
-      fasilitas_publik: "Fasilitas",
-      fasilitas: "Fasilitas",
-      pelayanan: "Pelayanan",
-      bencana: "Bencana",
-      lingkungan: "Lingkungan",
-    }
-
-    const grouped = posts.reduce<Record<string, number>>((acc, post) => {
-      const key = (post.complaint_category || "lainnya").toLowerCase()
-      const label = normalizedLabel[key] || "Lainnya"
-      acc[label] = (acc[label] || 0) + 1
-      return acc
-    }, {})
-
-    return Object.entries(grouped)
-      .map(([kategori, jumlah]) => ({ kategori, jumlah }))
-      .sort((a, b) => b.jumlah - a.jumlah)
-      .slice(0, 6)
-  }, [posts])
-
-  const trendData = useMemo(() => {
-    const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "short" })
-    const grouped = posts.reduce<Record<string, number>>((acc, post) => {
-      const date = new Date(post.created_at)
-      if (Number.isNaN(date.getTime())) return acc
-
-      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
-      acc[key] = (acc[key] || 0) + 1
-      return acc
-    }, {})
-
-    return Object.entries(grouped)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .slice(-6)
-      .map(([key, total]) => {
-        const [year, month] = key.split("-")
-        const date = new Date(Number(year), Number(month) - 1, 1)
-        return {
-          bulan: monthFormatter.format(date).toUpperCase(),
-          total,
-        }
-      })
-  }, [posts])
-
-  const latestReports = useMemo(() => {
-    const statusMap: Record<
-      string,
-      "SELESAI" | "DIPROSES" | "MENUNGGU" | "DITOLAK"
-    > = {
-      selesai: "SELESAI",
-      diproses: "DIPROSES",
-      ditolak: "DITOLAK",
-      menunggu: "MENUNGGU",
-    }
-
-    return [...posts]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-      .slice(0, 8)
-      .map((post) => ({
-        id: `#${post.id.slice(0, 8).toUpperCase()}`,
-        kategori: post.complaint_category,
-        ket: post.complaint_title,
-        status: statusMap[post.status || "menunggu"] || "MENUNGGU",
-        tgl: new Date(post.created_at).toLocaleDateString("id-ID", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }),
-      }))
-  }, [posts])
 
 
   return (
