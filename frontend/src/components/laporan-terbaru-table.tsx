@@ -1,21 +1,31 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
-const recentReports = [
+type RecentReport = {
+  id: string
+  kategori: string
+  ket: string
+  status: "SELESAI" | "DIPROSES" | "MENUNGGU" | "DITOLAK"
+  tgl: string
+}
+
+type LaporanTerbaruTableProps = {
+  rows?: RecentReport[]
+}
+
+const fallbackRecentReports: RecentReport[] = [
   { id: "#REP-202301", kategori: "Infrastruktur", ket: "Pipa air pecah di blok A", status: "SELESAI", tgl: "Oct 24, 2023" },
   { id: "#REP-202302", kategori: "Kebersihan", ket: "Sampah menumpuk di taman", status: "DIPROSES", tgl: "Oct 25, 2023" },
 ]
 
-export function LaporanTerbaruTable() {
+export function LaporanTerbaruTable({ rows }: LaporanTerbaruTableProps) {
+  const recentReports = rows && rows.length > 0 ? rows : fallbackRecentReports
+
   return (
     <Card className="rounded-2xl border-none shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between border-b px-6 py-5">
         <CardTitle className="text-lg font-bold">Laporan Terbaru</CardTitle>
-        <Button variant="link" className="text-primary dark:text-blue-600 font-semibold px-0">
-          Lihat Semua
-        </Button>
       </CardHeader>
       <CardContent className="p-0">
         <Table>

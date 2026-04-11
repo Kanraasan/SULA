@@ -32,9 +32,18 @@ import {
 
 export const description = "Tren Keluhan Masyarakat"
 
-// Saya persingkat datanya untuk contoh. Silakan masukkan semua tanggal aslimu
-// dengan format keys: baru, diproses, selesai
-const chartData = [
+type ChartTrendItem = {
+  date: string
+  baru: number
+  diproses: number
+  selesai: number
+}
+
+type ChartAreaInteractiveProps = {
+  data?: ChartTrendItem[]
+}
+
+const fallbackChartData: ChartTrendItem[] = [
   { date: "2024-04-01", baru: 222, diproses: 50, selesai: 150 },
   { date: "2024-04-02", baru: 197, diproses: 80, selesai: 180 },
   { date: "2024-04-03", baru: 167, diproses: 120, selesai: 120 },
@@ -67,9 +76,17 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartAreaInteractive() {
+export function ChartAreaInteractive({ data }: ChartAreaInteractiveProps) {
   const isMobile = useIsMobile()
   const [timeRange, setTimeRange] = React.useState("90d")
+
+  const sourceData = React.useMemo(() => {
+    if (data && data.length > 0) {
+      return data
+    }
+
+    return fallbackChartData
+  }, [data])
 
   React.useEffect(() => {
     if (isMobile) {
@@ -77,9 +94,11 @@ export function ChartAreaInteractive() {
     }
   }, [isMobile])
 
-  const filteredData = chartData.filter((item) => {
+  const filteredData = sourceData.filter((item) => {
     const date = new Date(item.date)
-    const referenceDate = new Date("2024-04-10") // Sesuaikan dengan tanggal terakhir di datamu
+    const referenceDate = sourceData.length
+      ? new Date(sourceData[sourceData.length - 1].date)
+      : new Date()
     let daysToSubtract = 90
     if (timeRange === "30d") {
       daysToSubtract = 30
@@ -131,7 +150,7 @@ export function ChartAreaInteractive() {
       <CardContent className="px-2 pt-4 sm:px-6 sm:pt-6">
         <ChartContainer
           config={chartConfig}
-          className="aspect-auto h-[250px] w-full"
+          className="aspect-auto h-62.5 w-full"
         >
           <AreaChart data={filteredData}>
             <defs>

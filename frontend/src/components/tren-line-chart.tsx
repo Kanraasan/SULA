@@ -7,7 +7,16 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const lineData = [
+type TrendLineItem = {
+  bulan: string
+  total: number
+}
+
+type TrenLineChartProps = {
+  data?: TrendLineItem[]
+}
+
+const fallbackLineData: TrendLineItem[] = [
   { bulan: "JAN", total: 100 },
   { bulan: "FEB", total: 120 },
   { bulan: "MAR", total: 250 },
@@ -23,7 +32,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function TrenLineChart() {
+export function TrenLineChart({ data }: TrenLineChartProps) {
+  const lineData = data && data.length > 0 ? data : fallbackLineData
+
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">
@@ -37,7 +48,7 @@ export function TrenLineChart() {
         </div>
       </CardHeader>
       <CardContent className="flex-1 pb-4">
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
+        <ChartContainer config={chartConfig} className="h-62.5 w-full">
           <AreaChart accessibilityLayer data={lineData} margin={{ left: 12, right: 12, top: 20 }}>
             <defs>
               <linearGradient id="fadeTotal" x1="0" y1="0" x2="0" y2="1">

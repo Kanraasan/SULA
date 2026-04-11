@@ -127,11 +127,13 @@ export const api = {
     ),
   delete: <TResponse extends ApiEnvelope>(
     path: string,
+    options?: Omit<RequestInit, "method">,
     config?: ApiRequestConfig
   ) =>
     request<TResponse>(
       path,
       {
+        ...options,
         method: "DELETE",
       },
       config
