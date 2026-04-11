@@ -5,7 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-const chartData = [
+type KategoriChartItem = {
+  kategori: string
+  jumlah: number
+}
+
+type KategoriBarChartProps = {
+  data?: KategoriChartItem[]
+}
+
+const fallbackChartData: KategoriChartItem[] = [
   { kategori: "Infrastruktur", jumlah: 452 },
   { kategori: "Kebersihan", jumlah: 298 },
   { kategori: "Fasilitas", jumlah: 360 },
@@ -19,7 +28,9 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function KategoriBarChart() {
+export function KategoriBarChart({ data }: KategoriBarChartProps) {
+  const chartData = data && data.length > 0 ? data : fallbackChartData
+
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">
@@ -28,7 +39,7 @@ export function KategoriBarChart() {
           <p className="text-sm text-muted-foreground mt-1">Berdasarkan klasifikasi masalah</p>
         </div>
         <Select defaultValue="7hari">
-          <SelectTrigger className="w-[140px] h-9 rounded-xl bg-slate-50 dark:bg-slate-900 border-none shadow-none">
+          <SelectTrigger className="w-35 h-9 rounded-xl bg-slate-50 dark:bg-slate-900 border-none shadow-none">
             <SelectValue placeholder="Pilih waktu" />
           </SelectTrigger>
           <SelectContent className="rounded-xl">
@@ -38,7 +49,7 @@ export function KategoriBarChart() {
         </Select>
       </CardHeader>
       <CardContent className="flex-1 pb-4">
-        <ChartContainer config={chartConfig} className="h-[250px] w-full">
+        <ChartContainer config={chartConfig} className="h-62.5 w-full">
           <BarChart accessibilityLayer data={chartData} margin={{ top: 20 }}>
             <CartesianGrid vertical={false} strokeDasharray="4 4" className="stroke-slate-300 dark:stroke-slate-700" />
             <XAxis

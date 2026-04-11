@@ -14,6 +14,7 @@ import { api, isHandledApiError } from "@/lib/api-client"
 
 type BackendPost = {
   createdAt: string
+  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
 }
 
 export default function DashboardPage() {
@@ -22,7 +23,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadPosts = async () => {
       try {
-        const result = await api.get<{ data?: BackendPost[] }>("/api/post", {
+        const result = await api.get<{ data?: BackendPost[] }>("/api/report", {
           fallbackMessage: "Gagal memuat ringkasan dashboard",
           showErrorToast: true,
         })
@@ -45,7 +46,6 @@ export default function DashboardPage() {
     void loadPosts()
   }, [])
 
-  const totalLaporan = posts.length
   const laporanHariIni = useMemo(() => {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
@@ -54,6 +54,51 @@ export default function DashboardPage() {
       createdAt.setHours(0, 0, 0, 0)
       return createdAt.getTime() === today.getTime()
     }).length
+  }, [posts])
+
+  const summary = useMemo(() => {
+    const selesai = posts.filter((item) => item.status === "selesai").length
+    const diproses = posts.filter((item) => item.status === "diproses").length
+    const menunggu = posts.filter(
+      (item) => !item.status || item.status === "menunggu"
+    ).length
+
+    return {
+      total: posts.length,
+      selesai,
+      diproses,
+      menunggu,
+    }
+  }, [posts])
+
+  const trendData = useMemo(() => {
+    const grouped = posts.reduce<
+      Record<string, { baru: number; diproses: number; selesai: number }>
+    >((acc, item) => {
+      const date = new Date(item.createdAt)
+      if (Number.isNaN(date.getTime())) return acc
+
+      const dateKey = date.toISOString().slice(0, 10)
+      if (!acc[dateKey]) {
+        acc[dateKey] = { baru: 0, diproses: 0, selesai: 0 }
+      }
+
+      const status = item.status || "menunggu"
+      if (status === "diproses") {
+        acc[dateKey].diproses += 1
+      } else if (status === "selesai") {
+        acc[dateKey].selesai += 1
+      } else {
+        acc[dateKey].baru += 1
+      }
+
+      return acc
+    }, {})
+
+    return Object.entries(grouped)
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([date, value]) => ({ date, ...value }))
+      .slice(-90)
   }, [posts])
 
   return (
@@ -73,19 +118,9 @@ export default function DashboardPage() {
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6">
-              <div className="grid grid-cols-1 gap-3 px-4 md:grid-cols-2 lg:px-6">
-                <div className="rounded-xl border bg-card p-4">
-                  <p className="text-sm text-muted-foreground">Total laporan dari API</p>
-                  <p className="mt-1 text-2xl font-bold">{totalLaporan.toLocaleString("id-ID")}</p>
-                </div>
-                <div className="rounded-xl border bg-card p-4">
-                  <p className="text-sm text-muted-foreground">Laporan masuk hari ini</p>
-                  <p className="mt-1 text-2xl font-bold">{laporanHariIni.toLocaleString("id-ID")}</p>
-                </div>
-              </div>
-              <DashboardCards />
+              <DashboardCards summary={summary} laporanHariIni={laporanHariIni} />
               <div className="px-4 lg:px-6">
-                <ChartAreaInteractive />
+                <ChartAreaInteractive data={trendData} />
               </div>
             </div>
           </div>

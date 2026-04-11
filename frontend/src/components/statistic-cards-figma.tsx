@@ -32,7 +32,7 @@ export function StatisticCardsFigma({ summary }: StatisticCardsFigmaProps) {
             <BarChart3 className="size-5" />
           </div>
           <Badge variant="secondary" className="bg-emerald-100 text-emerald-700 hover:bg-emerald-100 dark:bg-emerald-500/20 dark:text-emerald-400">
-            +12%
+            Data API
           </Badge>
         </div>
         <div className="mt-4">
@@ -48,7 +48,7 @@ export function StatisticCardsFigma({ summary }: StatisticCardsFigmaProps) {
             <CheckCircle2 className="size-5" />
           </div>
           <Badge variant="selesai" className="text-[10px]">
-            +8.4%
+            Status
           </Badge>
         </div>
         <div className="mt-4">
@@ -64,7 +64,7 @@ export function StatisticCardsFigma({ summary }: StatisticCardsFigmaProps) {
             <ClipboardList className="size-5" />
           </div>
           <Badge variant="diproses" className="text-[10px]">
-            -5.1%
+            Status
           </Badge>
         </div>
         <div className="mt-4">
@@ -80,11 +80,11 @@ export function StatisticCardsFigma({ summary }: StatisticCardsFigmaProps) {
             <AlertCircle className="size-5" />
           </div>
           <Badge variant="menunggu" className="text-[10px]">
-            -2.3%
+            Status
           </Badge>
         </div>
         <div className="mt-4">
-          <p className="text-sm font-medium text-muted-foreground">Menunggu</p>
+          <p className="text-sm font-medium text-muted-foreground">Menunggu Validasi</p>
           <h3 className="text-3xl font-bold mt-1">{data.menunggu.toLocaleString("id-ID")}</h3>
         </div>
       </Card>
