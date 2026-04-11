@@ -12,7 +12,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (userData: User) => void;
+  login: (userData: User, rememberMe?: boolean) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -25,27 +25,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const savedUser = localStorage.getItem("user");
+    const savedUser = localStorage.getItem("user") || sessionStorage.getItem("user");
     if (savedUser) {
       try {
         setUser(JSON.parse(savedUser));
       } catch (error) {
-        console.error("Failed to parse user from localStorage", error);
+        console.error("Failed to parse user from storage", error);
         localStorage.removeItem("user");
+        sessionStorage.removeItem("user");
       }
     }
     setLoading(false);
   }, []);
 
-  const login = (userData: User) => {
+  const login = (userData: User, rememberMe: boolean = false) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    if (rememberMe) {
+      localStorage.setItem("user", JSON.stringify(userData));
+    } else {
+      sessionStorage.setItem("user", JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
     setUser(null);
     localStorage.removeItem("user");
-    navigate("/");
+    sessionStorage.removeItem("user");
+    navigate("/login");
   };
 
   return (

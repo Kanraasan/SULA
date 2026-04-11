@@ -18,16 +18,18 @@ export function UserNavbar() {
   const { user, logout } = useAuth()
 
   const navItems = [
-    { label: "Dashboard", path: "/user-dashboard" },
-    { label: "Buat Laporan", path: "/report-form" },
-    { label: "Status Laporan", path: "/status-laporan" },
+    { label: "Dashboard", path: "/" },
+    ...(user ? [
+      { label: "Buat Laporan", path: "/report-form" },
+      { label: "Status Laporan", path: "/status-laporan" },
+    ] : []),
     { label: "Leaderboard", path: "/leaderboard" },
   ]
 
   return (
     <nav className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 items-center px-4 md:px-8">
-        <Link to="/user-dashboard" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
+        <Link to="/" className="flex items-center gap-2 hover:opacity-90 transition-opacity">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
             <Megaphone className="h-5 w-5 -rotate-12" />
           </div>
@@ -69,29 +71,52 @@ export function UserNavbar() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user?.username || "Warga"}</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    NIK: {user?.nik}
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link to="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  <span>Profil Saya</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem 
-                className="text-destructive focus:text-destructive cursor-pointer"
-                onClick={logout}
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                <span>Keluar</span>
-              </DropdownMenuItem>
+              {user ? (
+                <>
+                  <DropdownMenuLabel className="font-normal">
+                    <div className="flex flex-col space-y-1">
+                      <p className="text-sm font-medium leading-none">{user.username}</p>
+                      <p className="text-xs leading-none text-muted-foreground">
+                        NIK: {user.nik}
+                      </p>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Profil Saya</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    className="text-destructive focus:text-destructive cursor-pointer"
+                    onClick={logout}
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    <span>Keluar</span>
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuLabel className="font-normal text-muted-foreground">
+                    Halo, Warga!
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link to="/login" className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4 rotate-180" />
+                      <span>Log In</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/register" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      <span>Daftar Akun</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

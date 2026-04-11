@@ -18,15 +18,13 @@ export function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<UserDashboardPage />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/report-detail/:id" element={<ReportDetailPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
 
       {/* User & Admin Protected Routes */}
-      <Route path="/user-dashboard" element={
-        <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <UserDashboardPage />
-        </ProtectedRoute>
-      } />
       <Route path="/report-form" element={
         <ProtectedRoute allowedRoles={["user", "admin"]}>
           <ReportFormPage />
@@ -47,17 +45,6 @@ export function App() {
           <ReportStatusPage />
         </ProtectedRoute>
       } />
-      <Route path="/report-detail/:id" element={
-        <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <ReportDetailPage />
-        </ProtectedRoute>
-      } />
-      <Route path="/leaderboard" element={
-        <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <LeaderboardPage />
-        </ProtectedRoute>
-      } />
-
       {/* Admin ONLY Protected Routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute allowedRoles={["admin"]}>

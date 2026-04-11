@@ -171,7 +171,7 @@ export default function ReportFormPage() {
 
     if (!user) {
       alert("Anda harus login terlebih dahulu")
-      navigate("/")
+      navigate("/login")
       return
     }
 

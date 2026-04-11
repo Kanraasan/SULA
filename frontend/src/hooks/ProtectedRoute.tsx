@@ -20,13 +20,13 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
 
   if (!isAuthenticated) {
     // Redirect ke login jika belum terautentikasi
-    return <Navigate to="/" state={{ from: location }} replace />;
+    return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
   if (allowedRoles && user && !allowedRoles.includes(user.role || "")) {
     // Redirect ke dashboard user jika mencoba akses admin tanpa izin
     // atau sebaliknya jika diperlukan
-    return <Navigate to={user.role === "admin" ? "/dashboard" : "/user-dashboard"} replace />;
+    return <Navigate to={user.role === "admin" ? "/dashboard" : "/"} replace />;
   }
 
   return <>{children}</>;

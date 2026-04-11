@@ -50,12 +50,12 @@ export function LoginForm({
 
     try {
       const userData = await execute(authService.login(email, password))
-      login(userData)
+      login(userData, rememberMe)
       
       if (userData.role === "admin") {
         navigate("/dashboard")
       } else {
-        navigate("/user-dashboard")
+        navigate("/")
       }
     } catch (error) {
       // Error handled by useApi

@@ -15,6 +15,10 @@ import {
   ComboboxItem,
   ComboboxList,
 } from "@/components/ui/combobox"
+import { Calendar } from "@/components/ui/calendar"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { format } from "date-fns"
+import { CalendarIcon } from "lucide-react"
 import { useNavigate } from "react-router-dom"
 import { useApi } from "@/hooks/useApi"
 import { authService } from "@/services/auth.service"
@@ -113,16 +117,28 @@ export default function RegisterPage() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirm, setPasswordConfirm] = useState("")
-  const [tanggalLahir, setTanggalLahir] = useState("")
+  const [tanggalLahir, setTanggalLahir] = useState<Date | undefined>(undefined)
   const [alamatLengkap, setAlamatLengkap] = useState("")
   const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan | null>(null)
   const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(null)
+  const [kecamatanSearch, setKecamatanSearch] = useState("")
+  const [kelurahanSearch, setKelurahanSearch] = useState("")
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const filteredKelurahan = useMemo(() => {
     if (!selectedKecamatan) return []
-    return kelurahan.filter((item) => item.kecamatan === selectedKecamatan.name)
+    return kelurahan.filter(k => k.kecamatan === selectedKecamatan.name)
   }, [selectedKecamatan])
+
+  const filteredKecamatanOptions = useMemo(() => {
+    if (!kecamatanSearch) return kecamatan
+    return kecamatan.filter(k => k.name.toLowerCase().includes(kecamatanSearch.toLowerCase()))
+  }, [kecamatanSearch])
+
+  const filteredKelurahanOptions = useMemo(() => {
+    if (!kelurahanSearch) return filteredKelurahan
+    return filteredKelurahan.filter(k => k.name.toLowerCase().includes(kelurahanSearch.toLowerCase()))
+  }, [kelurahanSearch, filteredKelurahan])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -154,14 +170,14 @@ export default function RegisterPage() {
         username,
         password,
         passwordConfirm,
-        tanggalLahir,
+        tanggalLahir: tanggalLahir ? tanggalLahir.toISOString() : "",
         alamatLengkap,
         kecamatan: selectedKecamatan?.name || "",
         kelurahan: selectedKelurahan?.name || "",
       }))
 
       alert("Registrasi berhasil! Silakan login dengan akun Anda.")
-      navigate("/")
+      navigate("/login")
     } catch (error) {
       // Error handled by useApi
     }
@@ -208,7 +224,28 @@ export default function RegisterPage() {
                   </Field>
                   <Field>
                     <FieldLabel htmlFor="tanggalLahir">Tanggal Lahir</FieldLabel>
-                    <Input id="tanggalLahir" type="date" value={tanggalLahir} onChange={(e) => setTanggalLahir(e.target.value)} required />
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal bg-background",
+                            !tanggalLahir && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {tanggalLahir ? format(tanggalLahir, "PPP") : <span>Pilih Tanggal</span>}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0">
+                        <Calendar
+                          mode="single"
+                          selected={tanggalLahir}
+                          onSelect={setTanggalLahir}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
                   </Field>
                 </div>
 
@@ -229,14 +266,24 @@ export default function RegisterPage() {
                   <Field>
                     <FieldLabel htmlFor="kecamatan">Kecamatan</FieldLabel>
                     <Combobox
-                      items={kecamatan}
+                      items={filteredKecamatanOptions}
                       itemToStringValue={(k: Kecamatan) => k.name}
-                      onValueChange={(val: Kecamatan | null) => { setSelectedKecamatan(val); setSelectedKelurahan(null); }}
+                      onValueChange={(val: Kecamatan | null) => { 
+                        setSelectedKecamatan(val); 
+                        setSelectedKelurahan(null); 
+                        setKecamatanSearch(val ? val.name : "");
+                        setKelurahanSearch("");
+                      }}
                     >
-                      <ComboboxInput placeholder="Pilih..." value={selectedKecamatan?.name ?? ""} />
+                      <ComboboxInput 
+                        placeholder="Ketik atau pilih kecamatan..." 
+                        value={kecamatanSearch}
+                        onChange={(e) => setKecamatanSearch(e.target.value)}
+                        onBlur={() => { if(selectedKecamatan) setKecamatanSearch(selectedKecamatan.name) }}
+                      />
                       <ComboboxContent>
                         <ComboboxList>
-                          {kecamatan.map((kec) => (
+                          {filteredKecamatanOptions.map((kec) => (
                             <ComboboxItem key={kec.id} value={kec}>{kec.name}</ComboboxItem>
                           ))}
                         </ComboboxList>
@@ -246,14 +293,23 @@ export default function RegisterPage() {
                   <Field>
                     <FieldLabel htmlFor="kelurahan">Kelurahan</FieldLabel>
                     <Combobox
-                      items={filteredKelurahan}
+                      items={filteredKelurahanOptions}
                       itemToStringValue={(k: Kelurahan) => k.name}
-                      onValueChange={(val: Kelurahan | null) => setSelectedKelurahan(val)}
+                      onValueChange={(val: Kelurahan | null) => {
+                        setSelectedKelurahan(val);
+                        setKelurahanSearch(val ? val.name : "");
+                      }}
                     >
-                      <ComboboxInput placeholder="Pilih..." value={selectedKelurahan?.name ?? ""} disabled={!selectedKecamatan} />
+                      <ComboboxInput 
+                        placeholder="Ketik atau pilih kelurahan..." 
+                        disabled={!selectedKecamatan}
+                        value={kelurahanSearch}
+                        onChange={(e) => setKelurahanSearch(e.target.value)}
+                        onBlur={() => { if(selectedKelurahan) setKelurahanSearch(selectedKelurahan.name) }}
+                      />
                       <ComboboxContent>
                         <ComboboxList>
-                          {filteredKelurahan.map((kel) => (
+                          {filteredKelurahanOptions.map((kel) => (
                             <ComboboxItem key={kel.id} value={kel}>{kel.name}</ComboboxItem>
                           ))}
                         </ComboboxList>

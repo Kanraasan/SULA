@@ -26,7 +26,7 @@ export default function UserDashboardPage() {
   const { user } = useAuth()
   const { execute, data: reports, loading } = useApi()
   
-  const displayName = user?.username || "Warga"
+  const displayName = user ? user.username : "Warga"
 
   useEffect(() => {
     execute(reportService.getAll())
@@ -81,6 +81,19 @@ export default function UserDashboardPage() {
       <UserNavbar />
 
       <main className="container mx-auto px-4 py-12 md:px-8">
+        {!user && (
+          <div className="mb-8 rounded-2xl bg-primary/10 border border-primary/20 p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+              <h2 className="text-xl font-bold text-primary dark:text-blue-500">Anda Mengakses sebagai Guest</h2>
+              <p className="text-sm text-muted-foreground mt-1">Daftar atau Log In sekarang untuk berpartisipasi membuat laporan dan memantau status fasilitas di kota Anda.</p>
+            </div>
+            <div className="flex gap-3">
+              <Button onClick={() => navigate("/login")} className="whitespace-nowrap">Log In</Button>
+              <Button variant="outline" onClick={() => navigate("/register")} className="whitespace-nowrap">Daftar</Button>
+            </div>
+          </div>
+        )}
+
         {/* Hero Section */}
         <section className="mb-12">
           <h1 className="text-4xl font-black tracking-tight text-foreground">Halo, {displayName}!</h1>
@@ -90,32 +103,34 @@ export default function UserDashboardPage() {
         </section>
 
         {/* Quick Actions */}
-        <section className="mb-16">
-          <h2 className="mb-6 text-2xl font-bold tracking-tight">Aksi Cepat</h2>
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            {quickActions.map((action, idx) => (
-              <Card 
-                key={idx} 
-                onClick={() => navigate(action.link)}
-                className="group cursor-pointer transition-all duration-300 border-border hover:bg-primary dark:hover:bg-blue-600 hover:border-primary dark:hover:border-blue-600 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 dark:bg-blue-500/10 text-primary dark:text-blue-500 transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
-                    <action.icon className="h-6 w-6 stroke-[2.5px] transition-colors duration-300 group-hover:stroke-white group-hover:text-white" />
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <CardTitle className="transition-colors duration-300 group-hover:text-white">
-                    {action.title}
-                  </CardTitle>
-                  <CardDescription className="transition-colors duration-300 group-hover:text-white/90">
-                    {action.description}
-                  </CardDescription>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </section>
+        {user && (
+          <section className="mb-16">
+            <h2 className="mb-6 text-2xl font-bold tracking-tight">Aksi Cepat</h2>
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+              {quickActions.map((action, idx) => (
+                <Card 
+                  key={idx} 
+                  onClick={() => navigate(action.link)}
+                  className="group cursor-pointer transition-all duration-300 border-border hover:bg-primary dark:hover:bg-blue-600 hover:border-primary dark:hover:border-blue-600 hover:shadow-2xl hover:shadow-primary/20 hover:-translate-y-2"
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/10 dark:bg-blue-500/10 text-primary dark:text-blue-500 transition-all duration-300 group-hover:bg-white/20 group-hover:scale-110">
+                      <action.icon className="h-6 w-6 stroke-[2.5px] transition-colors duration-300 group-hover:stroke-white group-hover:text-white" />
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <CardTitle className="transition-colors duration-300 group-hover:text-white">
+                      {action.title}
+                    </CardTitle>
+                    <CardDescription className="transition-colors duration-300 group-hover:text-white/90">
+                      {action.description}
+                    </CardDescription>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Report Summary */}
         <section className="mb-16">
