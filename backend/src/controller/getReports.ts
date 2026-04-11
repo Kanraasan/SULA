@@ -1,4 +1,4 @@
-import reportData from '../reportData';
+import reportData from '../mock/reportData';
 
 export const getReports = (req: any, res: any) => {
   res.status(200).json({

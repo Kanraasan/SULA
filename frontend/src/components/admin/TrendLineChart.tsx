@@ -23,7 +23,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function TrenLineChart() {
+export function TrendLineChart() {
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">

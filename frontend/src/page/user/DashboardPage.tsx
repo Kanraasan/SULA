@@ -13,8 +13,8 @@ import {
   UserCircle,
   Loader2
 } from "lucide-react"
-import { UserNavbar } from "@/components/user/user-navbar"
-import { UserFooter } from "@/components/user/user-footer"
+import { UserNavbar } from "@/components/user/UserNavbar"
+import { UserFooter } from "@/components/user/UserFooter"
 import { useNavigate } from "react-router-dom"
 import { useAuth } from "@/hooks/useAuth"
 import { useEffect } from "react"
@@ -208,3 +208,4 @@ export default function UserDashboardPage() {
     </div>
   )
 }
+

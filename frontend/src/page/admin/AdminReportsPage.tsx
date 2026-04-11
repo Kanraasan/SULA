@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
-import { SearchForm } from "@/components/search-form"
+import { AppSidebar } from "@/components/AppSidebar"
+import { SearchForm } from "@/components/SearchForm"
 import { Button } from "@/components/ui/button"
 import {
   SidebarInset,
@@ -8,8 +8,8 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { Plus } from "lucide-react"
-import { RightFilterMenu } from "@/components/right-filter-menu"
-import { ReportTable, dataLaporan } from "@/components/report-table"
+import { RightFilterMenu } from "@/components/admin/RightFilterMenu"
+import { ReportTable, dataLaporan } from "@/components/admin/ReportTable"
 import { type DateRange } from "react-day-picker"
 import { ThemeToggle } from "@/components/theme-toggle"
 import {
@@ -32,7 +32,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import Clock from "@/components/clock-02"
+import Clock02 from "@/components/Clock02"
 
 const kategoriMasalah = [
   { value: "infrastruktur", label: "Infrastruktur & Jalan" },
@@ -44,7 +44,7 @@ const kategoriMasalah = [
   { value: "bencana", label: "Bencana & Keadaan Darurat" },
 ]
 
-export default function LaporanPage() {
+export default function AdminReportsPage() {
   // 1. Definisikan semua State
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("")
@@ -113,7 +113,7 @@ export default function LaporanPage() {
               <h2 className="font-bold">Laporan</h2>
             </div>
             <div className="flex items-center gap-4">
-              <Clock />
+              <Clock02 />
               <ThemeToggle />
             </div>
           </header>

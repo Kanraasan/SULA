@@ -1,6 +1,6 @@
 import { useState } from "react"
-import { UserNavbar } from "@/components/user/user-navbar"
-import { UserFooter } from "@/components/user/user-footer"
+import { UserNavbar } from "@/components/user/UserNavbar"
+import { UserFooter } from "@/components/user/UserFooter"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -448,3 +448,4 @@ export default function ReportFormPage() {
     </div>
   )
 }
+

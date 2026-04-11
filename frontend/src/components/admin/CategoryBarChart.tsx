@@ -19,7 +19,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function KategoriBarChart() {
+export function CategoryBarChart() {
   return (
     <Card className="rounded-2xl border-none shadow-sm flex flex-col">
       <CardHeader className="flex flex-row items-center justify-between pb-8">

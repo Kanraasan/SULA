@@ -1,5 +1,5 @@
 import { compareSync } from 'bcryptjs';
-import userData from '../userData';
+import userData from '../mock/userData';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret_key_sula_123';

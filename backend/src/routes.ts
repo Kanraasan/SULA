@@ -1,11 +1,12 @@
 import express from 'express';
 import { createUser } from './controller/userRegister';
 import { loginUser } from './controller/userLogin';
-import { createReport } from './controller/userPost';
+import { createReport } from './controller/createReport';
 import { uploadFile } from './controller/uploadFile';
-import { getReports } from './controller/getPost';
-import { getReportById } from './controller/getPostById';
-import { editReport } from './controller/editPost';
+import { getReports } from './controller/getReports';
+import { getReportById } from './controller/getReportById';
+import { getLeaderboard } from './controller/getLeaderboard';
+import { editReport } from './controller/editReport';
 import { deleteReportById } from './controller/deleteReport';
 import { authorize } from './middleware/auth';
 
@@ -17,6 +18,7 @@ router.post('/login', loginUser);
 router.post('/report', authorize(['user', 'admin']), uploadFile, createReport);
 router.get('/report', getReports);
 router.get('/report/:id', getReportById);
+router.get('/leaderboard', getLeaderboard);
 
 // Restricted actions (Admin only)
 router.put('/report/:id', authorize(['admin']), editReport);

@@ -1,9 +1,11 @@
 import { useState, useMemo, useEffect } from "react"
-import { UserNavbar } from "@/components/user/user-navbar"
-import { UserFooter } from "@/components/user/user-footer"
-import { ReportCard } from "@/components/user/report-card"
+import { UserNavbar } from "@/components/user/UserNavbar"
+import { UserFooter } from "@/components/user/UserFooter"
+import { ReportCard } from "@/components/user/ReportCard"
 import { Button } from "@/components/ui/button"
 import { Filter, ListFilter, Check } from "lucide-react"
+import { IReport, IReportUI } from "@/types/report"
+import { reportService } from "@/services/report.service"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,18 +15,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { cn } from "@/lib/utils"
-
-type Report = {
-  id: string
-  title: string
-  category: string
-  status: "Menunggu" | "Diproses" | "Selesai"
-  time: string
-  createdAt: Date
-  author: string
-  votes: number
-  imageUrl: string
-}
 
 const CATEGORIES = [
   "Infrastruktur",
@@ -66,40 +56,42 @@ const mapCategory = (category: string) => {
   return categoryMap[category.toLowerCase()] || category
 }
 
-export default function StatusLaporanPage() {
+export default function ReportStatusPage() {
   const [filterCategory, setFilterCategory] = useState<string | null>(null)
   const [sortOrder, setSortOrder] = useState<"newest" | "oldest">("newest")
-  const [reports, setReports] = useState<Report[]>([])
+  const [reports, setReports] = useState<IReportUI[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   // Fetch data dari backend
   useEffect(() => {
-    fetch("/api/report")
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.data) {
+    const fetchReports = async () => {
+      try {
+        const data = await reportService.getAll()
+        if (data) {
           // Transform data dari backend ke format yang dibutuhkan
-          const transformedReports: Report[] = result.data.map((post: any) => ({
-            id: post.id,
-            title: post.title,
-            category: mapCategory(post.category),
+          const transformedReports: IReportUI[] = data.map((report: IReport) => ({
+            id: report.id,
+            title: report.title,
+            category: mapCategory(report.category),
             status: "Menunggu" as const, // Default status, bisa disesuaikan
-            time: getRelativeTime(post.createdAt),
-            createdAt: new Date(post.createdAt),
-            author: post.username || "Anonim",
+            time: getRelativeTime(report.createdAt),
+            createdAt: new Date(report.createdAt),
+            author: report.username || "Anonim",
             votes: Math.floor(Math.random() * 50), // Random votes untuk demo
-            imageUrl: post.lampiranFoto
-              ? `http://localhost:5000/uploads/${post.lampiranFoto}`
+            imageUrl: report.lampiranFoto
+              ? `http://localhost:5000/uploads/${report.lampiranFoto}`
               : "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop",
           }))
           setReports(transformedReports)
         }
-        setIsLoading(false)
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("Error fetching reports:", error)
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+
+    fetchReports()
   }, [])
 
   // Logic for filtering and sorting
@@ -288,3 +280,4 @@ export default function StatusLaporanPage() {
     </div>
   )
 }
+
