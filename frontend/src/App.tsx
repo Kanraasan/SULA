@@ -13,6 +13,7 @@ import MyReportsPage from "./page/user/MyReportsPage"
 import EditReportPage from "./page/user/EditReportPage"
 import LeaderboardPage from "./page/user/Leaderboard"
 import { ProtectedRoute } from "./hooks/ProtectedRoute"
+import AdminSettingPage from "./page/admin/SettingPage"
 
 export function App() {
   return (
@@ -77,6 +78,11 @@ export function App() {
       <Route path="/statistik" element={
         <ProtectedRoute allowedRoles={["admin"]}>
           <StatistikPage />
+        </ProtectedRoute>
+      } />
+      <Route path="/setting" element={
+        <ProtectedRoute allowedRoles={["admin"]}>
+          <AdminSettingPage />
         </ProtectedRoute>
       } />
     </Routes>

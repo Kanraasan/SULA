@@ -1,21 +1,115 @@
 import { AppSidebar } from "@/components/app-sidebar"
 import Clock from "@/components/clock-02"
 import { ThemeToggle } from "@/components/theme-toggle"
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { Textarea } from "@/components/ui/textarea"
-import { AlertCircle, BriefcaseMedical } from "lucide-react"
-import { type FormEvent } from "react"
+import { BriefcaseMedical } from "lucide-react"
+import { type FormEvent, useState } from "react"
+import { toast } from "sonner"
+import { useAuth } from "@/hooks/useAuth"
 
-export default function AdminSettingPage() {
-  const currentYear = new Date().getFullYear()
+type AdminProfile = {
+  fullName: string
+  bio: string
+}
+
+const getProfileStorageKey = (nik: string) => `admin-profile:${nik}`
+
+const readAdminProfile = (nik: string): AdminProfile => {
+  const fallbackProfile: AdminProfile = {
+    fullName: "",
+    bio: "",
+  }
+
+  if (typeof window === "undefined") {
+    return fallbackProfile
+  }
+
+  const storedProfile = localStorage.getItem(getProfileStorageKey(nik))
+  if (!storedProfile) {
+    return fallbackProfile
+  }
+
+  try {
+    const parsedProfile = JSON.parse(storedProfile) as Partial<AdminProfile>
+    return {
+      fullName: parsedProfile.fullName || "",
+      bio: parsedProfile.bio || "",
+    }
+  } catch (error) {
+    console.error("Failed to parse admin profile from localStorage", error)
+    return fallbackProfile
+  }
+}
+
+function ProfileInformationForm({
+  user,
+}: {
+  user: {
+    nik: string
+    username: string
+  }
+}) {
+  const initialProfile = readAdminProfile(String(user.nik))
+  const [fullName, setFullName] = useState(
+    initialProfile.fullName || user.username || ""
+  )
+  const [bio, setBio] = useState(initialProfile.bio)
+
   const handleSaveProfile = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+
+    const profile: AdminProfile = {
+      fullName: fullName.trim() || user.username || "",
+      bio: bio.trim(),
+    }
+
+    localStorage.setItem(getProfileStorageKey(String(user.nik)), JSON.stringify(profile))
+    toast.success("Profil berhasil disimpan")
   }
+
+  return (
+    <form className="space-y-6" onSubmit={handleSaveProfile}>
+      <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+        <div className="space-y-2">
+          <Label htmlFor="fullName">Nama</Label>
+          <Input
+            id="fullName"
+            placeholder="Ubah nama panjang Anda..."
+            value={fullName}
+            onChange={(event) => setFullName(event.target.value)}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="bio">Bio</Label>
+        <Textarea
+          id="bio"
+          rows={4}
+          placeholder="Berikan informasi kredensial anda kepada kami...."
+          value={bio}
+          onChange={(event) => setBio(event.target.value)}
+        />
+      </div>
+
+      <div className="flex flex-col items-start justify-between gap-4 pt-4 text-sm text-muted-foreground md:flex-row md:items-center">
+        <p>Perubahan ini akan tersimpan di sistem SULA</p>
+        <Button type="submit" className="min-w-40">
+          Simpan Perubahan
+        </Button>
+      </div>
+    </form>
+  )
+}
+
+export default function AdminSettingPage() {
+  const { user } = useAuth()
+  const currentYear = new Date().getFullYear()
 
   return (
     <SidebarProvider>
@@ -51,70 +145,13 @@ export default function AdminSettingPage() {
                 <h2 className="text-2xl font-semibold tracking-tight">Profile information</h2>
               </div>
 
-              <form className="space-y-6" onSubmit={handleSaveProfile}>
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div className="space-y-2">
-                    <Label htmlFor="fullName">Nama</Label>
-                    <Input id="fullName" placeholder="Ubah nama panjang Anda..." />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email address</Label>
-                    <Input id="email" type="email" placeholder="Ubah alamat email Anda" />
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
-                  <Textarea
-                    id="bio"
-                    rows={4}
-                    placeholder="Berikan informasi kredensial anda kepada kami...."
-                  />
-                </div>
-
-                <div className="flex flex-col items-start justify-between gap-4 pt-4 text-sm text-muted-foreground md:flex-row md:items-center">
-                  <p>Perubahan ini akan tersimpan di sistem SULA</p>
-                  <Button type="submit" className="min-w-40">Simpan Perubahan</Button>
-                </div>
-              </form>
-            </CardContent>
-          </Card>
-
-          <Card className="overflow-hidden rounded-2xl border-red-200/80 py-0">
-            <CardTitle className="border-b bg-red-50 px-6 py-3 text-red-700 dark:bg-red-950/20 dark:text-red-400">
-              <div className="flex items-center gap-2 text-2xl font-semibold tracking-tight">
-                <AlertCircle className="h-5 w-5" />
-                Zona Berbahaya
-              </div>
-            </CardTitle>
-            <CardContent className="flex flex-col gap-5 px-6 py-6 md:flex-row md:items-center md:justify-between">
-              <div className="max-w-xl">
-                <h3 className="text-3xl font-bold tracking-tight">Hapus Akun</h3>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  Setelah anda klik tombol berikut, maka akun Anda akan segera terhapus secara permanen. Pastikan anda sudah
-                  yakin ketika hendak melakukan penghapusan akun.
+              {user?.nik ? (
+                <ProfileInformationForm key={String(user.nik)} user={user} />
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  Data pengguna belum tersedia.
                 </p>
-              </div>
-
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="outline" className="w-full border-red-500 text-red-600 hover:bg-red-50 hover:text-red-700 md:w-40">
-                    Hapus Akun
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Konfirmasi Hapus Akun</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Tindakan ini bersifat permanen. Data akun dan aktivitas Anda akan dihapus dari sistem.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Batal</AlertDialogCancel>
-                    <AlertDialogAction className="bg-red-600 hover:bg-red-700">Lanjut Hapus</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              )}
             </CardContent>
           </Card>
 

@@ -33,6 +33,7 @@ export const loginUser = (req: any, res: any) => {
     data: { 
       nik: user.nik, 
       username: user.username, 
+      email: user.email,
       role: user.role,
       token: token // kirim token ke frontend
     },
