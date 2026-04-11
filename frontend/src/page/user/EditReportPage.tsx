@@ -90,10 +90,10 @@ export default function EditReportPage() {
         if (!id) return
         const data = await reportService.getById(id)
         if (data) {
-          setTitle(data.title)
-          setDescription(data.description)
-          setSelectedCategory(data.category)
-          setExistingPhoto(data.lampiranFoto)
+          setTitle(data.complaint_title)
+          setDescription(data.complaint_description)
+          setSelectedCategory(data.complaint_category)
+          setExistingPhoto(data.complaint_image)
         }
       } catch (error) {
         alert("Gagal memuat data laporan")

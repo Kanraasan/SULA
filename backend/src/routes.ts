@@ -11,7 +11,7 @@ import { deleteReportById } from './controller/deleteReport';
 import { authorize } from './middleware/auth';
 
 const router = express.Router();
-router.post('/regist', createUser);
+router.post('/register', createUser);
 router.post('/login', loginUser);
 
 // User & Admin can do these

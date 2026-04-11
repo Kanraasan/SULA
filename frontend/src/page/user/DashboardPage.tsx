@@ -133,11 +133,11 @@ export default function UserDashboardPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {reports?.slice(0, 3).map((report: any) => (
+              {(reports || []).slice(0, 3).map((report: any) => (
                 <Card key={report.id} className="overflow-hidden border-border bg-card">
                   <div className="aspect-video w-full bg-muted">
-                    {report.lampiranFoto ? (
-                      <img src={`http://localhost:5000/uploads/${report.lampiranFoto}`} alt={report.title} className="h-full w-full object-cover" />
+                    {report.complaint_image ? (
+                      <img src={`http://localhost:5000/uploads/${report.complaint_image}`} alt={report.complaint_title} className="h-full w-full object-cover" />
                     ) : (
                       <div className="flex h-full items-center justify-center text-muted-foreground">
                         <LayoutDashboard className="h-10 w-10 opacity-20" />
@@ -146,23 +146,23 @@ export default function UserDashboardPage() {
                   </div>
                   <CardHeader className="p-5 pb-2">
                     <div className="flex items-center justify-between mb-2">
-                      <Badge variant={getStatusVariant(report.status)}>{report.status || 'Menunggu'}</Badge>
+                      <Badge variant={getStatusVariant(report.status)}>{report.status || 'menunggu'}</Badge>
                       <span className="text-xs text-muted-foreground">
-                        {new Date(report.createdAt).toLocaleDateString('id-ID')}
+                        {new Date(report.created_at).toLocaleDateString('id-ID')}
                       </span>
                     </div>
-                    <CardTitle className="text-base line-clamp-1">{report.title}</CardTitle>
+                    <CardTitle className="text-base line-clamp-1">{report.complaint_title}</CardTitle>
                   </CardHeader>
                   <CardContent className="p-5 pt-0 pb-4">
                     <p className="text-sm text-muted-foreground line-clamp-2">
-                      {report.description}
+                      {report.complaint_description}
                     </p>
                   </CardContent>
                   <Separator />
                   <div className="flex items-center gap-3 p-4 px-5 text-xs text-muted-foreground">
                     <div className="flex items-center gap-1">
                       <MapPin className="h-3 w-3" />
-                      {report.category}
+                      {report.complaint_category}
                     </div>
                     <div className="h-1 w-1 rounded-full bg-muted-foreground/30" />
                     <div className="flex items-center gap-1">

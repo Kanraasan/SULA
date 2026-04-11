@@ -92,7 +92,7 @@ export default function MyReportsPage() {
                 <CardHeader>
                   <div className="flex items-start justify-between">
                     <Badge variant="secondary" className="mb-2">
-                      {report.category}
+                      {report.complaint_category}
                     </Badge>
                     <div className="flex gap-2">
                       <Button
@@ -113,10 +113,10 @@ export default function MyReportsPage() {
                       </Button>
                     </div>
                   </div>
-                  <CardTitle className="text-lg">{report.title}</CardTitle>
+                  <CardTitle className="text-lg">{report.complaint_title}</CardTitle>
                   <CardDescription className="flex items-center gap-2 text-xs">
                     <CalendarIcon className="h-3 w-3" />
-                    {new Date(report.createdAt).toLocaleDateString("id-ID", {
+                    {new Date(report.created_at).toLocaleDateString("id-ID", {
                       day: "numeric",
                       month: "long",
                       year: "numeric",
@@ -125,12 +125,12 @@ export default function MyReportsPage() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-muted-foreground line-clamp-3 mb-4">
-                    {report.description}
+                    {report.complaint_description}
                   </p>
-                  {report.lampiranFoto && (
+                  {report.complaint_image && (
                     <img
-                      src={`http://localhost:5000/uploads/${report.lampiranFoto}`}
-                      alt={report.title}
+                      src={`http://localhost:5000/uploads/${report.complaint_image}`}
+                      alt={report.complaint_title}
                       className="w-full h-40 object-cover rounded-md"
                     />
                   )}

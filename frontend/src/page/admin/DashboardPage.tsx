@@ -1,19 +1,19 @@
 import { AppSidebar } from "@/components/AppSidebar"
-import { ChartAreaInteractive } from "@/components/chart-area-interactive"
+import { ChartAreaInteractive } from "@/components/ChartAreaInteractive"
 import { DashboardCards } from "@/components/admin/DashboardCards"
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import Clock02 from "@/components/Clock02"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
 
 type BackendPost = {
-  createdAt: string
+  created_at: string
   status?: "menunggu" | "diproses" | "selesai" | "ditolak"
 }
 
@@ -50,7 +50,7 @@ export default function DashboardPage() {
     const today = new Date()
     today.setHours(0, 0, 0, 0)
     return posts.filter((item) => {
-      const createdAt = new Date(item.createdAt)
+      const createdAt = new Date(item.created_at)
       createdAt.setHours(0, 0, 0, 0)
       return createdAt.getTime() === today.getTime()
     }).length
@@ -75,7 +75,7 @@ export default function DashboardPage() {
     const grouped = posts.reduce<
       Record<string, { baru: number; diproses: number; selesai: number }>
     >((acc, item) => {
-      const date = new Date(item.createdAt)
+      const date = new Date(item.created_at)
       if (Number.isNaN(date.getTime())) return acc
 
       const dateKey = date.toISOString().slice(0, 10)

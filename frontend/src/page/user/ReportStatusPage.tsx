@@ -71,15 +71,16 @@ export default function ReportStatusPage() {
           // Transform data dari backend ke format yang dibutuhkan
           const transformedReports: IReportUI[] = data.map((report: IReport) => ({
             id: report.id,
-            title: report.title,
-            category: mapCategory(report.category),
-            status: "Menunggu" as const, // Default status, bisa disesuaikan
-            time: getRelativeTime(report.createdAt),
-            createdAt: new Date(report.createdAt),
+            title: report.complaint_title,
+            category: mapCategory(report.complaint_category),
+            description: report.complaint_description,
+            status: report.status.charAt(0).toUpperCase() + report.status.slice(1),
+            time: getRelativeTime(report.created_at),
+            createdAt: new Date(report.created_at),
             author: report.username || "Anonim",
-            votes: Math.floor(Math.random() * 50), // Random votes untuk demo
-            imageUrl: report.lampiranFoto
-              ? `http://localhost:5000/uploads/${report.lampiranFoto}`
+            votes: report.upvotes || 0,
+            imageUrl: report.complaint_image
+              ? `http://localhost:5000/uploads/${report.complaint_image}`
               : "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop",
           }))
           setReports(transformedReports)

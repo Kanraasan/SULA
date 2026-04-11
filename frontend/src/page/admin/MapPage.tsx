@@ -11,7 +11,7 @@ import {
   SidebarTrigger,
 } from "@/components/ui/sidebar"
 import { useState, useEffect, useRef } from "react"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import Clock02 from "@/components/Clock02"
 
 const styles = {

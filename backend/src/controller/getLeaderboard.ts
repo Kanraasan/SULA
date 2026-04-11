@@ -1,46 +1,75 @@
-import reportData from '../mock/reportData';
-import userData from '../mock/userData';
+import { supabase } from '../lib/supabase';
 
-export const getLeaderboard = (req: any, res: any) => {
-  // Aggregate reports by username
-  const userStats = reportData.reduce((acc: any, report: any) => {
-    const { username, status } = report;
-    if (!acc[username]) {
-      acc[username] = {
+export const getLeaderboard = async (req: any, res: any) => {
+  try {
+    // 1. Fetch reports with joined user info from Supabase
+    const { data: reports, error } = await supabase
+      .from('reports')
+      .select(`
+        user_id,
         username,
-        totalReports: 0,
-        validReports: 0,
-      };
-    }
-    acc[username].totalReports += 1;
-    if (status === 'Selesai' || status === 'Diverifikasi') {
-      acc[username].validReports += 1;
-    }
-    return acc;
-  }, {});
+        status,
+        users (
+          username,
+          kecamatan
+        )
+      `);
 
-  // Merge with user profile info
-  const leaderboard = Object.values(userStats).map((stats: any) => {
-    const user = userData.find((u: any) => u.username === stats.username);
-    return {
-      ...stats,
-      name: user ? user.username : stats.username,
-      district: user ? user.kecamatan : 'N/A',
-      image: 'https://placehold.co/80x80', // Placeholder
-    };
-  });
+    if (error) throw error;
 
-  // Sort by valid reports descending
-  leaderboard.sort((a: any, b: any) => b.validReports - a.validReports);
+    // 2. Aggregate reports by user_id or username
+    const userStats: Record<string, any> = {};
 
-  // Assign ranks
-  const rankedLeaderboard = leaderboard.map((item: any, index: number) => ({
-    ...item,
-    rank: index + 1,
-  }));
+    reports?.forEach((report: any) => {
+      const key = report.user_id || report.username;
+      if (!userStats[key]) {
+        // Fallback to report.username if user join returns null
+        const userData: any = report.users;
+        userStats[key] = {
+          username: userData?.username || report.username,
+          totalReports: 0,
+          validReports: 0,
+          district: userData?.kecamatan || 'N/A',
+        };
+      }
 
-  res.status(200).json({
-    message: 'Berhasil mengambil data leaderboard',
-    data: rankedLeaderboard,
-  });
+      userStats[key].totalReports += 1;
+      
+      // Normalize status to lowercase for comparison
+      const normStatus = report.status?.toLowerCase();
+      if (normStatus === 'selesai' || normStatus === 'diverifikasi') {
+        userStats[key].validReports += 1;
+      }
+    });
+
+    // 3. Format into the leaderboard structure
+    const leaderboard = Object.values(userStats).map((stats: any) => ({
+      username: stats.username,
+      totalReports: stats.totalReports,
+      validReports: stats.validReports,
+      name: stats.username,
+      district: stats.district,
+      image: 'https://placehold.co/80x80', // Placeholder as in original
+    }));
+
+    // 4. Sort by valid reports descending
+    leaderboard.sort((a: any, b: any) => b.validReports - a.validReports);
+
+    // 5. Assign ranks
+    const rankedLeaderboard = leaderboard.map((item: any, index: number) => ({
+      ...item,
+      rank: index + 1,
+    }));
+
+    res.status(200).json({
+      message: 'Berhasil mengambil data leaderboard',
+      data: rankedLeaderboard,
+    });
+  } catch (error: any) {
+    console.error('Error fetching leaderboard:', error);
+    res.status(500).json({
+      message: 'Gagal mengambil data leaderboard',
+      error: error.message,
+    });
+  }
 };

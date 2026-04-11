@@ -66,14 +66,14 @@ export default function ReportDetailPage() {
   }
 
   const timeline = [
-    { label: "Laporan Diterima", date: report.createdAt, status: "completed" },
-    { label: "Diverifikasi", date: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? report.createdAt : null, status: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? "completed" : "pending" },
-    { label: "Dalam Perbaikan", date: report.status === 'Selesai' ? report.createdAt : null, status: report.status === 'Selesai' ? "completed" : "pending" },
-    { label: "Selesai", date: report.status === 'Selesai' ? report.createdAt : null, status: report.status === 'Selesai' ? "completed" : "pending" },
+    { label: "Laporan Diterima", date: report.created_at, status: "completed" },
+    { label: "Diverifikasi", date: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? report.created_at : null, status: (report.status === 'Diverifikasi' || report.status === 'Selesai') ? "completed" : "pending" },
+    { label: "Dalam Perbaikan", date: report.status === 'Selesai' ? report.created_at : null, status: report.status === 'Selesai' ? "completed" : "pending" },
+    { label: "Selesai", date: report.status === 'Selesai' ? report.created_at : null, status: report.status === 'Selesai' ? "completed" : "pending" },
   ]
 
-  const imageUrl = report.lampiranFoto 
-    ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${report.lampiranFoto}`
+  const imageUrl = report.complaint_image 
+    ? `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${report.complaint_image}`
     : "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop"
 
   return (
@@ -96,7 +96,7 @@ export default function ReportDetailPage() {
             <div className="rounded-3xl overflow-hidden shadow-sm border border-border bg-muted">
               <img 
                 src={imageUrl} 
-                alt={report.title}
+                alt={report.complaint_title}
                 className="w-full h-[450px] object-cover"
               />
             </div>
@@ -105,7 +105,7 @@ export default function ReportDetailPage() {
               <CardContent className="p-8 space-y-4">
                 <h2 className="text-xl font-bold text-foreground">Deskripsi Laporan</h2>
                 <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                  {report.description}
+                  {report.complaint_description}
                 </p>
               </CardContent>
             </Card>
@@ -118,7 +118,7 @@ export default function ReportDetailPage() {
               <CardContent className="p-8 space-y-6">
                 <div className="space-y-4">
                   <h1 className="text-2xl font-bold leading-tight text-foreground">
-                    {report.title}
+                    {report.complaint_title}
                   </h1>
                   <div className="flex flex-wrap gap-2">
                     <Badge className={cn(
@@ -130,7 +130,7 @@ export default function ReportDetailPage() {
                       {report.status || "Menunggu"}
                     </Badge>
                     <Badge variant="secondary" className="bg-muted text-muted-foreground hover:bg-muted border-none px-3 py-1 font-medium">
-                      {report.category}
+                      {report.complaint_category}
                     </Badge>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function ReportDetailPage() {
                   </div>
                   <div>
                     <p className="text-sm font-bold text-foreground">Dilaporkan oleh {report.username}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(report.createdAt).toLocaleString('id-ID')}</p>
+                    <p className="text-xs text-muted-foreground">{new Date(report.created_at).toLocaleString('id-ID')}</p>
                   </div>
                 </div>
 

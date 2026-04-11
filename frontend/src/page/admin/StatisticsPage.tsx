@@ -4,7 +4,7 @@ import { RecentReportsTable } from "@/components/admin/RecentReportsTable"
 import { StatisticCardsFigma } from "@/components/admin/StatisticCardsFigma"
 import { TrendLineChart } from "@/components/admin/TrendLineChart"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import Clock02 from "@/components/Clock02"
 import { useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
@@ -12,10 +12,10 @@ import { api, isHandledApiError } from "@/lib/api-client"
 
 type BackendPost = {
   id: string
-  title: string
-  category: string
-  description: string
-  createdAt: string
+  complaint_title: string
+  complaint_category: string
+  complaint_description: string
+  created_at: string
   status?: "menunggu" | "diproses" | "selesai" | "ditolak"
 }
 
@@ -83,7 +83,7 @@ export default function StatisticsPage() {
     }
 
     const grouped = posts.reduce<Record<string, number>>((acc, post) => {
-      const key = (post.category || "lainnya").toLowerCase()
+      const key = (post.complaint_category || "lainnya").toLowerCase()
       const label = normalizedLabel[key] || "Lainnya"
       acc[label] = (acc[label] || 0) + 1
       return acc
@@ -98,7 +98,7 @@ export default function StatisticsPage() {
   const trendData = useMemo(() => {
     const monthFormatter = new Intl.DateTimeFormat("id-ID", { month: "short" })
     const grouped = posts.reduce<Record<string, number>>((acc, post) => {
-      const date = new Date(post.createdAt)
+      const date = new Date(post.created_at)
       if (Number.isNaN(date.getTime())) return acc
 
       const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`
@@ -131,14 +131,14 @@ export default function StatisticsPage() {
     }
 
     return [...posts]
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
       .slice(0, 8)
       .map((post) => ({
         id: `#${post.id.slice(0, 8).toUpperCase()}`,
-        kategori: post.category,
-        ket: post.title,
+        kategori: post.complaint_category,
+        ket: post.complaint_title,
         status: statusMap[post.status || "menunggu"] || "MENUNGGU",
-        tgl: new Date(post.createdAt).toLocaleDateString("id-ID", {
+        tgl: new Date(post.created_at).toLocaleDateString("id-ID", {
           day: "2-digit",
           month: "short",
           year: "numeric",

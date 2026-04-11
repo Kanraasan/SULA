@@ -111,16 +111,14 @@ export default function RegisterPage() {
   const { execute, loading: isSubmitting, error: apiError } = useApi()
 
   const [nik, setNik] = useState("")
+  const [email, setEmail] = useState("")
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [passwordConfirm, setPasswordConfirm] = useState("")
+  const [tanggalLahir, setTanggalLahir] = useState("")
   const [alamatLengkap, setAlamatLengkap] = useState("")
-  const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan | null>(
-    null
-  )
-  const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(
-    null
-  )
+  const [selectedKecamatan, setSelectedKecamatan] = useState<Kecamatan | null>(null)
+  const [selectedKelurahan, setSelectedKelurahan] = useState<Kelurahan | null>(null)
   const [errors, setErrors] = useState<Record<string, string>>({})
 
   const filteredKelurahan = useMemo(() => {
@@ -134,16 +132,15 @@ export default function RegisterPage() {
     const newErrors: Record<string, string> = {}
 
     if (!nik.trim()) newErrors.nik = "NIK wajib diisi"
+    if (!email.trim()) newErrors.email = "Email wajib diisi"
     if (!username.trim()) newErrors.username = "Username wajib diisi"
     if (!password.trim()) newErrors.password = "Password wajib diisi"
-    if (!passwordConfirm.trim())
-      newErrors.passwordConfirm = "Konfirmasi password wajib diisi"
-    if (password !== passwordConfirm)
-      newErrors.passwordConfirm = "Password tidak sama"
+    if (!passwordConfirm.trim()) newErrors.passwordConfirm = "Konfirmasi password wajib diisi"
+    if (password !== passwordConfirm) newErrors.passwordConfirm = "Password tidak sama"
+    if (!tanggalLahir) newErrors.tanggalLahir = "Tanggal lahir wajib diisi"
     if (!selectedKecamatan) newErrors.kecamatan = "Kecamatan wajib dipilih"
     if (!selectedKelurahan) newErrors.kelurahan = "Kelurahan wajib dipilih"
-    if (!alamatLengkap.trim())
-      newErrors.alamatLengkap = "Alamat lengkap wajib diisi"
+    if (!alamatLengkap.trim()) newErrors.alamatLengkap = "Alamat lengkap wajib diisi"
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -155,9 +152,11 @@ export default function RegisterPage() {
     try {
       await execute(authService.register({
         nik,
+        email,
         username,
         password,
         passwordConfirm,
+        tanggalLahir,
         alamatLengkap,
         kecamatan: selectedKecamatan?.name || "",
         kelurahan: selectedKelurahan?.name || "",
@@ -172,221 +171,119 @@ export default function RegisterPage() {
 
   return (
     <div className="grid min-h-svh lg:grid-cols-2">
-      <div className="flex flex-col gap-4 border md:p-10">
+      <div className="flex flex-col gap-4 border p-6 md:p-10">
         <div className="flex flex-1 items-center justify-center">
           <div className="w-full max-w-md">
-            <form className={cn("flex flex-col gap-5")} onSubmit={handleSubmit}>
+            <form id="register-form" className={cn("flex flex-col gap-5")} onSubmit={handleSubmit}>
               <FieldGroup>
-                <div className="flex flex-col gap-1">
-                  <h1 className="text-3xl font-bold">
-                    Selamat Datang di SULA!
-                  </h1>
-                  <p className="text-sm text-balance text-muted-foreground">
-                    Silakan mendaftar dan mendapatkan akun Anda untuk melaporkan
-                    atau memantau status fasilitas di lingkungan Anda.
+                <div className="flex flex-col gap-1 mb-4">
+                  <h1 className="text-3xl font-bold">Selamat Datang di SULA!</h1>
+                  <p className="text-sm text-muted-foreground">
+                    Silakan mendaftar untuk melaporkan fasilitas publik di Kota Surakarta.
                   </p>
                 </div>
 
-                {(apiError || errors.general) && (
+                {apiError && (
                   <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
-                    {apiError || errors.general}
+                    {apiError}
                   </div>
                 )}
 
-                <Field>
-                  <FieldLabel htmlFor="nik">NIK</FieldLabel>
-                  <Input
-                    id="nik"
-                    type="text"
-                    placeholder="Masukkan NIK Anda"
-                    value={nik}
-                    onChange={(e) => setNik(e.target.value)}
-                    required
-                    className="bg-background"
-                  />
-                  {errors.nik && (
-                    <p className="text-sm text-destructive">{errors.nik}</p>
-                  )}
-                </Field>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="nik">NIK</FieldLabel>
+                    <Input id="nik" value={nik} onChange={(e) => setNik(e.target.value)} required placeholder="3372..." />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="email">Email</FieldLabel>
+                    <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required placeholder="nama@email.com" />
+                  </Field>
+                </div>
 
-                <Field>
-                  <FieldLabel htmlFor="username">Username</FieldLabel>
-                  <Input
-                    id="username"
-                    type="text"
-                    placeholder="Masukkan Username Anda"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    required
-                    className="bg-background"
-                  />
-                  {errors.username && (
-                    <p className="text-sm text-destructive">
-                      {errors.username}
-                    </p>
-                  )}
-                </Field>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="username">Username</FieldLabel>
+                    <Input id="username" value={username} onChange={(e) => setUsername(e.target.value)} required placeholder="johndoe" />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="tanggalLahir">Tanggal Lahir</FieldLabel>
+                    <Input id="tanggalLahir" type="date" value={tanggalLahir} onChange={(e) => setTanggalLahir(e.target.value)} required />
+                  </Field>
+                </div>
 
-                <Field>
-                  <div className="flex items-center">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field>
                     <FieldLabel htmlFor="password">Kata Sandi</FieldLabel>
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    placeholder="Masukkan kata sandi"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                    className="bg-background"
-                  />
-                  {errors.password && (
-                    <p className="text-sm text-destructive">
-                      {errors.password}
-                    </p>
-                  )}
-                </Field>
+                    <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required placeholder="******" />
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="passwordConfirm">Konfirmasi</FieldLabel>
+                    <Input id="passwordConfirm" type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required placeholder="******" />
+                  </Field>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <Field>
+                    <FieldLabel htmlFor="kecamatan">Kecamatan</FieldLabel>
+                    <Combobox
+                      items={kecamatan}
+                      itemToStringValue={(k) => k.name}
+                      onValueChange={(val) => { setSelectedKecamatan(val); setSelectedKelurahan(null); }}
+                    >
+                      <ComboboxInput placeholder="Pilih..." value={selectedKecamatan?.name ?? ""} />
+                      <ComboboxContent>
+                        <ComboboxList>
+                          {kecamatan.map((kec) => (
+                            <ComboboxItem key={kec.id} value={kec}>{kec.name}</ComboboxItem>
+                          ))}
+                        </ComboboxList>
+                      </ComboboxContent>
+                    </Combobox>
+                  </Field>
+                  <Field>
+                    <FieldLabel htmlFor="kelurahan">Kelurahan</FieldLabel>
+                    <Combobox
+                      items={filteredKelurahan}
+                      itemToStringValue={(k) => k.name}
+                      onValueChange={(val) => setSelectedKelurahan(val)}
+                    >
+                      <ComboboxInput placeholder="Pilih..." value={selectedKelurahan?.name ?? ""} disabled={!selectedKecamatan} />
+                      <ComboboxContent>
+                        <ComboboxList>
+                          {filteredKelurahan.map((kel) => (
+                            <ComboboxItem key={kel.id} value={kel}>{kel.name}</ComboboxItem>
+                          ))}
+                        </ComboboxList>
+                      </ComboboxContent>
+                    </Combobox>
+                  </Field>
+                </div>
 
                 <Field>
-                  <div className="flex items-center">
-                    <FieldLabel htmlFor="passwordConfirm">
-                      Konfirmasi Kata Sandi
-                    </FieldLabel>
-                  </div>
-                  <Input
-                    id="passwordConfirm"
-                    type="password"
-                    placeholder="Masukkan ulang kata sandi"
-                    value={passwordConfirm}
-                    onChange={(e) => setPasswordConfirm(e.target.value)}
-                    required
-                    className="bg-background"
-                  />
-                  {errors.passwordConfirm && (
-                    <p className="text-sm text-destructive">
-                      {errors.passwordConfirm}
-                    </p>
-                  )}
+                  <FieldLabel htmlFor="alamatLengkap">Alamat Lengkap</FieldLabel>
+                  <Textarea id="alamatLengkap" value={alamatLengkap} onChange={(e) => setAlamatLengkap(e.target.value)} required placeholder="Jl. Slamet Riyadi No..." />
                 </Field>
+
+                <Button size="lg" type="submit" className="w-full mt-2" disabled={isSubmitting}>
+                  {isSubmitting ? "Memproses..." : "Daftar Sekarang"}
+                </Button>
+
+                <p className="text-center text-sm text-muted-foreground mt-2">
+                  Sudah punya akun? <a href="/" className="text-primary hover:underline">Masuk</a>
+                </p>
               </FieldGroup>
             </form>
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-4 border p-6 md:p-10">
-        <div className="flex flex-1 items-center justify-center">
-          <div className="w-full max-w-xs">
-            <form className={cn("flex flex-col gap-5")} onSubmit={handleSubmit}>
-              <FieldGroup>
-                <Field>
-                  <FieldLabel htmlFor="kecamatan">Kecamatan</FieldLabel>
-                  <Combobox
-                    items={kecamatan}
-                    itemToStringValue={(kecamatan: Kecamatan) => kecamatan.name}
-                    onValueChange={(val) => {
-                      setSelectedKecamatan(val)
-                      setSelectedKelurahan(null)
-                    }}
-                  >
-                    <ComboboxInput
-                      placeholder="Pilih kecamatan anda"
-                      value={selectedKecamatan?.name ?? ""}
-                    />
-                    <ComboboxContent>
-                      <ComboboxEmpty>Pilih Kecamatan Anda</ComboboxEmpty>
-                      <ComboboxList>
-                        {kecamatan.map((kec) => (
-                          <ComboboxItem key={kec.id} value={kec}>
-                            {kec.name}
-                          </ComboboxItem>
-                        ))}
-                      </ComboboxList>
-
-                    </ComboboxContent>
-                  </Combobox>
-                  {errors.kecamatan && (
-                    <p className="text-sm text-destructive">
-                      {errors.kecamatan}
-                    </p>
-                  )}
-                </Field>
-
-                <Field>
-                  <FieldLabel htmlFor="kelurahan">Kelurahan</FieldLabel>
-                  <Combobox
-                    items={filteredKelurahan}
-                    itemToStringValue={(kelurahan: Kelurahan) => kelurahan.name}
-                    onValueChange={(val) => {
-                      setSelectedKelurahan(val)
-                    }}
-                  >
-                    <ComboboxInput
-                      placeholder={
-                        selectedKecamatan
-                          ? "Pilih kelurahan anda"
-                          : "Pilih kecamatan dulu"
-                      }
-                      value={selectedKelurahan?.name ?? ""}
-                      disabled={!selectedKecamatan}
-                    />
-                    <ComboboxContent>
-                      <ComboboxEmpty>Pilih Kelurahan Anda</ComboboxEmpty>
-                      <ComboboxList>
-                        {filteredKelurahan.map((kel) => (
-                          <ComboboxItem key={kel.id} value={kel}>
-                            {kel.name}
-                          </ComboboxItem>
-                        ))}
-                      </ComboboxList>
-                    </ComboboxContent>
-                  </Combobox>
-                  {errors.kelurahan && (
-                    <p className="text-sm text-destructive">
-                      {errors.kelurahan}
-                    </p>
-                  )}
-                </Field>
-
-                <Field>
-                  <div className="flex items-center">
-                    <FieldLabel htmlFor="fullAdress">Alamat Lengkap</FieldLabel>
-                  </div>
-                  <Textarea
-                    id="fullAdress"
-                    placeholder="Masukkan alamat lengkap Anda"
-                    value={alamatLengkap}
-                    onChange={(e) => setAlamatLengkap(e.target.value)}
-                    required
-                  />
-                  {errors.alamatLengkap && (
-                    <p className="text-sm text-destructive">
-                      {errors.alamatLengkap}
-                    </p>
-                  )}
-                </Field>
-
-                <Field>
-                  <Button size="lg" type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? "Memproses..." : "Daftar"}
-                  </Button>
-                </Field>
-
-                <Field>
-                  <FieldDescription className="text-center">
-                    Sudah punya akun?{" "}
-                    <a
-                      href="/"
-                      className="text-primary underline-offset-4 hover:underline dark:text-blue-600"
-                    >
-                      Masuk Sekarang
-                    </a>
-                  </FieldDescription>
-                </Field>
-              </FieldGroup>
-            </form>
-          </div>
-        </div>
+      <div className="relative hidden bg-muted lg:block">
+        <img
+          src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?q=80&w=1470&auto=format&fit=crop"
+          alt="Registration"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 z-10 bg-primary/20" />
       </div>
     </div>
   )

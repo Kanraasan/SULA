@@ -1,4 +1,4 @@
-import { ThemeToggle } from "@/components/theme-toggle"
+import { ThemeToggle } from "@/components/ThemeToggle"
 import { Button } from "@/components/ui/button"
 import { Bell, UserCircle, Megaphone, LogOut, User } from "lucide-react"
 import { useLocation, Link } from "react-router-dom"

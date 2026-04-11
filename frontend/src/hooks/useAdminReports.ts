@@ -1,18 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import { type Laporan } from "@/components/report-table"
+// Note: Changed from '@/components/report-table' to '@/components/admin/ReportTable' to match actual file location
+import { type Laporan } from "@/components/admin/ReportTable"
 import { api, isHandledApiError } from "@/lib/api-client"
 
 export type BackendPost = {
   id: string
-  title: string
-  category: string
-  description: string
-  lampiranFoto: string | null
-  userNik?: string
-  username?: string
-  createdAt: string
-  status?: "menunggu" | "diproses" | "selesai" | "ditolak"
+  user_id: string
+  username: string
+  complaint_title: string
+  complaint_category: string
+  complaint_description: string
+  complaint_image: string | null
+  status: "menunggu" | "diproses" | "selesai" | "ditolak"
+  upvotes: number
+  created_at: string
+  updated_at?: string
 }
 
 export type CreateReportPayload = {
@@ -32,8 +35,9 @@ const toInitials = (name: string) => {
 const normalizeStatus = (
   value: BackendPost["status"] | string | undefined
 ): Laporan["status"] => {
-  if (value === "diproses" || value === "selesai" || value === "ditolak") {
-    return value
+  const v = value?.toLowerCase()
+  if (v === "diproses" || v === "selesai" || v === "ditolak") {
+    return v as Laporan["status"]
   }
   return "menunggu"
 }
@@ -43,18 +47,18 @@ const mapPostToLaporan = (item: BackendPost): Laporan => {
 
   return {
     id: item.id,
-    date: item.createdAt,
+    date: item.created_at,
     reporter: {
       initials: toInitials(reporterName),
       name: reporterName,
     },
     complaint: {
-      title: item.title,
-      category: item.category?.toLowerCase() || "lainnya",
-      description: item.description,
+      title: item.complaint_title,
+      category: item.complaint_category?.toLowerCase() || "lainnya",
+      description: item.complaint_description,
     },
     status: normalizeStatus(item.status),
-    upvotes: 0,
+    upvotes: item.upvotes || 0,
   }
 }
 

@@ -1,7 +1,6 @@
-import { hashSync } from 'bcryptjs';
-import userData from '../mock/userData';
+import { supabase } from '../lib/supabase';
 
-export const createUser = (req: any, res: any) => {
+export const createUser = async (req: any, res: any) => {
   if (!req.body) {
     return res.status(400).json({
       message:
@@ -9,29 +8,21 @@ export const createUser = (req: any, res: any) => {
     });
   }
 
-  interface RegisterUser {
-    nik: string;
-    username: string;
-    password: string;
-    passwordConfirm: string;
-    alamatLengkap: string;
-    kecamatan: string;
-    kelurahan: string;
-  }
-
   const {
     nik,
     username,
+    email,
     password,
     passwordConfirm,
     alamatLengkap,
     kecamatan,
     kelurahan,
-  } = req.body as RegisterUser;
+    tanggalLahir, // Tambahkan field ini sesuai SQL
+  } = req.body;
 
-  if (!username || !password || !passwordConfirm) {
+  if (!username || !email || !password || !passwordConfirm || !nik || !tanggalLahir) {
     return res.status(400).json({
-      message: 'Username dan password wajib diisi',
+      message: 'Username, email, password, NIK, dan Tanggal Lahir wajib diisi',
     });
   }
 
@@ -41,21 +32,53 @@ export const createUser = (req: any, res: any) => {
     });
   }
 
-  const hashedPassword = hashSync(password, 10);
-  const newUserData = {
-    nik,
-    username,
-    password: hashedPassword,
-    alamatLengkap,
-    kecamatan,
-    kelurahan,
-    role: "user",
-  };
+  try {
+    // 1. SignUp ke Supabase Auth (untuk autentikasi)
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+          nik,
+        },
+      },
+    });
 
-  userData.push(newUserData);
+    if (authError) throw authError;
 
-  return res.status(201).json({
-    message: 'Registrasi berhasil',
-    data: newUserData,
-  });
+    if (authData.user) {
+      // 2. Simpan info tambahan ke tabel public.users (sesuai SQL Anda)
+      const { error: profileError } = await supabase.from('users').insert([
+        {
+          id: authData.user.id,
+          nik,
+          username,
+          password: password, // Sesuai kolom 'password' di SQL Anda
+          alamatLengkap,      // CamelCase sesuai SQL
+          kecamatan,
+          kelurahan,
+          tanggalLahir,       // Sesuai SQL
+          role: 'user',       // Default role
+        },
+      ]);
+
+      if (profileError) throw profileError;
+    }
+
+    return res.status(201).json({
+      message: 'Registrasi berhasil. Silakan cek email untuk verifikasi.',
+      data: {
+        id: authData.user?.id,
+        email: authData.user?.email,
+        username,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error saat registrasi:', error);
+    return res.status(500).json({
+      message: 'Gagal melakukan registrasi',
+      error: error.message,
+    });
+  }
 };
