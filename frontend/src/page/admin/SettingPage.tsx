@@ -53,22 +53,6 @@ export default function AdminSettingPage() {
 
   // Fetch profil admin saat halaman dimuat
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const result = await api.get<{ data?: AdminProfile }>("/api/admin/profile", {
-          fallbackMessage: "Gagal memuat profil",
-          showErrorToast: true,
-        })
-
-        // Tambahkan Authorization header secara manual karena api.get tidak mendukungnya by default
-        // Jadi kita pakai fetch langsung
-      } catch (error) {
-        if (!isHandledApiError(error)) {
-          console.error("Gagal memuat profil:", error)
-        }
-      }
-    }
-
     // Gunakan fetch langsung karena api.get tidak support custom headers
     const loadProfile = async () => {
       try {
