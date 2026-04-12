@@ -6,7 +6,7 @@ import { TrendLineChart } from "@/components/admin/TrendLineChart"
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import Clock02 from "@/components/Clock02"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
 

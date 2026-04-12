@@ -1,0 +1,22 @@
+[33m3acb2b3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/admin[m[33m, [m[1;31morigin/feat/admin[m[33m)[m HEAD@{0}: checkout: moving from feat/admin to feat/admin
+[33m3acb2b3[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeat/admin[m[33m, [m[1;31morigin/feat/admin[m[33m)[m HEAD@{1}: commit: fix: fix inconsistent badge background color in status laporam
+[33me4e437f[m HEAD@{2}: commit: feat: implement default value on AdminSettingPage
+[33m99f2e7c[m HEAD@{3}: pull origin main: Fast-forward
+[33m73a1dad[m HEAD@{4}: commit: feat: sync admin pages with backend report API and clean up dashboard metrics
+[33mdf85b81[m HEAD@{5}: pull origin main: Fast-forward
+[33m41768b3[m HEAD@{6}: commit: refactor: centralize API client and standardize admin API handling
+[33mad17db7[m HEAD@{7}: commit: feat: api implement from backend to admin
+[33m3166917[m HEAD@{8}: pull origin main: Fast-forward
+[33m2b062b9[m HEAD@{9}: commit: feat: add clock widget and user account component
+[33m0e7d6c5[m HEAD@{10}: pull origin main: Merge made by the 'ort' strategy.
+[33m9718571[m HEAD@{11}: commit: fix: fix bug at kelurahan combobox input
+[33m3c179f0[m HEAD@{12}: pull origin main: Fast-forward
+[33mfe1d009[m HEAD@{13}: commit: feat: implement dashboard, laporan, statistik, and peta wilayah page
+[33mab961ce[m HEAD@{14}: commit (merge): feat: sync to main branch
+[33m570a8e4[m HEAD@{15}: checkout: moving from feat/admin to feat/admin
+[33m570a8e4[m HEAD@{16}: commit: feat: implement login and register page
+[33meebbc0a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{17}: checkout: moving from main to feat/admin
+[33meebbc0a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{18}: reset: moving to eebbc0a
+[33meebbc0a[m[33m ([m[1;32mmain[m[33m)[m HEAD@{19}: pull origin main: Fast-forward
+[33mc360526[m HEAD@{20}: pull origin main: Fast-forward
+[33m180c1f7[m HEAD@{21}: clone: from https://github.com/Kanraasan/SULA.git

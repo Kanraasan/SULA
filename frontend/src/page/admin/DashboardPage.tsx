@@ -8,28 +8,42 @@ import {
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/ThemeToggle"
 import Clock02 from "@/components/Clock02"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { api, isHandledApiError } from "@/lib/api-client"
 
+type DashboardSummary = {
+  total: number
+  selesai: number
+  diproses: number
+  menunggu: number
+}
+
+type TrendDataItem = {
+  date: string
+  baru: number
+  diproses: number
+  selesai: number
+}
+
 export default function DashboardPage() {
-  const [summary, setSummary] = useState({
+  const [summary, setSummary] = useState<DashboardSummary>({
     total: 0,
     selesai: 0,
     diproses: 0,
     menunggu: 0,
   })
   const [laporanHariIni, setLaporanHariIni] = useState(0)
-  const [trendData, setTrendData] = useState<any[]>([])
+  const [trendData, setTrendData] = useState<TrendDataItem[]>([])
 
   useEffect(() => {
     const loadStats = async () => {
       try {
         const result = await api.get<{
           data?: {
-            summary: any
+            summary: DashboardSummary
             todayCount: number
-            trendDataDaily: any[]
+            trendDataDaily: TrendDataItem[]
           }
         }>("/api/admin/stats", {
           fallbackMessage: "Gagal memuat ringkasan dashboard",

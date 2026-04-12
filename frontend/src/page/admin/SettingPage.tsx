@@ -10,7 +10,6 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle, BriefcaseMedical, Loader2 } from "lucide-react"
 import { useEffect, useState, type FormEvent } from "react"
-import { api, isHandledApiError } from "@/lib/api-client"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -38,6 +37,11 @@ export default function AdminSettingPage() {
     kelurahan: "",
   })
 
+  const getApiBaseUrl = () =>
+    import.meta.env.VITE_API_URL
+      ? (import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")
+      : "/api"
+
   // Ambil auth headers dari localStorage
   const getAuthHeaders = (): Record<string, string> => {
     const rawUser = localStorage.getItem("user")
@@ -53,36 +57,16 @@ export default function AdminSettingPage() {
 
   // Fetch profil admin saat halaman dimuat
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const result = await api.get<{ data?: AdminProfile }>("/api/admin/profile", {
-          fallbackMessage: "Gagal memuat profil",
-          showErrorToast: true,
-        })
-
-        // Tambahkan Authorization header secara manual karena api.get tidak mendukungnya by default
-        // Jadi kita pakai fetch langsung
-      } catch (error) {
-        if (!isHandledApiError(error)) {
-          console.error("Gagal memuat profil:", error)
-        }
-      }
-    }
-
-    // Gunakan fetch langsung karena api.get tidak support custom headers
     const loadProfile = async () => {
       try {
         const headers = getAuthHeaders()
-        const response = await fetch(
-          import.meta.env.VITE_API_URL
-            ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/profile`
-            : "/api/admin/profile",
-          { headers }
-        )
+        const response = await fetch(`${getApiBaseUrl()}/admin/profile`, { headers })
 
         if (!response.ok) {
-          const errData = await response.json().catch(() => ({}))
-          toast.error((errData as any).message || "Gagal memuat profil")
+          const errData = (await response.json().catch(() => ({}))) as {
+            message?: string
+          }
+          toast.error(errData.message || "Gagal memuat profil")
           return
         }
 
@@ -118,23 +102,20 @@ export default function AdminSettingPage() {
         ...getAuthHeaders(),
       }
 
-      const response = await fetch(
-        import.meta.env.VITE_API_URL
-          ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/profile`
-          : "/api/admin/profile",
-        {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            username: profile.username,
-            alamatLengkap: profile.alamatLengkap,
-            kecamatan: profile.kecamatan,
-            kelurahan: profile.kelurahan,
-          }),
-        }
-      )
+      const response = await fetch(`${getApiBaseUrl()}/admin/profile`, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          username: profile.username,
+          alamatLengkap: profile.alamatLengkap,
+          kecamatan: profile.kecamatan,
+          kelurahan: profile.kelurahan,
+        }),
+      })
 
-      const result = await response.json()
+      const result = (await response.json().catch(() => ({}))) as {
+        message?: string
+      }
 
       if (!response.ok) {
         toast.error(result.message || "Gagal menyimpan perubahan")
@@ -169,17 +150,14 @@ export default function AdminSettingPage() {
         ...getAuthHeaders(),
       }
 
-      const response = await fetch(
-        import.meta.env.VITE_API_URL
-          ? `${(import.meta.env.VITE_API_URL as string).replace(/\/+$/, "")}/admin/account`
-          : "/api/admin/account",
-        {
-          method: "DELETE",
-          headers,
-        }
-      )
+      const response = await fetch(`${getApiBaseUrl()}/admin/account`, {
+        method: "DELETE",
+        headers,
+      })
 
-      const result = await response.json()
+      const result = (await response.json().catch(() => ({}))) as {
+        message?: string
+      }
 
       if (!response.ok) {
         toast.error(result.message || "Gagal menghapus akun")
