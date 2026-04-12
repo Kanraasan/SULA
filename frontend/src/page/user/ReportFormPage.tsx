@@ -211,13 +211,19 @@ export default function ReportFormPage() {
     }
 
     try {
+      const userNik = user.nik ?? user.userNik
+
       // Buat FormData untuk upload file
       const formData = new FormData()
       formData.append("title", title)
       formData.append("category", selectedCategory)
       formData.append("description", description)
-      formData.append("userNik", user.nik.toString())
-      formData.append("username", user.username)
+      if (userNik) {
+        formData.append("userNik", String(userNik))
+      }
+      if (user.username) {
+        formData.append("username", user.username)
+      }
       if (reportType) formData.append("reportType", reportType)
       if (latitude !== null) formData.append("latitude", latitude.toString())
       if (longitude !== null) formData.append("longitude", longitude.toString())
@@ -236,8 +242,8 @@ export default function ReportFormPage() {
       }
       
       navigate("/my-reports")
-    } catch (error: any) {
-      toast.error(error.message || "Laporan gagal dikirim")
+    } catch (error: unknown) {
+      toast.error(error instanceof Error ? error.message : "Laporan gagal dikirim")
     }
   }
 
