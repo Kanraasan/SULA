@@ -10,7 +10,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle, BriefcaseMedical, Loader2 } from "lucide-react"
 import { useEffect, useState, type FormEvent } from "react"
-import { api, isHandledApiError, parseApiResponse } from "@/lib/api-client"
+import { parseApiResponse } from "@/lib/api-client"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
 
