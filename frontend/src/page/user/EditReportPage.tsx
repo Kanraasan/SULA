@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useParams, useNavigate } from "react-router-dom"
-import { UserNavbar } from "@/components/user/user-navbar"
-import { UserFooter } from "@/components/user/user-footer"
+import { UserNavbar } from "@/components/user/UserNavbar"
+import { UserFooter } from "@/components/user/UserFooter"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -34,6 +34,7 @@ import {
   Leaf,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { reportService } from "@/services/report.service"
 
 const categories = [
   {
@@ -83,22 +84,25 @@ export default function EditReportPage() {
   const categoryLabel = categories.find((c) => c.id === selectedCategory)?.label
 
   useEffect(() => {
-    // Fetch data laporan berdasarkan ID
-    fetch(`/api/report/${id}`)
-      .then((res) => res.json())
-      .then((result) => {
-        if (result.data) {
-          setTitle(result.data.title)
-          setDescription(result.data.description)
-          setSelectedCategory(result.data.category)
-          setExistingPhoto(result.data.lampiranFoto)
+    // Fetch data laporan berdasarkan ID menggunakan service
+    const fetchReport = async () => {
+      try {
+        if (!id) return
+        const data = await reportService.getById(id)
+        if (data) {
+          setTitle(data.complaint_title)
+          setDescription(data.complaint_description)
+          setSelectedCategory(data.complaint_category)
+          setExistingPhoto(data.complaint_image)
         }
-        setIsLoading(false)
-      })
-      .catch(() => {
+      } catch (error) {
         alert("Gagal memuat data laporan")
+      } finally {
         setIsLoading(false)
-      })
+      }
+    }
+
+    fetchReport()
   }, [id])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,28 +116,17 @@ export default function EditReportPage() {
     setIsSubmitting(true)
 
     try {
-      const response = await fetch(`/api/report/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          title,
-          category: selectedCategory,
-          description,
-        }),
+      if (!id) return
+      await reportService.update(id, {
+        title,
+        category: selectedCategory,
+        description,
       })
 
-      const result = await response.json()
-
-      if (response.ok) {
-        alert("Laporan berhasil diperbarui!")
-        navigate("/my-reports")
-      } else {
-        alert(result.message || "Gagal memperbarui laporan")
-      }
+      alert("Laporan berhasil diperbarui!")
+      navigate("/my-reports")
     } catch (error) {
-      alert("Terjadi kesalahan saat memperbarui laporan")
+      alert("Gagal memperbarui laporan")
     } finally {
       setIsSubmitting(false)
     }
@@ -318,7 +311,7 @@ export default function EditReportPage() {
                       Foto Laporan Sebelumnya
                     </Label>
                     <img
-                      src={`http://localhost:5000/uploads/${existingPhoto}`}
+                      src={existingPhoto.startsWith('http') ? existingPhoto : `http://localhost:5000/uploads/${existingPhoto}`}
                       alt="Foto laporan"
                       className="h-48 w-full rounded-2xl object-cover"
                     />
@@ -359,3 +352,4 @@ export default function EditReportPage() {
     </div>
   )
 }
+

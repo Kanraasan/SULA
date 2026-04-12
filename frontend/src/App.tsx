@@ -1,33 +1,42 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, Navigate } from "react-router-dom"
 import LoginPage from "./page/LoginPage"
 import RegisterPage from "./page/RegisterPage"
 import DashboardPage from "./page/admin/DashboardPage"
-import LaporanPage from "./page/admin/LaporanPage"
-import PetaWilayahPage from "./page/admin/PetaWilayahPage"
-import StatistikPage from "./page/admin/StatistikPage"
+import AdminReportsPage from "./page/admin/AdminReportsPage"
+import MapPage from "./page/admin/MapPage"
+import StatisticsPage from "./page/admin/StatisticsPage"
+import AdminSettingPage from "./page/admin/SettingPage"
 import UserDashboardPage from "./page/user/DashboardPage"
-import ReportFormPage from "./page/user/ReportForm"
-import StatusLaporanPage from "./page/user/StatusLaporanPage"
+import ReportFormPage from "./page/user/ReportFormPage"
+import ReportStatusPage from "./page/user/ReportStatusPage"
 import ReportDetailPage from "./page/user/ReportDetailPage"
 import MyReportsPage from "./page/user/MyReportsPage"
 import EditReportPage from "./page/user/EditReportPage"
-import LeaderboardPage from "./page/user/Leaderboard"
+import LeaderboardPage from "./page/user/LeaderboardPage"
+import UserSettingPage from "./page/user/SettingPage"
 import { ProtectedRoute } from "./hooks/ProtectedRoute"
-import AdminSettingPage from "./page/admin/SettingPage"
+import { useAuth } from "./hooks/useAuth"
+
+function RootRoute() {
+  const { user, loading } = useAuth()
+  if (loading) return null
+  if (user?.role === "admin") {
+    return <Navigate to="/dashboard" replace />
+  }
+  return <UserDashboardPage />
+}
 
 export function App() {
   return (
     <Routes>
       {/* Public Routes */}
-      <Route path="/" element={<LoginPage />} />
+      <Route path="/" element={<RootRoute />} />
+      <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/report-detail/:id" element={<ReportDetailPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
 
       {/* User & Admin Protected Routes */}
-      <Route path="/user-dashboard" element={
-        <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <UserDashboardPage />
-        </ProtectedRoute>
-      } />
       <Route path="/report-form" element={
         <ProtectedRoute allowedRoles={["user", "admin"]}>
           <ReportFormPage />
@@ -45,20 +54,14 @@ export function App() {
       } />
       <Route path="/status-laporan" element={
         <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <StatusLaporanPage />
+          <ReportStatusPage />
         </ProtectedRoute>
       } />
-      <Route path="/report-detail/:id" element={
+      <Route path="/user-settings" element={
         <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <ReportDetailPage />
+          <UserSettingPage />
         </ProtectedRoute>
       } />
-      <Route path="/leaderboard" element={
-        <ProtectedRoute allowedRoles={["user", "admin"]}>
-          <LeaderboardPage />
-        </ProtectedRoute>
-      } />
-
       {/* Admin ONLY Protected Routes */}
       <Route path="/dashboard" element={
         <ProtectedRoute allowedRoles={["admin"]}>
@@ -67,17 +70,17 @@ export function App() {
       } />
       <Route path="/laporan" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <LaporanPage />
+          <AdminReportsPage />
         </ProtectedRoute>
       } />
       <Route path="/peta-wilayah" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <PetaWilayahPage />
+          <MapPage />
         </ProtectedRoute>
       } />
       <Route path="/statistik" element={
         <ProtectedRoute allowedRoles={["admin"]}>
-          <StatistikPage />
+          <StatisticsPage />
         </ProtectedRoute>
       } />
       <Route path="/setting" element={
@@ -85,6 +88,9 @@ export function App() {
           <AdminSettingPage />
         </ProtectedRoute>
       } />
+      
+      {/* 404 Fallback Route - Redirect to Dashboard */}
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )
 }

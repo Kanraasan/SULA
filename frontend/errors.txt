@@ -1,0 +1,18 @@
+src/components/admin/create-report-dialog.tsx(23,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/admin/report-detail-dialog.tsx(11,30): error TS2307: Cannot find module '@/components/report-table' or its corresponding type declarations.
+src/components/admin/update-status-dialog.tsx(2,30): error TS2307: Cannot find module '@/components/report-table' or its corresponding type declarations.
+src/components/ui/sonner.tsx(1,26): error TS2307: Cannot find module 'next-themes' or its corresponding type declarations.
+src/components/ui/sonner.tsx(2,54): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/components/user/ReportCard.tsx(5,10): error TS1484: 'IReportUI' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/hooks/useAdminReports.ts(2,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/hooks/useAdminReports.ts(3,30): error TS2307: Cannot find module '@/components/report-table' or its corresponding type declarations.
+src/lib/api-client.ts(1,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/page/admin/DashboardPage.tsx(12,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/page/admin/SettingPage.tsx(1,28): error TS2307: Cannot find module '@/components/app-sidebar' or its corresponding type declarations.
+src/page/admin/SettingPage.tsx(2,19): error TS2307: Cannot find module '@/components/clock-02' or its corresponding type declarations.
+src/page/admin/StatisticsPage.tsx(10,23): error TS2307: Cannot find module 'sonner' or its corresponding type declarations.
+src/page/user/LeaderboardPage.tsx(22,10): error TS6133: 'error' is declared but its value is never read.
+src/page/user/LeaderboardPage.tsx(52,9): error TS6133: 'topThree' is declared but its value is never read.
+src/page/user/MyReportsPage.tsx(7,10): error TS1484: 'IReport' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/page/user/ReportStatusPage.tsx(7,10): error TS1484: 'IReport' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
+src/page/user/ReportStatusPage.tsx(7,19): error TS1484: 'IReportUI' is a type and must be imported using a type-only import when 'verbatimModuleSyntax' is enabled.
