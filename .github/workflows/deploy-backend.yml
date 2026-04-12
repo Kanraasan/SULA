@@ -1,0 +1,50 @@
+name: Deploy Backend
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: backend/package-lock.json
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        npm ci
+
+    - name: Run tests (optional)
+      run: |
+        cd backend
+        npm test
+      continue-on-error: true
+
+    - name: Deploy to Railway
+      run: |
+        # Install Railway CLI
+        npm install -g @railway/cli
+
+        # Login and deploy
+        railway login --token ${{ secrets.RAILWAY_TOKEN }}
+        railway link --project ${{ secrets.RAILWAY_PROJECT_ID }}
+        railway up --service backend
+
+        # Alternative: If using Railway's Git integration, just push
+        # This workflow assumes Railway CLI deployment
+      env:
+        RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        RAILWAY_PROJECT_ID: ${{ secrets.RAILWAY_PROJECT_ID }}
