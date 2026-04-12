@@ -7,6 +7,19 @@ const getAuthHeader = (): Record<string, string> => {
   return {};
 };
 
+const parseJsonResponse = async (response: Response) => {
+  const text = await response.text()
+  if (!text) {
+    return {}
+  }
+
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error(`Invalid JSON response from server (${response.status})`)
+  }
+}
+
 export const reportService = {
   create: async (formData: FormData) => {
     const response = await fetch("/api/report", {
@@ -15,9 +28,9 @@ export const reportService = {
       body: formData,
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal membuat laporan");
+      throw new Error((result as any).message || "Gagal membuat laporan");
     }
     return result;
   },
@@ -26,22 +39,22 @@ export const reportService = {
     const response = await fetch(`/api/report?limit=${limit}&offset=${offset}`, {
       headers: { ...getAuthHeader() },
     });
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal memuat laporan");
+      throw new Error((result as any).message || "Gagal memuat laporan");
     }
-    return result.data; // You may want to return {data, pagination} if you need total count, but keeping this for backward compatibility
+    return (result as any).data; // You may want to return {data, pagination} if you need total count, but keeping this for backward compatibility
   },
 
   getById: async (id: string) => {
     const response = await fetch(`/api/report/${id}`, {
       headers: { ...getAuthHeader() },
     });
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal memuat detail laporan");
+      throw new Error((result as any).message || "Gagal memuat detail laporan");
     }
-    return result.data;
+    return (result as any).data;
   },
 
   update: async (id: string, data: FormData | any) => {
@@ -58,9 +71,9 @@ export const reportService = {
       body: isFormData ? data : JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal memperbarui laporan");
+      throw new Error((result as any).message || "Gagal memperbarui laporan");
     }
     return result;
   },
@@ -71,20 +84,20 @@ export const reportService = {
       headers: { ...getAuthHeader() },
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal menghapus laporan");
+      throw new Error((result as any).message || "Gagal menghapus laporan");
     }
     return result;
   },
 
   getLeaderboard: async () => {
     const response = await fetch("/api/leaderboard");
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal memuat leaderboard");
+      throw new Error((result as any).message || "Gagal memuat leaderboard");
     }
-    return result.data;
+    return (result as any).data;
   },
 
   upvote: async (id: string) => {
@@ -93,11 +106,11 @@ export const reportService = {
       headers: { ...getAuthHeader() },
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Gagal mendukung laporan");
+      throw new Error((result as any).message || "Gagal mendukung laporan");
     }
-    return result.data;
+    return (result as any).data;
   },
 };
 

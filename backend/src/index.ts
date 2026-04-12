@@ -1,4 +1,4 @@
-import express, { Request, Response } from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import router from './routes';
@@ -8,7 +8,7 @@ import path from 'path';
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3245;
 // ambil url frontend buat izin cors, default-nya localhost vite
 const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
 // atur izin akses (cors) biar frontend bisa konek
@@ -29,6 +29,20 @@ app.use('/api', router);
 // endpoint simpel buat ngetes koneksi aja
 app.get('/api/hello', (req: Request, res: Response) => {
   res.json({ message: 'halo dari express!' });
+});
+
+// fallback 404 API JSON
+app.use((req: Request, res: Response) => {
+  res.status(404).json({ message: 'Endpoint tidak ditemukan' });
+});
+
+// error handler JSON untuk semua error tidak tertangani
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+  console.error('Unhandled error:', err);
+  const status = err?.status || 500;
+  res.status(status).json({
+    message: err?.message || 'Terjadi kesalahan pada server',
+  });
 });
 
 // nyalain server-nya

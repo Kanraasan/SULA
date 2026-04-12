@@ -126,7 +126,7 @@ export default function MyReportsPage() {
                   </p>
                   {report.complaint_image && (
                     <img
-                      src={report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:5000/uploads/${report.complaint_image}`}
+                      src={report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:3245/uploads/${report.complaint_image}`}
                       alt={report.complaint_title}
                       className="w-full h-40 object-cover rounded-md"
                     />

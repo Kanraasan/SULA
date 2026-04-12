@@ -1,3 +1,16 @@
+const parseJsonResponse = async (response: Response) => {
+  const text = await response.text()
+  if (!text) {
+    return {}
+  }
+
+  try {
+    return JSON.parse(text)
+  } catch {
+    throw new Error(`Invalid JSON response from server (${response.status})`)
+  }
+}
+
 export const authService = {
   login: async (identifier: string, password: string) => {
     const response = await fetch("/api/login", {
@@ -6,17 +19,17 @@ export const authService = {
       body: JSON.stringify({ identifier, password }),
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.message || "Login gagal");
+      throw new Error((result as any).message || "Login gagal");
     }
     
     // Simpan ke localStorage
-    if (result.data) {
-      localStorage.setItem("user", JSON.stringify(result.data));
+    if ((result as any).data) {
+      localStorage.setItem("user", JSON.stringify((result as any).data));
     }
     
-    return result.data;
+    return (result as any).data;
   },
 
   register: async (data: any) => {
@@ -26,9 +39,9 @@ export const authService = {
       body: JSON.stringify(data),
     });
 
-    const result = await response.json();
+    const result = await parseJsonResponse(response)
     if (!response.ok) {
-      throw new Error(result.error || result.message || "Registrasi gagal");
+      throw new Error((result as any).error || (result as any).message || "Registrasi gagal");
     }
     return result;
   },

@@ -10,7 +10,7 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/s
 import { Textarea } from "@/components/ui/textarea"
 import { AlertCircle, BriefcaseMedical, Loader2 } from "lucide-react"
 import { useEffect, useState, type FormEvent } from "react"
-import { api, isHandledApiError } from "@/lib/api-client"
+import { api, isHandledApiError, parseApiResponse } from "@/lib/api-client"
 import { toast } from "sonner"
 import { useAuth } from "@/hooks/useAuth"
 
@@ -81,12 +81,17 @@ export default function AdminSettingPage() {
         )
 
         if (!response.ok) {
-          const errData = await response.json().catch(() => ({}))
+          let errData = {}
+          try {
+            errData = await parseApiResponse(response)
+          } catch {
+            // ignore parse failure and use generic error message
+          }
           toast.error((errData as any).message || "Gagal memuat profil")
           return
         }
 
-        const result = await response.json()
+        const result = await parseApiResponse(response)
         if (result.data) {
           setProfile({
             username: result.data.username || "",
@@ -134,7 +139,7 @@ export default function AdminSettingPage() {
         }
       )
 
-      const result = await response.json()
+      const result = await parseApiResponse(response)
 
       if (!response.ok) {
         toast.error(result.message || "Gagal menyimpan perubahan")
@@ -179,7 +184,7 @@ export default function AdminSettingPage() {
         }
       )
 
-      const result = await response.json()
+      const result = await parseApiResponse(response)
 
       if (!response.ok) {
         toast.error(result.message || "Gagal menghapus akun")

@@ -87,7 +87,7 @@ export default function ReportStatusPage() {
             author: report.username || "Anonim",
             votes: report.upvotes || 0,
             imageUrl: report.complaint_image
-              ? (report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:5000/uploads/${report.complaint_image}`)
+              ? (report.complaint_image.startsWith('http') ? report.complaint_image : `http://localhost:3245/uploads/${report.complaint_image}`)
               : "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?q=80&w=1470&auto=format&fit=crop",
         }))
 

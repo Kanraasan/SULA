@@ -1,4 +1,5 @@
 import { supabase } from '../lib/supabase';
+import bcrypt from 'bcryptjs';
 import { z } from 'zod';
 
 const registerSchema = z.object({
@@ -58,12 +59,15 @@ export const createUser = async (req: any, res: any) => {
     if (authError) throw authError;
 
     if (authData.user) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+
       // 2. Simpan info tambahan ke tabel public.users (sesuai SQL Anda)
       const { error: profileError } = await supabase.from('users').insert([
         {
           id: authData.user.id,
           nik,
           username,
+          password: hashedPassword,
           alamatLengkap,
           kecamatan,
           kelurahan,

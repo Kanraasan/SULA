@@ -52,7 +52,8 @@ export const loginUser = async (req: any, res: any) => {
 
     // 3. SignIn dengan email dan password menggunakan client auth isolated agar tidak mencemari global supabase client
     const { createClient } = require('@supabase/supabase-js');
-    const authClient = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
+    const authKey = process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || '';
+    const authClient = createClient(process.env.SUPABASE_URL, authKey, {
       auth: { persistSession: false, autoRefreshToken: false }
     });
 

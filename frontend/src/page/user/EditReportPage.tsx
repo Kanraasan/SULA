@@ -311,7 +311,7 @@ export default function EditReportPage() {
                       Foto Laporan Sebelumnya
                     </Label>
                     <img
-                      src={existingPhoto.startsWith('http') ? existingPhoto : `http://localhost:5000/uploads/${existingPhoto}`}
+                      src={existingPhoto.startsWith('http') ? existingPhoto : `http://localhost:3245/uploads/${existingPhoto}`}
                       alt="Foto laporan"
                       className="h-48 w-full rounded-2xl object-cover"
                     />

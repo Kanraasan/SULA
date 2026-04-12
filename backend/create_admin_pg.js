@@ -12,7 +12,8 @@ async function main() {
     // Asumsikan id admin diambil dari auth.users yang sukses saya create tadi
     // Let's get the id from auth.users via supabase client
     const { createClient } = require('@supabase/supabase-js');
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY || '';
+    const supabase = createClient(process.env.SUPABASE_URL, supabaseKey);
     const { data: { users } } = await supabase.auth.admin.listUsers();
     const user = users.find(u => u.email === email);
     

@@ -78,7 +78,7 @@ export default function ReportDetailPage() {
   ]
 
   const imageUrl = report.complaint_image 
-    ? (report.complaint_image.startsWith('http') ? report.complaint_image : `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/uploads/${report.complaint_image}`)
+    ? (report.complaint_image.startsWith('http') ? report.complaint_image : `${import.meta.env.VITE_API_URL || 'http://localhost:3245'}/uploads/${report.complaint_image}`)
     : "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?q=80&w=1470&auto=format&fit=crop"
 
   return (

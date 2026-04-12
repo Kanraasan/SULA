@@ -46,9 +46,13 @@ export const toApiUrl = (path: string) => {
   return `${normalizedBase}${normalizedPath}`
 }
 
-const parseJsonResponse = async (response: Response) => {
+export const parseApiResponse = async (response: Response) => {
   const contentType = response.headers.get("content-type") || ""
   const rawText = await response.text()
+
+  if (!rawText) {
+    return {}
+  }
 
   if (!contentType.includes("application/json")) {
     const preview = rawText.trim().slice(0, 120)
@@ -94,7 +98,7 @@ const request = async <TResponse extends ApiEnvelope>(
   }
 
   const response = await fetch(toApiUrl(path), mergedOptions)
-  const result = (await parseJsonResponse(response)) as TResponse
+  const result = (await parseApiResponse(response)) as TResponse
 
   if (!response.ok) {
     const message = result.message || config.fallbackMessage || "Permintaan API gagal"

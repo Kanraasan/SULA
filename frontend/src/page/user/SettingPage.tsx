@@ -24,6 +24,7 @@ import {
 } from "lucide-react"
 import { useEffect, useState, useMemo, type FormEvent } from "react"
 import { useAuth } from "@/hooks/useAuth"
+import { parseApiResponse } from "@/lib/api-client"
 import { toast } from "sonner"
 import { KECAMATAN_LIST, KELURAHAN_LIST, type Kecamatan, type Kelurahan } from "@/lib/regions"
 import {
@@ -135,7 +136,7 @@ export default function UserSettingPage() {
         }),
       })
 
-      const data = await response.json()
+      const data = await parseApiResponse(response)
 
       if (!response.ok) {
         throw new Error(data.error || data.message || "Gagal menyimpan profil")
